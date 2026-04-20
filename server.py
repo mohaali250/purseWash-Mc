@@ -3,7 +3,7 @@ import datetime
 cur = datetime.datetime.today()
 
 url="https://raw.githubusercontent.com/mohaali250/server_plan_predicter_pack/main/calibration.json"
-data = json.load(requests.get(url).text)
+data = json.loads(requests.get(url).text)
 
 oldcrt = data["Credits"]
 olddslp = data["Days_Since_last_pay"]
