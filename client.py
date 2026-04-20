@@ -24,13 +24,13 @@ pon = True
 difmonth = ""
 
 for i in range(1,365,1):
+    if i%7==ws: 
+        print(" "+cur.strftime("%B %Y") if difmonth != cur.strftime("%B %Y") else " ")
+        print()
+        difmonth = cur.strftime("%B %Y")
     dslp += 1
     crt += getd
     cur = cur + datetime.timedelta(days=1)
-    if i%7==ws: 
-        print(" "+str(cur.month) if difmonth != str(cur.month) else " ")
-        print()
-        difmonth = str(cur.month)
     if dslp > 30 and crt < rq:
         cron = False
     elif dslp > 30 and crt >= rq:
