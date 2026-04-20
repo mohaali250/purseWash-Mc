@@ -24,9 +24,6 @@ pon = True
 difmonth = ""
 
 for i in range(1,365,1):
-    dslp += 1
-    crt += getd
-    cur = cur + datetime.timedelta(days=1)
     if i%7==ws: 
         print(" "+str(cur)[:7] if difmonth != str(cur)[:7] else " ")
         print()
@@ -45,4 +42,7 @@ for i in range(1,365,1):
     print("\033[48;2;0;255;0m\033[38;2;0;0;0m" if cron else "\033[48;2;255;0;0m", end="")  
     print(f"{cur.day:0>2}", end="")
     print("\033[49m\033[39m", end="")
+    dslp += 1
+    crt += getd
+    cur = cur + datetime.timedelta(days=1)
     pon = cron
