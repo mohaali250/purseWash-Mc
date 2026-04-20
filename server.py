@@ -2,7 +2,7 @@ import datetime
 
 cur = datetime.datetime.today()
 
-url=""
+url="https://raw.githubusercontent.com/mohaali250/server_plan_predicter_pack/main/calibration.json"
 data = json.load(requests.get(url).text)
 
 oldcrt = data["Credits"]
