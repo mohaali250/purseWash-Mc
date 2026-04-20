@@ -19,7 +19,7 @@ dslp = (((cur-lupd).days)+olddslp)%(rq//getd)
 
 ws = cur.weekday()
 print(" Mon Tue Wed Thu Fri Sat Sun")
-print("  "*(ws+1), end="")
+print("    "*(ws+1), end="")
 pon = True
 difmonth = ""
 
