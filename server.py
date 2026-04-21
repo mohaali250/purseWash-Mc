@@ -1,6 +1,4 @@
-import datetime
-
-import json
+import datetime, json
 
 from java.net import URL
 from java.io import BufferedReader, InputStreamReader
