@@ -24,10 +24,6 @@ pon = True
 difmonth = ""
 
 for i in range(1,365,1):
-    if i%7==ws: 
-        print(" "+cur.strftime("%B %Y") if difmonth != cur.strftime("%B %Y") else " ")
-        print()
-        difmonth = cur.strftime("%B %Y")
     dslp += 1
     crt += getd
     cur = cur + datetime.timedelta(days=1)
@@ -39,10 +35,14 @@ for i in range(1,365,1):
         dslp = 0
     elif dslp <= 30 :
         cron = True
-    if i%7==ws:    
+    if cur.weekday() == 0:    
         pon = not cron    
     print("  " if pon != cron else ("\033[48;2;0;255;0m\033[38;2;0;0;0m  " if cron else "\033[48;2;255;0;0m  "),end="")    
     print("\033[48;2;0;255;0m\033[38;2;0;0;0m" if cron else "\033[48;2;255;0;0m", end="")  
     print(f"{cur.day:0>2}", end="")
     print("\033[49m\033[39m", end="")
+    if cur.weekday() == 6: 
+        print(" "+cur.strftime("%B %Y") if difmonth != cur.strftime("%B %Y") else " ")
+        print()
+        difmonth = cur.strftime("%B %Y")
     pon = cron
