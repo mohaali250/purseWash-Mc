@@ -67,7 +67,7 @@ def apply_state():
     now = datetime.datetime.utcnow().time()
     time_allowed = datetime.time(9, 0) <= now <= datetime.time(20, 15)
 
-    should_open = allowed and time_allowed
+    should_open = allowed if allowed else not time_allowed
 
     if should_open:
         Bukkit.setWhitelist(False)
