@@ -1,4 +1,4 @@
-import datetime, urllib
+import datetime, urllib, json
 
 cur = datetime.datetime.today()
 
@@ -46,7 +46,7 @@ def is_ok():
             dslp = 0
         elif dslp <= 30 :
             cron = True
-        if datetime.datetime.today() == cur:
+        if datetime.datetime.today().date() == cur.date():
             return not cron
 
 @EventHandler
