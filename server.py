@@ -1,4 +1,6 @@
 import datetime, urllib, json
+from org.bukkit.event.player import PlayerLoginEvent
+from org.bukkit.event import EventHandler
 
 cur = datetime.datetime.today()
 
