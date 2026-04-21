@@ -91,5 +91,9 @@ class Loop(Runnable):
     def run(self):
         apply_state()
 
+from org.bukkit import Bukkit
+
+plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
+
 # run every 60 seconds
-Bukkit.getScheduler().runTaskTimer(__plugin__, Loop(), 0, 20 * 60)
+Bukkit.getScheduler().runTaskTimer(plugin, Loop(), 0, 20 * 60)
