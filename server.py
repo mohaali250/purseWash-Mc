@@ -1,9 +1,27 @@
-import datetime
+import datetime, urllib
 
 cur = datetime.datetime.today()
 
 url="https://raw.githubusercontent.com/mohaali250/server_plan_predicter_pack/main/calibration.json"
-data = json.loads(requests.get(url).text)
+
+from java.net import URL
+from java.io import BufferedReader, InputStreamReader
+
+url = URL(url)
+conn = url.openConnection()
+conn.setRequestMethod("GET")
+
+reader = BufferedReader(InputStreamReader(conn.getInputStream()))
+response = ""
+
+line = reader.readLine()
+while line:
+    response += line
+    line = reader.readLine()
+
+reader.close()
+
+data = json.loads(response)
 
 oldcrt = data["Credits"]
 olddslp = data["Days_Since_last_pay"]
