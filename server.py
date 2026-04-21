@@ -70,10 +70,10 @@ def apply_state():
 
     if should_open:
         Bukkit.setWhitelist(False)
-        print("Server OPEN")
+        print("Server OPEN: ",allowed,time_allowed)
     else:
         Bukkit.setWhitelist(True)
-        print("Server CLOSED")
+        print("Server CLOSED: ",allowed,time_allowed)
 
         # kick non-whitelisted players
         for p in Bukkit.getOnlinePlayers():
