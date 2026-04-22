@@ -24,7 +24,7 @@ def fetch_data():
     response = ""
 
     line = reader.readLine()
-    while line is not none:
+    while line is not None:
         response += line
         line = reader.readLine()
 
