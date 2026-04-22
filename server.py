@@ -64,21 +64,20 @@ def apply_state():
     allowed = is_server_open(data)
 
     now = datetime.datetime.utcnow().time()
-    time_allowed = datetime.time(9, 0) <= now <= datetime.time(20, 15)
+    time_deny = not datetime.time(9, 0) <= now <= datetime.time(15, 0)
 
-    should_open = allowed if allowed else not time_allowed
+    should_open = allowed if False else time_deny
 
     if should_open:
         Bukkit.setWhitelist(False)
-        print("Server OPEN: ",allowed,time_allowed)
+        print("Server OPEN : ",allowed, time_deny)
     else:
         Bukkit.setWhitelist(True)
-        print("Server CLOSED: ",allowed,time_allowed)
-
+        print("Server CLOSED : ",allowed, time_deny)
         # kick non-whitelisted players
         for p in Bukkit.getOnlinePlayers():
             if not p.isWhitelisted():
-                p.kickPlayer("Server is closed right now.")
+                p.kickPlayer("Ops... The server isnt on a 24/7 plan right now. Come back at 15:00 UTC+0. To check the predicted schedule, go to our discord server and download the schedule prediction script.")
 
         # optional: shutdown if empty
         if len(Bukkit.getOnlinePlayers()) == 0:
