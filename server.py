@@ -64,8 +64,8 @@ def apply_state():
 
     now = datetime.datetime.utcnow()
 
-    start = now.replace(hour=9, minute=0, second=0, microsecond=0)
-    end = now.replace(hour=15, minute=0, second=0, microsecond=0)
+    start = now.replace(hour=8, minute=0, second=0, microsecond=0)
+    end = now.replace(hour=14, minute=0, second=0, microsecond=0)
     
     time_deny = not (start <= now <= end)
     
@@ -73,7 +73,7 @@ def apply_state():
 
     print(now)
 
-    if should_open or True:
+    if should_open:
         Bukkit.setWhitelist(False)
         print("Server OPEN : ",allowed, time_deny)
     else:
