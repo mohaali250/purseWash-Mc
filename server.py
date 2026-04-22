@@ -55,11 +55,7 @@ def is_server_open(data):
 # APPLY SERVER STATE
 # ------------------------
 def apply_state():
-    try:
-        data = fetch_data()
-    except Exception as ex:
-        print("Failed to fetch data : ",ex)
-        return
+    data = fetch_data()
 
     allowed = is_server_open(data)
 
