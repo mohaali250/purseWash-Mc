@@ -2,6 +2,7 @@ import datetime, json
 
 from java.net import URL
 from java.io import BufferedReader, InputStreamReader
+from java.util import Scanner
 
 from org.bukkit import Bukkit
 from java.lang import Runnable
