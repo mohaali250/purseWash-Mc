@@ -17,15 +17,22 @@ GETD = 10
 # HTTP FETCH (Java way)
 # ------------------------
 def fetch_data():
-    url = URL(URL_DATA)
-    stream = url.openStream()
-    scanner = Scanner(stream).useDelimiter("\\A")
-    response = ""
-    while scanner.hasNext():
-        response = response + scanner.next()
-    scanner.close()
-    return json.loads(response)
+    try:
+        stream = URL(URL_DATA).openStream()
+        scanner = Scanner(stream).useDelimiter("\\A")
+        response = scanner.next() if scanner.hasNext() else None
+        scanner.close()
 
+        if response is None or response.strip() == "":
+            print("Empty response from URL")
+            return None
+
+        print("RAW RESPONSE:", response[:200])
+        return json.loads(response)
+
+    except Exception as e:
+        print("fetch_data error:", e)
+        return None
 # ------------------------
 # CORE LOGIC (NO LOOP)
 # ------------------------
@@ -51,7 +58,8 @@ def is_server_open(data):
 # ------------------------
 def apply_state():
     data = fetch_data()
-
+    if data is None:
+        return
     allowed = is_server_open(data)
 
     now = datetime.datetime.utcnow()
