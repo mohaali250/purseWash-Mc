@@ -64,7 +64,7 @@ def apply_state():
     allowed = is_server_open(data)
 
     now = datetime.datetime.utcnow().time()
-    time_deny = not datetime.time(8, 0) <= now <= datetime.time(14, 0)
+    time_deny = not datetime.time(9, 0) <= now <= datetime.time(15, 0)
 
     should_open = allowed if False else time_deny
 
