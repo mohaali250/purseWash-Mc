@@ -69,7 +69,7 @@ def apply_state():
     
     time_deny = not (start <= now <= end)
     
-    should_open = allowed if False else time_deny
+    should_open = allowed if allowed else time_deny
 
     print(now)
 
