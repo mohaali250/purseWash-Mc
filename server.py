@@ -17,18 +17,10 @@ GETD = 10
 # ------------------------
 def fetch_data():
     url = URL(URL_DATA)
-    conn = url.openConnection()
-    conn.setRequestMethod("GET")
-
-    reader = BufferedReader(InputStreamReader(conn.getInputStream()))
-    response = ""
-
-    line = reader.readLine()
-    while line is not None:
-        response += line
-        line = reader.readLine()
-
-    reader.close()
+    stream = url.openStream()
+    scanner = Scanner(stream).useDelimiter("\\A")
+    response = scanner.next() if scanner.hasNext() else ""
+    scanner.close()
     return json.loads(response)
 
 # ------------------------
