@@ -54,7 +54,7 @@ def apply_state():
 
     allowed = is_server_open(data)
 
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.utcnow()
 
     start = now.replace(hour=9, minute=0, second=0, microsecond=0)
     end = now.replace(hour=15, minute=0, second=0, microsecond=0)
