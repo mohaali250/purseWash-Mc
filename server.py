@@ -20,7 +20,9 @@ def fetch_data():
     url = URL(URL_DATA)
     stream = url.openStream()
     scanner = Scanner(stream).useDelimiter("\\A")
-    response = scanner.next() if scanner.hasNext() else ""
+    response = ""
+    while scanner.hasNext():
+        response = response + scanner.next()
     scanner.close()
     return json.loads(response)
 
