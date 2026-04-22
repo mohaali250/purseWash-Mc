@@ -73,7 +73,7 @@ def apply_state():
 
     print(now)
 
-    if should_open:
+    if should_open or True:
         Bukkit.setWhitelist(False)
         print("Server OPEN : ",allowed, time_deny)
     else:
