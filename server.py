@@ -168,9 +168,18 @@ tips = [
     "purseWash was the name minehut randomly generated for this server"
 ]
 
-def send_random_tip():
-    tip = random.choice(tips)
+
+
+class randomtip(Runnable):
+    def send_random_tip(self):
+        try:
+            tip = random.choice(tips)
     Bukkit.broadcastMessage("§6FUN FACT - §f" + tip)
+        except Exception as ex:
+            Bukkit.getLogger().severe(
+                '[37412][24/7 Plan Script] Exception :'
+                .format(days_passed)
+            )
 
 
 plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
@@ -178,4 +187,4 @@ plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 # run every 60 seconds
 Bukkit.getScheduler().runTaskTimer(plugin, Loop, 0, 20 * 60)
 
-Bukkit.getScheduler().runTaskTimer(plugin, send_random_tip, 0, 20 * 300)
+Bukkit.getScheduler().runTaskTimer(plugin, randomtip, 0, 20 * 300)
