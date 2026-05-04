@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <title>purseWash MC Server</title>
+        <style>
+            #discord_btn {
+                background-image: url('https://logowik.com/content/uploads/images/discord-icon9600.logowik.com.webp');
+                background-size: cover;
+                position: absolute;
+                left: 6.5%;
+                width: 40%;
+                aspect-ratio: 18/14;
+                border: none;
+                cursor: pointer;
+                border: 2px solid #4c5fac;
+                border-radius: 10%;
+            }
+            #main_window {
+                width: 45%;
+                height: 60%;
+                background-color: #fff;
+                border: #8a8a8a 3px solid;
+                border-radius: 15px;
+                position: absolute;
+                top: 20%;
+                left: 27.5%;
+                container-type: inline-size;
+            }
+            #title {
+                text-align: center;
+                font-family: 'Arial', sans-serif;
+                color: #000000;
+            }
+            #server_status_btn {
+                position: absolute;
+                right: 6.5%;
+                width: 40%;
+                aspect-ratio: 18/14;
+                border-radius: 10%;
+                border: none;
+                background-color: #4c5fac;
+                color: white;
+                font-size: 20cqw;
+                cursor: pointer;
+            }
+            body {
+                background-image: url('home_background.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-position: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main_window">
+            <div>
+                <h1 id="title">Welcome to the official purseWash MC server Website!</h1>
+            </div>
+            <button id="server_status_btn" title="Check when the server is available 24/7" onclick="window.location.href='../plan/serv_pln.html';">📅</button>
+            <button title="Join our Discord Server" onclick="window.location.href='https://discord.gg/MucMkx2yPE';" id="discord_btn"></button>
+        </div>
+    </body>
+</html>
