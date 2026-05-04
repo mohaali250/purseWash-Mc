@@ -168,12 +168,14 @@ tips = [
     "purseWash was the name minehut randomly generated for this server"
 ]
 
+def chcol(msg):
+    return ChatColor.translateAlternateColorCodes('&', msg)
 
 
 def randomtip(task):
     try:
     	tip = random.choice(tips)
-    	Bukkit.broadcastMessage("\u00A76FUN FACT - \u00A7f" + tip)
+    	Bukkit.broadcastMessage(chcol("&6FUN FACT - &f") + tip)
     except Exception as ex:
     	Bukkit.getLogger().severe(
         	'[37412][24/7 Plan Script] Exception : {}'
