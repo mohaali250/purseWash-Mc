@@ -10,8 +10,6 @@ from java.lang import Runnable
 # CONFIG
 URL_DATA = "https://raw.githubusercontent.com/mohaali250/server_plan_predicter_pack/main/calibration.json"
 
-RQ = 400
-GETD = 10
 
 # ------------------------
 # HTTP FETCH (Java way)
@@ -39,19 +37,55 @@ def fetch_data():
 def is_server_open(data):
     now = datetime.datetime.utcnow()
 
-    oldcrt = data["Credits"]
-    olddslp = data["Days_Since_last_pay"]
+    crt = data["Credits"]
+    dslp = data["Days_Since_last_pay"]
     lupd = datetime.datetime(*data["Last_Updated"])
+    rq = data["required_credits"]
+    getd = data["daily_credits"]
+    data_type = data["load_type"]
 
     days_passed = (now - lupd).days
 
-    crt = (oldcrt + days_passed * GETD) % RQ
-    dslp = (olddslp + days_passed) % (RQ // GETD)
+    if data_type != "absolute":
+        Bukkit.getLogger().warning(f"[37412][24/7 Plan Script] Data type (\"{data_type}\") is invalid. Assuming data type is \"absolute\"")
+    if days_passed < 0:
+        Bukkit.getLogger().severe(f"[37412][24/7 Plan Script] Variable days_passed returns an unhandelable value ({days_passed}), Please review and reset the calibration.json file")
+    if dslp < 0:
+        Bukkit.getLogger().warning(f"[37412][24/7 Plan Script] Variable dslp returns an unhandelable value ({dslp}), Consider checking the calibration.json file. Setting value to the default (30)")
+        dslp = 30
+    cur = lupd
+    cron = False
 
-    # decision logic
-    if dslp > 30 and crt < RQ:
+    for i in range(days_passed):
+        cron = False
+        dslp += 1
+        crt += getd
+        cur = cur + datetime.timedelta(days=1)
+        if dslp > 30:
+            if crt >= rq:
+                crt -= rq
+                dslp = 0
+                cron = True
+            else:
+                cron = False
+        else:
+            cron = True
+    if days_passed < 1:
+        cron = False
+        if dslp > 30:
+            if crt >= rq:
+                crt -= rq
+                dslp = 0
+                cron = True
+            else:
+                cron = False
+        else:
+            cron = True
+    return cron
+    """
+    if dslp > 30 and crt < rq:
         return False
-    return True
+    return True"""
 
 # ------------------------
 # APPLY SERVER STATE
@@ -82,7 +116,7 @@ def apply_state():
         # kick non-whitelisted players
         for p in Bukkit.getOnlinePlayers():
             if not p.isWhitelisted():
-                p.kickPlayer("Ops... The server isnt on a 24/7 plan right now. Come back at 15:00 UTC+0. To check the predicted schedule, go to our discord server and download the schedule prediction script.")
+                p.kickPlayer("Ops... The server isnt on a 24/7 plan right now. Come back at 15:00 UTC+0. To check the predicted schedule, go to our discord server and download the schedule prediction script. Or alternatively use the link to check the web version")
 
         # optional: shutdown if empty
         if len(Bukkit.getOnlinePlayers()) == 0:
@@ -95,7 +129,6 @@ class Loop(Runnable):
     def run(self):
         apply_state()
 
-from org.bukkit import Bukkit
 
 plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 
