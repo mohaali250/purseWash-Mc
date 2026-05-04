@@ -171,7 +171,7 @@ tips = [
 
 
 class randomtip(Runnable):
-    def send_random_tip(self):
+    def run(self):
         try:
             tip = random.choice(tips)
     Bukkit.broadcastMessage("§6FUN FACT - §f" + tip)
@@ -185,6 +185,6 @@ class randomtip(Runnable):
 plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 
 # run every 60 seconds
-Bukkit.getScheduler().runTaskTimer(plugin, Loop, 0, 20 * 60)
+Bukkit.getScheduler().runTaskTimer(plugin, Loop(), 0, 20 * 60)
 
-Bukkit.getScheduler().runTaskTimer(plugin, randomtip, 0, 20 * 300)
+Bukkit.getScheduler().runTaskTimer(plugin, randomtip(), 0, 20 * 300)
