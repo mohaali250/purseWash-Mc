@@ -47,11 +47,11 @@ def is_server_open(data):
     days_passed = (now - lupd).days
 
     if data_type != "absolute":
-        Bukkit.getLogger().warning(f"[37412][24/7 Plan Script] Data type (\"{data_type}\") is invalid. Assuming data type is \"absolute\"")
+        Bukkit.getLogger().warning(f'[37412][24/7 Plan Script] Data type ("{data_type}") is invalid. Assuming data type is "absolute"')
     if days_passed < 0:
-        Bukkit.getLogger().severe(f"[37412][24/7 Plan Script] Variable days_passed returns an unhandelable value ({days_passed}), Please review and reset the calibration.json file")
+        Bukkit.getLogger().severe(f'[37412][24/7 Plan Script] Variable days_passed returns an unhandelable value ({days_passed}), Please review and reset the calibration.json file')
     if dslp < 0:
-        Bukkit.getLogger().warning(f"[37412][24/7 Plan Script] Variable dslp returns an unhandelable value ({dslp}), Consider checking the calibration.json file. Setting value to the default (30)")
+        Bukkit.getLogger().warning(f'[37412][24/7 Plan Script] Variable dslp returns an unhandelable value ({dslp}), Consider checking the calibration.json file. Setting value to the default (30)')
         dslp = 30
     cur = lupd
     cron = False
