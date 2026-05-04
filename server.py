@@ -131,15 +131,14 @@ def apply_state():
 # ------------------------
 # SCHEDULER (runs every 60s)
 # ------------------------
-class Loop(Runnable):
-    def run(self):
-        try:
-            apply_state()
-        except Exception as ex:
-            Bukkit.getLogger().severe(
-                '[37412][24/7 Plan Script] Exception :'
-                .format(days_passed)
-            )
+class Loop():
+    try:
+        apply_state()
+    except Exception as ex:
+        Bukkit.getLogger().severe(
+            '[37412][24/7 Plan Script] Exception :'
+            .format(days_passed)
+        )
 
 tips = [
     "Use /trigger ping set <Rank of ping: 1 to 5> to ping afk staff",
@@ -170,21 +169,20 @@ tips = [
 
 
 
-class randomtip(Runnable):
-    def run(self):
-        try:
-            tip = random.choice(tips)
-    Bukkit.broadcastMessage("§6FUN FACT - §f" + tip)
-        except Exception as ex:
-            Bukkit.getLogger().severe(
-                '[37412][24/7 Plan Script] Exception :'
-                .format(days_passed)
-            )
+def randomtip():
+     try:
+        tip = random.choice(tips)
+        Bukkit.broadcastMessage("§6FUN FACT - §f" + tip)
+    except Exception as ex:
+        Bukkit.getLogger().severe(
+            '[37412][24/7 Plan Script] Exception : {}'
+            .format(ex)
+     )
 
 
 plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 
 # run every 60 seconds
-Bukkit.getScheduler().runTaskTimer(plugin, Loop(), 0, 20 * 60)
+Bukkit.getScheduler().runTaskTimer(plugin, Loop, 0, 20 * 60)
 
-Bukkit.getScheduler().runTaskTimer(plugin, randomtip(), 0, 20 * 300)
+Bukkit.getScheduler().runTaskTimer(plugin, randomtip, 0, 20 * 300)
