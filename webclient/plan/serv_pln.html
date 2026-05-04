@@ -1,0 +1,369 @@
+<html>
+    <head>
+        <title>purseWash MC Server</title>
+        <style>
+            .cld_btn {
+                border: none;
+                color: white;
+                font-size: 20px;
+                cursor: default;
+                border-radius: 5px;
+            }
+            .weekdays_btn {
+                border: none;
+                color: white;
+                font-size: 16px;
+                cursor: default;
+                border-radius: 5px;
+            }
+            .month_div {
+                justify-content: center;
+                align-items: center;
+                border: none;
+            }
+            .mth_btn {
+                border: none;
+                color: white;
+                font-size: 16px;
+                cursor: default;
+                border-radius: 5px;
+                position:sticky;
+            }
+            .status_off {
+                background-color: #ff0000;
+                border : #8a8a8a 2px solid;
+                color:#ffffff;
+                border-radius: 10px;
+                width: 50%;
+                aspect-ratio: 5/1;
+                margin-left:25%;
+                font:bold 16px Arial, sans-serif;
+            }
+            .status_on {
+                background-color: #00ff00;
+                border : #8a8a8a 2px solid;
+                color:#000000;
+                border-radius: 10px;
+                width: 50%;
+                aspect-ratio: 5/1;
+                margin-left:25%;
+                font:bold 16px Arial, sans-serif;
+            }
+            .status_mild {
+                background-color: #ffcc00;
+                border : #8a8a8a 2px solid;
+                color:#000000;
+                border-radius: 10px;
+                width: 50%;
+                aspect-ratio: 5/1;
+                margin-left:25%;
+                font:bold 16px Arial, sans-serif;
+            }
+            #tooltip {
+              position: fixed;
+              background: rgba(0,0,0,0.85);
+              color: white;
+              padding: 6px 10px;
+              border-radius: 6px;
+              font-size: 12px;
+
+              pointer-events: none;
+              opacity: 0;
+              transform: translate(10px, 10px);
+
+              transition: opacity 0.05s ease;
+              z-index: 9999;
+            }
+            
+            #main_window {
+                width: 65%;
+                height: 85%;
+                background-color: #fff;
+                border: #8a8a8a 3px solid;
+                border-radius: 15px;
+                position: absolute;
+                top: 10%;
+                left: 20%;
+                container-type: inline-size;
+            }
+            #weekdays {
+                display: grid;
+                grid-template-columns: repeat(8, 1fr); /* 7 days */
+                gap: 4px;
+                width: 100%;
+                height: 5%;
+                top:0;
+                border: none;
+                position: sticky;
+                box-sizing: border-box;
+            }
+            #title {
+                text-align: center;
+                font-family: 'Arial', sans-serif;
+                color: #000000;
+            }
+            #exit_btn {
+                position: absolute;
+                width: 15%;
+                height: 5%;
+                border-radius: 15px;
+                border: none;
+                background-color: #c52700;
+                color: white;
+                font-size: 20px;
+                cursor: pointer;
+                top: 10px;
+            }
+            #desc {
+                display: block;
+                text-align: center;
+                font-family: 'Arial', sans-serif;
+                color: #000000;
+                text-align: justify;
+                font-size: 15px;
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+            #monthdays {
+                display: grid;
+                grid-template-columns: repeat(8, 1fr); /* 8 columns including the day of the week */
+                gap: 4px;
+                border: none;
+                margin-top: 10px;
+                margin-left: 0%;
+                padding: 0px;
+                box-sizing: border-box;
+                grid-auto-rows: 25px; 
+            }
+            #calendar {
+                gap: 4px;
+                width: 85%;
+                height: clamp(20px, 50%, 300px);
+                border: 2px solid #8a8a8a;
+                border-radius: 15px;
+                margin-top: 20px;
+                margin-left: 6.5%;
+                padding: 10px;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            body {
+                background-image: url('plan_background.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-position: center;
+            }
+        </style>
+        <script>
+            
+            async function fetchData() {
+                // get data from github
+                const response = await fetch("https://raw.githubusercontent.com/mohaali250/server_plan_predicter_pack/refs/heads/main/calibration.json");
+                data = await response.json();
+                //start generating the calendar
+                console.log(data)
+                genCal();
+            }
+            
+            
+            function fixweekday(num) {
+                return (num + 6) % 7
+            }
+            function getDays(millisec) {
+                return Math.floor(millisec / (1000 * 60 * 60 * 24))
+            }
+            
+            function genBTN(num, color, classname = "cld_btn",visible = true, title = "") {
+                let btn = document.createElement("button");
+                btn.innerHTML = num;
+                btn.className = classname;
+                btn.style.backgroundColor = color;
+                btn.style.visibility = visible ? "visible" : "hidden";
+                btn.title = title;
+                return btn;
+            }
+            function genCal() {
+
+                if (data["load_type"] != "absolute") {return;}
+
+                // variables
+                let lm = new Date().getMonth()-1
+                // constants
+                const rq = data["required_credits"]
+                const getd = data["daily_credits"]
+                // initial
+                let oldcrt = data["Credits"]
+                let olddslp = data["Days_Since_last_pay"]
+                // transform and update values
+                let lupd = new Date(
+                    data["Last_Updated"][0],
+                    data["Last_Updated"][1] - 1,
+                    data["Last_Updated"][2]
+                );
+
+                let tdeny = data["time_deny"]
+
+                let cur = lupd;
+
+                //let crt = 30 <= dslp ? (oldcrt + (getDays(cur - lupd) * getd)) % rq : (oldcrt + (getDays(cur - lupd) * getd))
+                //let dslp = rq <= crt ? (getDays(cur - lupd) + olddslp) % Math.floor(rq / getd) : (getDays(cur - lupd) + olddslp);
+                let crt = oldcrt
+                let dslp = olddslp
+                //TODO : Rearrange the grid button placement to fit to its exact day of the week
+                let startOffset = fixweekday(cur.getDay());
+                
+                for (const i of ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].keys()) {
+                    document.getElementById("weekdays")
+                        .appendChild(genBTN(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i], "#ffaa00", "weekdays_btn"));
+                }
+
+                for (let i = 0; i < startOffset+1; i++) {
+                    document.getElementById("monthdays")
+                        .appendChild(genBTN(new Date((cur-(startOffset*(1000*60*60*24)))+i*(1000*60*60*24)).getDate(), "#cccccc"));
+                }
+
+                const days_in_advance = 365
+
+                // loop
+                for (let i = 1; i < days_in_advance; i++) {
+                    let cron = false;
+                    dslp += 1
+                    crt += getd
+                    cur.setDate(cur.getDate() + 1);
+                    if (dslp > 30 && crt < rq)
+                    {
+                        cron = false
+                    }
+                    else if (dslp > 30 && crt >= rq)
+                    {
+                        cron = true;
+                        crt -= rq;
+                        dslp = 0;
+                    }
+                    else if (dslp <= 30) 
+                    {
+                        cron = true
+                    }
+
+                    const utcStartString = "2026-05-02T"+tdeny[0]+":00:00Z";
+                    const utc_time_start = new Date(utcStartString);
+
+                    const utcEndString = "2026-05-02T"+tdeny[1]+":00:00Z";
+                    const utc_time_end = new Date(utcEndString);
+
+                    if (fixweekday(new Date(cur).getDay()) == 0)
+                    {
+                        if (cur.getMonth() != lm && cur.getDate() != 1)
+                        {
+                            lm = cur.getMonth()
+                            let y = document.createElement("div");
+                            y.className = "month_div";
+                            y.style.height = fixweekday(new Date(cur.getFullYear(), cur.getMonth()+1, 1).getDay()) == 0
+                                ? Math.floor((new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate()-cur.getDate()+7)/7)*29+25+"px"
+                                : Math.floor((new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate()-cur.getDate()+7)/7)*29-4+"px";
+                            y.className = "month_div";
+                            let mh = genBTN(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][cur.getMonth()]+ " " + cur.getFullYear(), "#5555ff", "mth_btn");
+                            //let mh = genBTN(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][cur.getMonth()]+ " " +  fixweekday(new Date(cur.getFullYear(), cur.getMonth()+1, 1).getDay()), "#5555ff", "mth_btn");
+                            y.appendChild(mh);
+                            mh.style.width = "100%";
+                            mh.style.top = "25px";
+                            document.getElementById("monthdays").appendChild(y);
+                        } else {
+                            document.getElementById("monthdays")
+                                .appendChild(genBTN("", "#5555ff","cld_btn", false));
+                        }
+                    } 
+                    let strs = `${cur.getDate()}-${cur.getMonth()+1}-${cur.getFullYear()} : ${cron ? "Covered (Available 24/7)" : "Not Covered (Opens at "+utc_time_end.toLocaleTimeString()+")"}`
+                    document.getElementById("monthdays")
+                        .appendChild(genBTN(new Date(cur).getDate(), (new Date().getFullYear() === cur.getFullYear() && new Date().getMonth() === cur.getMonth() && new Date().getDate() === cur.getDate()) ? "#cc11ee" : cron ? "#00ff00" : "#ff0000", "cld_btn", true, strs));
+
+                    if (new Date().getFullYear() === cur.getFullYear() && new Date().getMonth() === cur.getMonth() && new Date().getDate() === cur.getDate()) {
+                        const hour = new Date().getUTCHours();
+                        document.getElementById("status").textContent = cron ? 
+                            "Available 24/7" : 
+                                !(tdeny[0] < hour && hour < tdeny[1]) ? 
+                                        (tdeny[0] < hour || hour < tdeny[1]) ? 
+                                            "Availability unlikely (Reopens at "+utc_time_end.toLocaleTimeString()+")" : 
+                                        "Opens at " + utc_time_end.toLocaleTimeString() :
+                                        "Guaranteed Availability until " + new Date(utc_time_end.getFullYear(), utc_time_end.getMonth(), utc_time_end.getDate(), (utc_time_end.isDstObserved() ? 
+                                    tdeny[1]+1 : 
+                            tdeny[1]) + 4).toLocaleTimeString();
+                        document.getElementById("status").className = cron ? "status_on" : !(tdeny[0] < hour && hour < tdeny[1]) ? (tdeny[0] < hour || hour < tdeny[1]) ? "status_mild" : "status_off" : "status_on";
+                    }
+                    
+                }
+                const tooltip = document.getElementById("tooltip");
+
+                let active = false;
+
+                document.addEventListener("mousemove", (e) => {
+                  if (!active) return;
+                
+                  tooltip.style.left = e.clientX + "px";
+                  tooltip.style.top = e.clientY + "px";
+                });
+
+                document.querySelectorAll(".cld_btn").forEach(el => {
+                
+                  el.addEventListener("mouseenter", (e) => {
+                    const text = el.title;
+                
+                    if (!text) return;
+                
+                    tooltip.textContent = text;
+                    tooltip.style.opacity = 1;
+                
+                    active = true;
+                    el.dataset.oldTitle = el.title;
+                    el.title = "";
+                  });
+              
+                  el.addEventListener("mouseleave", () => {
+                    tooltip.style.opacity = 0;
+                    active = false;
+                    el.title = el.dataset.oldTitle;
+                  });
+                });
+            }
+
+            let data;
+
+            Date.prototype.stdTimezoneOffset = function () {
+                var jan = new Date(this.getFullYear(), 0, 1);
+                var jul = new Date(this.getFullYear(), 6, 1);
+                return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+            }
+            
+            Date.prototype.isDstObserved = function () {
+                return this.getTimezoneOffset() < this.stdTimezoneOffset();
+            }
+
+            window.onload = function() {
+                fetchData();
+            };
+        </script>
+    </head>
+    <body>
+        <button id="exit_btn" title="Go back to main page" onclick="window.location.href='../home/Home.html';">Home</button>
+        <div id="main_window">
+            <div>
+                <h1 id="title">24/7 Plan</h1>
+                <span id="desc">Since the server runs on a free plan, its only available for 4 hours a day, but with credits we can collect them to pay for the 24/7 plan, however to coloect enough credits,we need 40 days, so, only 30 out of 40 days are available for the 24/7 plan. check the calender below to see if the next days are gonna be covered by the 24/7 plan</span>
+            </div>
+        <div id="calendar">
+            <div id="weekdays">
+            </div>
+            <div id="monthdays">
+            </div>
+            <div id="months">
+            </div>
+        </div>
+        <div>
+            <h3 id="status_text">Current Server status: </h3>
+            <button id="status">Status</button>
+        </div>
+        <span style="margin-left:5px;margin-right:5px;">Note: This is not accurate as minehut doesnt expose its api to developers. To calculate this info on your screen we use data outside of minehut, which can be inaccurate, lose accuracy over time or displaying outdated info.<br> Also, if even the owner misses a day to claim the credits, it will delay the 24/7 plan, so dont assume the current AND future info will stay the same, and to be accurate. This calendar is to give you an idea of when the server will be covered by the 24/7 plan. </span>
+        <div id="tooltip"></div>
+    </body>
+</html> 
