@@ -132,7 +132,7 @@ def apply_state():
 # ------------------------
 # SCHEDULER (runs every 60s)
 # ------------------------
-def Loop():
+def Loop(task):
     try:
         apply_state()
     except Exception as ex:
@@ -170,7 +170,7 @@ tips = [
 
 
 
-def randomtip():
+def randomtip(task):
     try:
     	tip = random.choice(tips)
     	Bukkit.broadcastMessage("§6FUN FACT - §f" + tip)
