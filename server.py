@@ -1,4 +1,5 @@
-import datetime, json
+# -*- coding: utf-8 -*-
+import datetime, json, random
 
 from java.net import URL
 from java.io import BufferedReader, InputStreamReader
@@ -131,7 +132,7 @@ def apply_state():
 # ------------------------
 # SCHEDULER (runs every 60s)
 # ------------------------
-class Loop():
+def Loop():
     try:
         apply_state()
     except Exception as ex:
@@ -170,12 +171,12 @@ tips = [
 
 
 def randomtip():
-     try:
-        tip = random.choice(tips)
-        Bukkit.broadcastMessage("§6FUN FACT - §f" + tip)
+    try:
+    	tip = random.choice(tips)
+    	Bukkit.broadcastMessage("§6FUN FACT - §f" + tip)
     except Exception as ex:
-        Bukkit.getLogger().severe(
-            '[37412][24/7 Plan Script] Exception : {}'
+    	Bukkit.getLogger().severe(
+        	'[37412][24/7 Plan Script] Exception : {}'
             .format(ex)
      )
 
