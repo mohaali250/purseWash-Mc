@@ -6,5 +6,7 @@
         4,
         27
     ],
-    "load_type":"absolute"
+    "load_type":"absolute",
+    "required_credits":400,
+    "daily_credits":10
 }
