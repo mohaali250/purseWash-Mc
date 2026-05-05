@@ -6,6 +6,7 @@ from java.io import BufferedReader, InputStreamReader
 from java.util import Scanner
 
 from org.bukkit import Bukkit
+from org.bukkit import ChatColor
 from java.lang import Runnable
 
 # CONFIG
