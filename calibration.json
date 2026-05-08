@@ -9,5 +9,5 @@
     "load_type":"absolute",
     "required_credits":400,
     "daily_credits":10,
-    "time_deny":[8,14]
+    "time_deny":[9,15]
 }
