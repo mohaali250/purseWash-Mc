@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime, json, random
+import datetime, json, random, time
 
 from java.net import URL
 from java.io import BufferedReader, InputStreamReader
@@ -109,8 +109,10 @@ def apply_state():
 
     now = datetime.datetime.utcnow()
 
-    start = now.replace(hour=8, minute=0, second=0, microsecond=0)
-    end = now.replace(hour=14, minute=0, second=0, microsecond=0)
+    is_summer = time.localtime().tm_isdst > 0
+
+    start = now.replace(hour=data["time_deny"][0]+(-1 if is_summer else 0), minute=0, second=0, microsecond=0)
+    end = now.replace(hour=data["time_deny"][1]+(-1 if is_summer else 0), minute=0, second=0, microsecond=0)
     
     time_deny = not (start <= now <= end)
     
