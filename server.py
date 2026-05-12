@@ -163,7 +163,7 @@ def Loop(task):
         apply_state()
     except Exception as ex:
         Bukkit.getLogger().severe(
-            '[37412][24/7 Plan Script] Exception :'
+            '[37412][24/7 Plan Script] Exception : {}'
             .format(ex)
         )
 
