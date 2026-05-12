@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime, json, random, time
+import datetime, json, random, time, pytz
 
 from java.net import URL
 from java.io import BufferedReader, InputStreamReader
@@ -107,12 +107,12 @@ def apply_state():
         return
     allowed = is_server_open(data)
 
-    now = datetime.datetime.utcnow()
+    tz = pytz.timezone("Europe/Lisbon")
 
-    is_summer = time.localtime().tm_isdst > 0
+    now = datetime.now(tz)
 
-    start = now.replace(hour=data["time_deny"][0]+(-1 if is_summer else 0), minute=0, second=0, microsecond=0)
-    end = now.replace(hour=data["time_deny"][1]+(-1 if is_summer else 0), minute=0, second=0, microsecond=0)
+    start = now.replace(hour=data["time_deny"][0], minute=0, second=0, microsecond=0)
+    end = now.replace(hour=data["time_deny"][1], minute=0, second=0, microsecond=0)
     
     time_deny = not (start <= now <= end)
     
