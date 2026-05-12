@@ -107,7 +107,7 @@ def apply_state():
         return
     allowed = is_server_open(data) 
 
-    now = datetime.now()+datetime.timedelta(seconds=time.timezone)
+    now = datetime.datetime.now()+datetime.timedelta(seconds=time.timezone)
 
     start = now.replace(hour=data["time_deny"][0], minute=0, second=0, microsecond=0)
     end = now.replace(hour=data["time_deny"][1], minute=0, second=0, microsecond=0)
