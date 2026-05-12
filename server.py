@@ -12,6 +12,29 @@ from java.lang import Runnable
 # CONFIG
 URL_DATA = "https://raw.githubusercontent.com/mohaali250/server_plan_predicter_pack/main/calibration.json"
 
+# time
+
+def last_sunday(year, month):
+    # go to last day of month
+    d = datetime.datetime(year, month, 31)
+
+    # step back until Sunday (weekday() == 6 in Python where Monday=0)
+    while d.weekday() != 6:
+        d -= datetime.timedelta(days=1)
+
+    return d
+
+
+def is_lisbon_dst(now_utc):
+    year = now_utc.year
+
+    # DST start/end (UTC times)
+    dst_start = last_sunday(year, 3).replace(hour=1)
+    dst_end = last_sunday(year, 10).replace(hour=1)
+
+    return dst_start <= now_utc < dst_end
+
+
 
 # ------------------------
 # HTTP FETCH (Java way)
@@ -107,7 +130,9 @@ def apply_state():
         return
     allowed = is_server_open(data) 
 
-    now = datetime.datetime.now()+datetime.timedelta(seconds=time.timezone)
+    now = datetime.datetime.utcnow()
+
+    now = now.replace(hours=now.hour+(1 if is_lisbon_dst(now.year) else 0))
 
     start = now.replace(hour=data["time_deny"][0], minute=0, second=0, microsecond=0)
     end = now.replace(hour=data["time_deny"][1], minute=0, second=0, microsecond=0)
