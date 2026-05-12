@@ -132,7 +132,7 @@ def apply_state():
 
     now = datetime.datetime.utcnow()
 
-    now = now.replace(hours=now.hour+(1 if is_lisbon_dst(now.year) else 0))
+    now = now + datetime.timedelta(hours=(1 if is_lisbon_dst(now) else 0))
 
     start = now.replace(hour=data["time_deny"][0], minute=0, second=0, microsecond=0)
     end = now.replace(hour=data["time_deny"][1], minute=0, second=0, microsecond=0)
