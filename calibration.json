@@ -11,5 +11,6 @@
     "daily_credits":10,
     "time_deny":[9,15],
     "time_played":[],
-    "boost_timestamp":[]
+    "boost_timestamp":[],
+    "last_boost_number":0,
 }
