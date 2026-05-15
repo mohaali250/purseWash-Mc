@@ -10,5 +10,6 @@
     "required_credits":400,
     "daily_credits":10,
     "time_deny":[9,15],
-    "time_played":[]
+    "time_played":[],
+    "boost_timestamp":[]
 }
