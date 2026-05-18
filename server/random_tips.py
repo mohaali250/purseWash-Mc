@@ -53,7 +53,6 @@ def randomtip(task):
 
 plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 
-# run every 60 seconds
-Bukkit.getScheduler().runTaskTimer(plugin, Loop, 0, 20 * 60)
+# run every 300 seconds
 
 Bukkit.getScheduler().runTaskTimer(plugin, randomtip, 0, 20 * 300)
