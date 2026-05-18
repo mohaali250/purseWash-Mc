@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+import datetime, json, random, time
+
+from java.net import URL
+from java.io import BufferedReader, InputStreamReader
+from java.util import Scanner
+
+from org.bukkit import Bukkit
+from org.bukkit import ChatColor
+from java.lang import Runnable
 
 tips = [
     "Use /trigger ping set <Rank of ping: 1 to 5> to ping afk staff",
