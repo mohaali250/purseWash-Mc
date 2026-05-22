@@ -10,7 +10,7 @@ from org.bukkit import ChatColor
 from java.lang import Runnable
 
 # CONFIG
-URL_DATA = "https://raw.githubusercontent.com/mohaali250/server_plan_predicter_pack/main/calibration.json"
+URL_DATA = "https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/pln_time.json"
 
 # time
 
