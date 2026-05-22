@@ -3,7 +3,7 @@
   [
     {"content":"&6&lFUN FACT - &r&n&fUse /trigger ping set <Rank of ping: 1 to 5> to ping afk staff","tooltip":"Ping a staff member","do":{"suggest_command":"/trigger ping set "}},
     {"content":"&4&lNOT SO FUN FACT - &r&fCheating will result in a temporary ban with no chance of appeal","tooltip":"","do":{}},
-    {"content":"&6&lFUN FACT - &r&n&fJoin our Discord by typing /trigger discord","tooltip":"Click to join discord","do":{"run_local_command":"/trigger discord"}},
+    {"content":"&6&lFUN FACT - &r&n&fJoin our Discord by typing /trigger discord","tooltip":"Click to join discord","do":{"run_command":"/trigger discord"}},
     {"content":"&6&lFUN FACT - &r&fTalismans grant more Health and mining speed","tooltip":"","do":{}},
     {"content":"Thank you for playing, Player","tooltip":"","do":{}},
     {"content":"&6&lFUN FACT - &r&fBoosting the discord server or this server, is highly apreciated","tooltip":"","do":{}},
@@ -14,8 +14,8 @@
     {"content":"&4&lNOT SO FUN FACT - &r&fSpamming the mine reset button, ping and flooding chat is not allowed","tooltip":"","do":{}},
     {"content":"&6&lFUN FACT - &r&fBe nice","tooltip":"","do":{}},
     {"content":"&6&lFUN FACT - &r&fThe higher rank staff are always open to suggestions","tooltip":"","do":{}},
-    {"content":"&6&lFUN FACT - &r&n&fReport a player in discord /trigger discord","tooltip":"Click to join discord","do":{"run_local_command":"/trigger discord"}},
-    {"content":"&6&lFUN FACT - &r&n&fIf you a stuck somewhere do /trigger spawn","tooltip":"Click to teleport","do":{"run_local_command":"/trigger spawn"}},
+    {"content":"&6&lFUN FACT - &r&n&fReport a player in discord /trigger discord","tooltip":"Click to join discord","do":{"run_command":"/trigger discord"}},
+    {"content":"&6&lFUN FACT - &r&n&fIf you a stuck somewhere do /trigger spawn","tooltip":"Click to teleport","do":{"run_command":"/trigger spawn"}},
     {"content":"&6&lFUN FACT - &r&n&fFavouriting the server helps it grow /fav","tooltip":"Click favourite the server","do":{"suggest_command":"/fav"}},
     {"content":"&4&lNOT SO FUN FACT - &r&fTalking about NSFW Topics results in a permanent ban wiith no chance of appeal","tooltip":"","do":{}},
     {"content":"&6&lFUN FACT - &r&fBe creative at the free build arena","tooltip":"","do":{}},
@@ -32,7 +32,7 @@
     {"content":"&6&lFUN FACT - &r&fUse Fast CMD Dial book to skip typing the command","tooltip":"","do":{}},
     {"content":"&6&lFUN FACT - &r&fRead the rules at spawn","tooltip":"","do":{}},
     {"content":"&6&lFUN FACT - &r&n&fI am something of a programmer myself :3","tooltip":"Meow :3","do":{}},
-    {"content":"&b&lBORING FACT - &r&n&fYou cant teleport to the command block room using the command book nor /trigger cmdroom","tooltip":"Try it","do":{"run_local_command":"/trigger cmdroom"}},
+    {"content":"&b&lBORING FACT - &r&n&fYou cant teleport to the command block room using the command book nor /trigger cmdroom","tooltip":"Try it","do":{"run_command":"/trigger cmdroom"}},
     {"content":"&6&lFUN FACT - &r&f&kjdywqhkdsiu&r is where you can get admin items, you're welcome","tooltip":"Welp i guess no admin items for you","do":{}}
   ]
 }
