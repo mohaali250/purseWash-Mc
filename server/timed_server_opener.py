@@ -158,7 +158,7 @@ def apply_state():
 # ------------------------
 # SCHEDULER (runs every 60s)
 # ------------------------
-def Loop(task):
+def Loop():
     try:
         apply_state()
     except Exception as ex:
