@@ -61,5 +61,5 @@ plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 if __name__ == "__main__":
     data = fetch_data()
     if data is None:
-        return
+        print("Nothing returned")
     Bukkit.getScheduler().runTaskTimer(plugin, randomtip, 0, 20 * 300)
