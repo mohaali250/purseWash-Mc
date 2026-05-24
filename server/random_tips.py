@@ -47,7 +47,7 @@ def randomtip(task):
         
     	Bukkit.dispatchCommand(
             Bukkit.getConsoleSender(),
-            ,cmd
+            cmd
         )
     except Exception as ex:
     	Bukkit.getLogger().severe(
