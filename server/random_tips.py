@@ -33,7 +33,7 @@ def chcol(msg):
     return ChatColor.translateAlternateColorCodes('&', msg)
 
 
-def randomtip(task):
+def randomtip():
     try:
         tip = random.choice(data["tips"])
         
