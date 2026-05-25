@@ -34,32 +34,64 @@ def chcol(msg):
 
 
 def randomtip():
+
     try:
+
         tip = random.choice(data["tips"])
-        
-        start = "/tellraw @a "
-        click = "\"click_event\":{\"action\":\"" + list(tip["do"].keys())[0] + "\",\"command\":\"" + tip["do"][list(tip["do"].keys())[0]] + "\"" if len(list(tip["do"].keys())) != 0 else ""
-        hover = "\"hover_event\":{\"action\":\"show_text\",\"value\":\"" + tip["tooltip"] + "\"" if len(tip["tooltip"]) != 0 else ""
-        content = "\"text\":\"" + chcol(tip["content"]) + "\""
-        end = ""
-        
-        cmd = start + "{" + ",".join([i for i in [click,hover,content] if i != ""]) + "}" + end
-        
-    	Bukkit.dispatchCommand(
+
+        parts = []
+
+        parts.append(
+            "\"text\":\"" + tip["content"].replace("\"","\\\"") + "\""
+        )
+
+        if len(tip["tooltip"]) != 0:
+
+            parts.append(
+                "\"hoverEvent\":{\"action\":\"show_text\",\"contents\":\"" +
+                tip["tooltip"].replace("\"","\\\"") +
+                "\"}"
+            )
+
+        if len(tip["do"].keys()) != 0:
+
+            action = list(tip["do"].keys())[0]
+            value = tip["do"][action]
+
+            parts.append(
+                "\"clickEvent\":{\"action\":\"" +
+                action +
+                "\",\"value\":\"" +
+                value.replace("\"","\\\"") +
+                "\"}"
+            )
+
+        cmd = "/tellraw @a {" + ",".join(parts) + "}"
+
+        print(cmd)
+
+        Bukkit.dispatchCommand(
             Bukkit.getConsoleSender(),
             cmd
         )
-    except Exception as ex:
-    	Bukkit.getLogger().severe(
-        	'[37412][24/7 Plan Script] Exception : {}'
-            .format(ex)
-     )
 
+    except Exception as ex:
+
+        Bukkit.getLogger().severe(
+            "[RandomTips] {}".format(ex)
+        )
 
 plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
+data = fetch_data()
 
-if __name__ == "__main__":
-    data = fetch_data()
-    if data is None:
-        print("Nothing returned")
-    Bukkit.getScheduler().runTaskTimer(plugin, randomtip, 0, 20 * 300)
+# Run
+
+if data is None:
+    print("Nothing returned")
+else:
+    Bukkit.getScheduler().runTaskTimer(
+        plugin,
+        randomtip,
+        0,
+        20 * 300
+    )
