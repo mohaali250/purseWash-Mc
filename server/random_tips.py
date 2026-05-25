@@ -72,6 +72,30 @@ def randomtip():
 
 plugin=Bukkit.getPluginManager().getPlugin("PySpigot")
 
+# add these imports
+
+from org.bukkit.command import CommandExecutor
+
+# -------------------------
+# COMMAND
+# -------------------------
+
+class RefreshTip(CommandExecutor):
+    def onCommand(self,sender,command,label,args):
+        randomtip()
+        return True
+
+# -------------------------
+# REGISTER
+# -------------------------
+
+refresh=RefreshTip()
+
+cmd=Bukkit.getPluginCommand("refreshtip")
+
+if cmd:
+    cmd.setExecutor(refresh)
+
 data=fetch_data()
 if data is not None:
     Bukkit.getScheduler().runTaskTimer(
