@@ -1,0 +1,57 @@
+{
+	"punishments":{
+		"disrespect_staff": {				
+			"reason":"Disrespect to staff",
+			"kick":{}
+		},
+		"failed_report":{
+			"reason":"Failing to report"
+		},
+		"failed_punishment":{
+			"reason":"Failing to Punish a rule breaking player"
+		},
+		"unauthorized_changes":{
+			"reason":"Changed/Updated contents of the server",
+			"suspend_staff":"5wk"
+		},
+		"attempt_loophole_rule":{
+			"reason":"Attempted to loophole a rule",
+			"staff_ban":"3wk"
+		},
+		"advertising":{
+			"reason":"Advertising",
+			"mute":"1wk",
+			"ban":"3d"
+		},
+		"usage_nbt":{
+			"reason":"Used unauthorized nbt items",
+			"clear":{},
+			"staff_ban":"4wk"
+		},
+		"threats_irl":{
+			"reason":"Threatened for irl things",
+			"mute":true,
+			"ban":"48wk"
+		},
+		"threats_mc":{
+			"reason":"Threatened ingame",
+			"mute":"4wk",
+			"ban":"1wk"
+		},
+		"unauthorized_config_change":{
+			"reason":"Altered a config file without consent",
+			"demote":{},
+			"ban":true
+		},
+		"griefiing":{
+			"reason":"Griefing server contents",
+			"ban":true,
+			"demote":{}
+		},
+		"irl_trading":{
+			"reason":"Trading server items for real goods or money",
+			"ban":"2wk",
+			"clear":{}
+		}
+	}
+}
