@@ -53,5 +53,25 @@
 			"ban":"2wk",
 			"clear":{}
 		}
+	},
+	"ranks":{
+		"helper":{
+			"required_playtime":"5h"
+		},
+		"mod":{
+			"required_playtime":"5h"
+		},
+		"admin":{
+			"required_playtime":"8h"
+		},
+		"builder":{
+			"required_playtime":"12h"
+		},
+		"dev":{
+			"required_playtime":"18h"
+		},
+		"manager":{
+			"required_playtime":"36h"
+		}
 	}
 }
