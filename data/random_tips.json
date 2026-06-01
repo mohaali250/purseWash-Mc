@@ -33,6 +33,7 @@
     {"content":"&6&lFUN FACT - &r&fRead the rules at spawn","tooltip":"","do":{}},
     {"content":"&6&lFUN FACT - &r&n&fI am something of a programmer myself :3","tooltip":"Meow :3","do":{}},
     {"content":"&b&lBORING FACT - &r&n&fYou cant teleport to the command block room using the command book nor /trigger cmdroom","tooltip":"Try it","do":{"run_command":"/trigger cmdroom"}},
-    {"content":"&6&lFUN FACT - &r&f&kjdywqhkdsiu&r is where you can get admin items, you're welcome","tooltip":"Welp i guess no admin items for you","do":{}}
+    {"content":"&6&lFUN FACT - &r&f&kjdywqhkdsiu&r is where you can get admin items, you're welcome","tooltip":"Welp i guess no admin items for you","do":{}},
+    {"content":"&6&lFUN FACT - &r&fHacked clients are made by bad people who spy on your computer","tooltip":"","do":{}}
   ]
 }
