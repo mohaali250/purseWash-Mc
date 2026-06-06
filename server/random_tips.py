@@ -690,6 +690,10 @@ if not os.path.exists(FILE):
 with open(FILE,"r") as f:
     data=json.load(f)
 
+# Debug
+
+help(ps.command.registerCommand)
+
 # Run  
     
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
