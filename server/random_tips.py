@@ -693,7 +693,7 @@ with open(FILE,"r") as f:
 # Run  
     
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
-    ps.command.registerCommand(name=c, command_function=onCommand, tab_function=onTabComplete)
+    ps.command.registerCommand(onCommand, onTabComplete, c)
 
 
 gdata = fetch_data()
