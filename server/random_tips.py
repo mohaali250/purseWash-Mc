@@ -690,6 +690,13 @@ if not os.path.exists(FILE):
 with open(FILE,"r") as f:
     data=json.load(f)
 
+# Debug
+
+print(onCommand)
+print(onCommand.__class__)
+print(onTabComplete)
+print(onTabComplete.__class__)
+
 # Run  
     
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
