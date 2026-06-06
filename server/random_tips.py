@@ -132,7 +132,7 @@ def onCommand(sender,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
         return
-    cmd=label
+    cmd=label.split(" ")[0]
     if hasattr(sender, "getUniqueId"):
         u=uuid(sender)
         ensure(u)
@@ -578,8 +578,8 @@ def onCommand(sender,label,args):
         session_notify(p) 
     save()
     return True
-def onTabComplete(sender,command,alias,args):
-    cmd=command.getName().lower()
+def onTabComplete(sender,alias,args):
+    cmd=alias.split(" ")[0]
     if len(args)==1:
         if cmd=="activate":
             return ["staff"]
