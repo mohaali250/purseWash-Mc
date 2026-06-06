@@ -19,7 +19,7 @@ URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/m
 
 def fetch_data():
 
-@@ -27,83 +41,667 @@ def fetch_data():
+def fetch_data():
         return json.loads(response)
     except Exception as ex:
         Bukkit.getLogger().severe(
