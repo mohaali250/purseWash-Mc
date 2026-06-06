@@ -692,8 +692,6 @@ with open(FILE,"r") as f:
 
 # Run  
 
-executor=Cmd()
-
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
     ps.command.registerCommand(c, onCommand,onTabComplete)
 
