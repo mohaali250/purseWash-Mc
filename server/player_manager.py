@@ -596,7 +596,7 @@ def onTabComplete(sender,command,alias,args):
             return ["\"" + args[-1] + "\""]
         if cmd=="punish":
             return Arrays.asList(list(gdata["punishments"].keys()))
-    return Arrays.asList([])
+    return []
 
 
 def tick():
