@@ -758,6 +758,6 @@ ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 
-Bukkit.getScheduler().runTaskTimer(__plugin__,tick,1200,1200)
+ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
 
 print("[Staff] Loaded.")
