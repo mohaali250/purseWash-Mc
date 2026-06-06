@@ -161,8 +161,8 @@ def onCommand(sender,label,args):
             sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Target is staff banned")
             return True
         if d["staff"] == "" and d["locked"] == -1:
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Target needs to agree to the rules first")
-            return True
+            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Target will need to agree to the rules first before having staff perms")
+
         
         sender.sendMessage("§a[Staff Manager] [INFO] Sucess : Promoted player §b" + args[0] + "§a for §b" + args[1] + "§a.")
         target.sendMessage("§b[Staff Manager] [INFO] STDOUT : You are promoted for §a" + args[1] + "§b.")
