@@ -747,10 +747,8 @@ with open(FILE,"r") as f:
 executor=Cmd()
 
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
-    cmd=Bukkit.getPluginCommand(c)
-    if cmd:
-        cmd.setExecutor(executor)
-        cmd.setTabCompleter(executor)
+    ps.command.registerCommand(c, executor)
+
 
 gdata = fetch_data()
 
