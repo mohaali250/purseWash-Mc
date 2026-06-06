@@ -714,19 +714,17 @@ def handle_disconnect(event):
     local_session_notify.pop(uuid(player), None)
     pass
 
-class playerListener(Listener):
 
-    @EventHandler
-    def onJoin(self, event):
-        handle_join(event)
-    
-    @EventHandler
-    def onQuit(self, event):
-        handle_disconnect(event)
+@EventHandler
+def onJoin(self, event):
+    handle_join(event)
 
-    @EventHandler
-    def onKick(self, event):
-        handle_disconnect(event)
+@EventHandler
+def onQuit(self, event):
+    handle_disconnect(event)
+@EventHandler
+def onKick(self, event):
+    handle_disconnect(event)
 
 # starter variables
 
@@ -754,9 +752,10 @@ for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activ
 
 gdata = fetch_data()
 
-listener = playerListener()
+Bukkit.listener.registerListener(onJoin, PlayerJoinEvent)
+Bukkit.listener.registerListener(onQuit, PlayerQuitEvent)
+Bukkit.listener.registerListener(onKick, PlayerKickEvent)
 
-Bukkit.getPluginManager().registerEvents(listener,  __plugin__)
 Bukkit.getScheduler().runTaskTimer(__plugin__,tick,1200,1200)
 
 print("[Staff] Loaded.")
