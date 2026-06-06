@@ -694,6 +694,12 @@ with open(FILE,"r") as f:
 
 help(ps.command.registerCommand)
 
+print("onCommand =", onCommand)
+print("type(onCommand) =", type(onCommand))
+
+print("onTabComplete =", onTabComplete)
+print("type(onTabComplete) =", type(onTabComplete))
+
 # Run  
     
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
