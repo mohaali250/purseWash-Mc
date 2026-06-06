@@ -128,11 +128,11 @@ def get_mute_info(player_name):
     return data
 
 
-def onCommand(sender,command,label,args):
+def onCommand(sender,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
         return
-    cmd=command.getName().lower()
+    cmd=label.split(" ")[0]
     if hasattr(sender, "getUniqueId"):
         u=uuid(sender)
         ensure(u)
@@ -161,13 +161,13 @@ def onCommand(sender,command,label,args):
             sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Target is staff banned")
             return True
         if d["staff"] == "" and d["locked"] == -1:
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Target needs to agree to the rules first")
-            return True
+            sender.sendMessage("§b[Staff Manager] [INFO] STDOUT : Target will need to agree to the rules first before having staff perms")
+
         
         sender.sendMessage("§a[Staff Manager] [INFO] Sucess : Promoted player §b" + args[0] + "§a for §b" + args[1] + "§a.")
         target.sendMessage("§b[Staff Manager] [INFO] STDOUT : You are promoted for §a" + args[1] + "§b.")
         # Run start
-        if d["staff"]: remove_staff(target.getName(),d["staff"])
+        if len(d["staff"]) != "": remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
         # Run end
         if not eligible(d):
@@ -578,8 +578,8 @@ def onCommand(sender,command,label,args):
         session_notify(p) 
     save()
     return True
-def onTabComplete(sender,command,alias,args):
-    cmd=command.getName().lower()
+def onTabComplete(sender,alias,args):
+    cmd=alias.split(" ")[0]
     if len(args)==1:
         if cmd=="activate":
             return ["staff"]
@@ -590,12 +590,12 @@ def onTabComplete(sender,command,alias,args):
         if any([i==cmd for i in ["suspend","staff_ban"]]):
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="punish":
-            return Arrays.asList(list(gdata["punishments"].keys()))
+            return list(gdata["punishments"].keys())
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staff_ban","demote"]]):
             return ["\"" + args[-1] + "\""]
         if cmd=="punish":
-            return Arrays.asList(list(gdata["punishments"].keys()))
+            return  list(gdata["punishments"].keys())
     return []
 
 
@@ -685,15 +685,22 @@ local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlineP
 
 if not os.path.exists(FILE):
     with open(FILE,"w") as f:
-        json.dump({},f)
+        json.dump({},f) 
 
 with open(FILE,"r") as f:
     data=json.load(f)
 
-# Run  
+# Debug
 
+print(onCommand)
+print(onCommand.__class__)
+print(onTabComplete)
+print(onTabComplete.__class__)
+
+# Run  
+    
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
-    ps.command.registerCommand(c, onCommand, onTabComplete)
+    ps.command.registerCommand(onCommand, onTabComplete, c)
 
 
 gdata = fetch_data()
