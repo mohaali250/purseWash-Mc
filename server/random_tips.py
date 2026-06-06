@@ -128,11 +128,11 @@ def get_mute_info(player_name):
     return data
 
 
-def onCommand(sender,command,label,args):
+def onCommand(sender,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
         return
-    cmd=command.getName().lower()
+    cmd=label
     if hasattr(sender, "getUniqueId"):
         u=uuid(sender)
         ensure(u)
@@ -689,16 +689,6 @@ if not os.path.exists(FILE):
 
 with open(FILE,"r") as f:
     data=json.load(f)
-
-# Debug
-
-help(ps.command.registerCommand)
-
-print("onCommand =", onCommand)
-print("type(onCommand) =", type(onCommand))
-
-print("onTabComplete =", onTabComplete)
-print("type(onTabComplete) =", type(onTabComplete))
 
 # Run  
     
