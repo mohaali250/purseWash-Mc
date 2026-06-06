@@ -590,12 +590,12 @@ def onTabComplete(sender,alias,args):
         if any([i==cmd for i in ["suspend","staff_ban"]]):
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="punish":
-            return Arrays.asList(list(gdata["punishments"].keys()))
+            return list(gdata["punishments"].keys())
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staff_ban","demote"]]):
             return ["\"" + args[-1] + "\""]
         if cmd=="punish":
-            return Arrays.asList(list(gdata["punishments"].keys()))
+            return  list(gdata["punishments"].keys())
     return []
 
 
@@ -685,7 +685,7 @@ local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlineP
 
 if not os.path.exists(FILE):
     with open(FILE,"w") as f:
-        json.dump({},f)
+        json.dump({},f) 
 
 with open(FILE,"r") as f:
     data=json.load(f)
