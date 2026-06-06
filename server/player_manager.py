@@ -715,14 +715,13 @@ def handle_disconnect(event):
     pass
 
 
-@EventHandler
+
 def onJoin(self, event):
     handle_join(event)
 
-@EventHandler
 def onQuit(self, event):
     handle_disconnect(event)
-@EventHandler
+
 def onKick(self, event):
     handle_disconnect(event)
 
