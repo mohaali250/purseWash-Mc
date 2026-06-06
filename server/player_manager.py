@@ -128,7 +128,7 @@ def get_mute_info(player_name):
     return data
 
 
-def onCommand(self,sender,command,label,args):
+def onCommand(sender,command,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
         return
@@ -578,7 +578,7 @@ def onCommand(self,sender,command,label,args):
         session_notify(p) 
     save()
     return True
-def onTabComplete(self,sender,command,alias,args):
+def onTabComplete(sender,command,alias,args):
     cmd=command.getName().lower()
     if len(args)==1:
         if cmd=="activate":
@@ -693,7 +693,7 @@ with open(FILE,"r") as f:
 # Run  
 
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
-    ps.command.registerCommand(c, onCommand,onTabComplete)
+    ps.command.registerCommand(c, onCommand, onTabComplete)
 
 
 gdata = fetch_data()
