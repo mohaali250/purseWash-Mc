@@ -2,6 +2,8 @@
 
 import json,random,datetime,time,re,os
 
+import pyspigot as ps
+
 from java.net import URL
 from java.util import Scanner
 
@@ -715,13 +717,14 @@ def handle_disconnect(event):
     pass
 
 
-
+@EventHandler
 def onJoin(self, event):
     handle_join(event)
 
+@EventHandler
 def onQuit(self, event):
     handle_disconnect(event)
-
+@EventHandler
 def onKick(self, event):
     handle_disconnect(event)
 
@@ -751,9 +754,9 @@ for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activ
 
 gdata = fetch_data()
 
-Bukkit.listener.registerListener(onJoin, PlayerJoinEvent)
-Bukkit.listener.registerListener(onQuit, PlayerQuitEvent)
-Bukkit.listener.registerListener(onKick, PlayerKickEvent)
+ps.listener.registerListener(onJoin, PlayerJoinEvent)
+ps.listener.registerListener(onQuit, PlayerQuitEvent)
+ps.listener.registerListener(onKick, PlayerKickEvent)
 
 Bukkit.getScheduler().runTaskTimer(__plugin__,tick,1200,1200)
 
