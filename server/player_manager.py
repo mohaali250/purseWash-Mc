@@ -84,7 +84,7 @@ def get_total_playtime_seconds(u):
 def ensure(u):
     defaults = {
         "staff": "",
-        "staff_playtime": [],
+        "staff_playtime": get_total_playtime_seconds(u),
         "locked": -1,
         "banned": 0,
         "punishments": {},
