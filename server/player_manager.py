@@ -362,7 +362,7 @@ def onCommand(sender,label,args):
             f["notify"] = 0
             #Run end
             if f["staff"] != "": sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just claimed staff and verified their account to have staff perms §b")
-            elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
+            elif f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
                 sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet")
             else: sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just acepted to staff rules and made your account elegible to apply§b")
             return True
