@@ -557,14 +557,21 @@ def onCommand(sender,label,args):
                 _any = True
                 sender.sendMessage(", ".join([i for i,v in zip(["Staff Ban","Suspended"],[d["banned"] != 0,0<d["locked"]]) if v]))
                 sender.sendMessage("")
-                sender.sendMessage("Time until "+", ".join([i for i,v in zip(["Staff Ban","Suspended"],[d["banned"] != 0,0<d["locked"]]) if v])+"expires: "+str(datetime.timedelta(seconds=now()-max(d["locked"],d["banned"]))))
+                
+                if max(d["locked"],d["banned"])-now() > 0:
+                    expires_time_text = str(datetime.timedelta(seconds=max(d["locked"],d["banned"])-now()))
+                elif d["banned"] == -1:
+                    expires_time_text = "Never"
+                else:
+                    expires_time_text = "Reagree to rules to lift ban"
+                sender.sendMessage("Time until %s expires: %s" % (", ".join([i for i,v in zip(["Staff Ban","Suspended"],[d["banned"] != 0,0<d["locked"]]) if v]),expires_time_text))
             mute_info = get_mute_info(sender.getName())
             if mute_info:
                 if mute_info["muted"]:
                     _any = True
                     sender.sendMessage("")
                     sender.sendMessage("Muted")
-                    sender.sendMessage("Time until mute expires: %s" % (str(datetime.timedelta(seconds=now()-mute_info["unmute_timestamp"]))))
+                    sender.sendMessage("Time until mute expires: %s" % (str(datetime.timedelta(seconds=mute_info["unmute_timestamp"]-now()) if mute_info["unmute_timestamp"] != -1 else "Never")))
             else:
                 sender.sendMessage("No Data (mute_info returned None)")
             if not _any:
@@ -572,7 +579,6 @@ def onCommand(sender,label,args):
             else:
                 sender.sendMessage("")
                 sender.sendMessage("Reason for punishments:")
-                sender.sendMessage("")
                 for i, v in d["punishments"].items():
                     sender.sendMessage("")
                     sender.sendMessage("Reason: "+i)
