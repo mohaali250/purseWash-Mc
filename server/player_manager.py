@@ -482,11 +482,11 @@ def onCommand(sender,label,args):
             d["locked"] = 0
         if bn != 0:
             if bn == -1:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban %s \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0],str(bn), "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban %s \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
             else:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban %s %ss \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0],str(bn), "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban %s %ss \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], str(bn), "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
         if kick:
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s \"Stack Start; %s\"; Stack End; Rejoin with that in mind" % (args[0], "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s \"Stack Start; %s\"; Stack End; Rejoin with that in mind" % (args[0], "\\\""+"\\\", \\\"".join(reason_stack)+"\\\"")) 
         
         
         sender.sendMessage()
