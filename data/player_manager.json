@@ -52,7 +52,24 @@
 			"reason":"Trading server items for real goods or money",
 			"ban":"2wk",
 			"clear":{}
+		},
+		"incomplete_punishment":{
+			"reason":"Lacking info for punishment. Use /punish for auto info",
+			"suspend_staff":"2d"
+		},
+		"unreasoned_punishment":{
+			"reason":"Punishing without a cause / Missing proof of rule breaking",
+			"demote":{}
+		},
+		"macros":{
+			"reason":"Using macros for automated actions",
+			"ban":"14d"
+		},
+		"chatbot":{
+			"reason":"Using chatbots inplemented into user messages to automate messages",
+			"mute":"2d"
 		}
+		
 	},
 	"ranks":{
 		"helper":{
