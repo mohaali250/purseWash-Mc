@@ -340,25 +340,27 @@ def onCommand(sender,label,args):
             if f["locked"] >= time.time():
                 sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is suspended")
                 return True
-            if f["staff"] == "":
-                sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not a pending staff member, perhaps you forgot to apply")
-                return True
             if parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
                 sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet")
                 return True
+            
             for p in Bukkit.getOnlinePlayers():
                 if p.isOp():
-                    p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e claimed staff and verified their account to have staff perms §b" % (sender.getName()))
+                    if f["staff"] == "":
+                        p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e agreed to staff rules and their account is elegible to apply§b" % (sender.getName()))
+                    else:
+                        p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e claimed staff and verified their account to have staff perms §b" % (sender.getName()))
             
             #Run start
             f["banned"] = 0
             f["locked"] = 0
-            if parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
+            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
             
             f["notify"] = 0
             #Run end
-            sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just claimed staff and verified their account to have staff perms §b")
+            if f["staff"] != "": sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just claimed staff and verified their account to have staff perms §b")
+            else: sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just acepted to staff rules and made your account elegible to apply§b")
             return True
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
