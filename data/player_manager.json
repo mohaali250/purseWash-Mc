@@ -94,7 +94,7 @@
 		"nsfw":{
 			"reason":"Doing or talking about nsfw topics",
 			"ban":true
-		},
+		}
 	},
 	"ranks":{
 		"helper":{
