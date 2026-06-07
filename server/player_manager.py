@@ -578,26 +578,37 @@ def onCommand(sender,label,args):
         session_notify(p) 
     save()
     return True
+
+def typing_filter(arg, options):
+    return [c for c in options if c.lower().startswith(arg.lower())]
+
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0]
     if len(args)==1:
         if cmd=="activate":
-            return ["staff"]
+            return typing_filter(args[0],["staff"])
         if cmd=="status":
-            return ["staff","punishments"]
-        return [p.getName() for p in Bukkit.getOnlinePlayers()]
+            return typing_filter(args[0],["staff","punishments"])
+        return typing_filter(args[0],[p.getName() for p in Bukkit.getOnlinePlayers()])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
+            try:
+                num = int(args[1])
+            except Exception:
+                try:
+                    num = parse(args[1])
+                except Exception:
+                    return [args[1]+c for c in ["s","min","h","d","wk"] if (args[1]+c).lower().startswith(args[1].lower())]
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="punish":
-            return list(gdata["punishments"].keys())
+            return typing_filter(args[1],list(gdata["punishments"].keys()))
         if cmd=="promote":
-            return list(gdata["ranks"].keys())
+            return typing_filter(args[1],list(gdata["ranks"].keys()))
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staff_ban","demote"]]):
             return ["\"" + args[-1] + "\""]
         if cmd=="punish":
-            return  list(gdata["punishments"].keys())
+            return typing_filter(args[-1],list(gdata["punishments"].keys()))
     return []
 
 
