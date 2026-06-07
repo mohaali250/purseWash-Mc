@@ -2,8 +2,6 @@
 
 import json,random
 
-
-
 from java.net import URL
 from java.util import Scanner
 
@@ -58,7 +56,6 @@ def randomtip():
                         value
                     )
                 )
-
         for p in Bukkit.getOnlinePlayers():
             p.spigot().sendMessage(msg)
     except Exception as ex:
