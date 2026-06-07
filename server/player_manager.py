@@ -427,7 +427,7 @@ def onCommand(sender,label,args):
                 else:
                     continue    
             reason_stack.append(lt_pn["reason"])
-            reason_stack.append(proof)
+            proof_stack.append(proof)
         # Optimizing actions and apply
         d["punishments"] = {i: v for i,v in zip(reason_stack,proof_stack)}
         if clear:
@@ -702,13 +702,6 @@ if not os.path.exists(FILE):
 
 with open(FILE,"r") as f:
     data=json.load(f)
-
-# Debug
-
-print(onCommand)
-print(onCommand.__class__)
-print(onTabComplete)
-print(onTabComplete.__class__)
 
 # Run  
     
