@@ -60,20 +60,22 @@ def now():
 def uuid(p):
     return str(p.getUniqueId())
 
+
 def ensure(u):
+    defaults = {
+        "staff": "",
+        "staff_playtime": 0,
+        "locked": -1,
+        "banned": 0,
+        "punishments": [],
+        "notify": 0
+    }
     if u not in data:
-        data[u]={
-            "staff":"",
-            "staff_playtime":0,
-            "locked":-1,
-            "banned":0,
-            "punishments":[],
-            "notify":0
-        }
+        data[u] = defaults.copy()
     else:
-        for i, v in zip(["staff","staff_playtime","locked","banned","punishments","notify"],["",0,-1,0,[],0]):
-            if not isinstance(data[i],type(v)):
-                data[i] = v
+        for k, default in defaults.items():
+            if k not in data[u]:
+                data[u][k] = default
 def parse(t):
     if t=="perm":
         return -1
