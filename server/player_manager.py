@@ -616,6 +616,12 @@ def onCommand(sender,label,args):
                             sender.sendMessage("Rule Breaking Item: %s" % (n))
                 sender.sendMessage("")
                 sender.sendMessage("If you believe you were punished unfairly join discord (/trigger discord) and apeal your ban in tickets")
+            if section_show == 3 or section_show == 0:
+                sender.sendMessage("Raw staff data:")
+                for i, v in d.items():
+                    sender.sendMessage("")
+                    sender.sendMessage("Key: %s" % (i))
+                    sender.sendMessage("Value: %s" % (v))
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
     save()
