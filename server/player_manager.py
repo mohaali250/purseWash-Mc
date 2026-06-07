@@ -177,7 +177,7 @@ def onCommand(sender,label,args):
         sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] Sucess : Promoted player &b%s&a for &b%s&a." % (args[0], args[1])))
         target.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : You are promoted for &a%s&b." % (args[1])))
         # Run start
-        if len(d["staff"]) != "": remove_staff(target.getName(),d["staff"])
+        if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
         # Run end
         if not eligible(d):
