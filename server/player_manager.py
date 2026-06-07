@@ -568,7 +568,7 @@ def onCommand(sender,label,args):
                 sender.sendMessage("")
                 sender.sendMessage("Reason for punishments:")
                 sender.sendMessage("")
-                for i, v in d["punishments"]:
+                for i, v in d["punishments"].items():
                     sender.sendMessage("")
                     sender.sendMessage("Reason: "+i)
                     if len(v) != 0:
@@ -653,8 +653,11 @@ def session_notify(p):
 
 
 class _bit:
+    @staticmethod
     def read(integer,n):
         return (integer >> n) & 1
+    
+    @staticmethod
     def write(integer,n,value):
         if value is None:
             integer ^= (1 << n)
