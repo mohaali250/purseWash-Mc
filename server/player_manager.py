@@ -20,6 +20,8 @@ from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.player import PlayerQuitEvent
 from org.bukkit.event.player import PlayerKickEvent
 
+from org.bukkit import ChatColor
+
 
 from net.md_5.bungee.api.chat import TextComponent
 from net.md_5.bungee.api.chat import ClickEvent
@@ -133,6 +135,8 @@ def get_mute_info(player_name):
         pass
     return data
 
+def chatcolor(msg):
+    return ChatColor.translateAlternateColorCodes('&', msg)
 
 def onCommand(sender,label,args):
     if gdata is None:
@@ -146,100 +150,100 @@ def onCommand(sender,label,args):
     allowed = ["owner","manager"]
     if cmd=="promote":
         if not sender.hasPermission("staffmanager.promote"):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
             return True
         
         if len(args)<1:
-            sender.sendMessage("§6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage("§6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         if len(args)!=2:
-            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/promote\" requires exactely 2 arguments (%s were given)" % (str(len(args))))
+            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] ParameterError : Command \"/promote\" requires exactely 2 arguments (%s were given)" % (str(len(args)))))
             return True
         if d["staff"] == "" and d["banned"] > time.time():
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Target is staff banned")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Target is staff banned"))
             return True
         if d["staff"] == "" and d["locked"] == -1:
-            sender.sendMessage("§b[Staff Manager] [INFO] STDOUT : Target will need to agree to the rules first before having staff perms")
+            sender.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : Target will need to agree to the rules first before having staff perms"))
 
         
-        sender.sendMessage(u"§a[Staff Manager] [INFO] Sucess : Promoted player §b%s§a for §b%s§a." % (args[0], args[1]))
-        target.sendMessage(u"§b[Staff Manager] [INFO] STDOUT : You are promoted for §a%s§b." % (args[1]))
+        sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] Sucess : Promoted player &b%s&a for &b%s&a." % (args[0], args[1])))
+        target.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : You are promoted for &a%s&b." % (args[1])))
         # Run start
         if len(d["staff"]) != "": remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
         # Run end
         if not eligible(d):
-            target.sendMessage("§b[Staff Manager] [INFO] STDOUT : You didnt yet complete the requirements, once you do you'll be notified")
-            sender.sendMessage("§a[Staff Manager] [INFO] STDOUT : When the target completes their requirements they'll get notified")
+            target.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : You didnt yet complete the requirements, once you do you'll be notified"))
+            sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] STDOUT : When the target completes their requirements they'll get notified"))
         else:
             session_notify(target)
     elif cmd=="suspend":
         if not sender.hasPermission("staffmanager.suspend"):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
             return True
         
         if len(args)<1:
-            sender.sendMessage("§6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage("§6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         if d["staff"] == "":
-            sender.sendMessage("§6[Staff Manager] [INFO] STDOUT : Cannot suspend non-staff players, nothing has changed")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [INFO] STDOUT : Cannot suspend non-staff players, nothing has changed"))
             return True
         if len(args)<2:
-            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/suspend\" requires atleast 2 arguments (%s were given)" % (str(len(args))))
+            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] ParameterError : Command \"/suspend\" requires atleast 2 arguments (%s were given)" % (str(len(args)))))
             return True
         if len(args)<3:
-            sender.sendMessage("§c[Staff Manager] [WARN] STDOUT : You must provide a reason")
+            sender.sendMessage(chatcolor("&c[Staff Manager] [WARN] STDOUT : You must provide a reason"))
             return True
         dur=parse(args[1])
         if dur is None:
-            sender.sendMessage("§c[Staff Manager] [ERROR] TypeError : Argument 2 cannot be parsed as a valid timedelta")
+            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] TypeError : Argument 2 cannot be parsed as a valid timedelta"))
             return True
         
         #Run start
         d["locked"]=now()+dur
         remove_staff(target.getName(),d["staff"])
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Suspended §b%s§e for §b%s§e expiring in §b%s" % (args[0],",".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never")))
-        target.sendMessage("§cAccount Suspension of Staff")
-        target.sendMessage("§cYour account lost its Staff permissions due to a violation of our staff rules")
-        target.sendMessage("§cSuspension expires in §b%s" % (str(datetime.timedelta(seconds=dur) if dur != -1 else "Never")))
+        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Suspended &b%s&e for &b%s&e expiring in &b%s" % (args[0],",".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))))
+        target.sendMessage(chatcolor("&cAccount Suspension of Staff"))
+        target.sendMessage(chatcolor("&cYour account lost its Staff permissions due to a violation of our staff rules"))
+        target.sendMessage(chatcolor("&cSuspension expires in &b%s" % (str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))))
         for i in args[2:]:
-            target.sendMessage("§cReason: %s" % (i))
+            target.sendMessage("&cReason: %s" % (i))
         target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
     elif cmd=="demote":
         if not sender.hasPermission("staffmanager.demote"):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
             return True
         
         if len(args)<1:
-            sender.sendMessage("§6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage("§6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         if d["staff"] == "":
-            sender.sendMessage("§6[Staff Manager] [INFO] STDOUT : Target wasn't staff, nothing has changed")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [INFO] STDOUT : Target wasn't staff, nothing has changed"))
             return True
         
         #Run start
@@ -248,67 +252,67 @@ def onCommand(sender,label,args):
         d["staff"]=""
         d["locked"]=-2
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Demoted §b%s§e for §b%s" % (args[0]," ".join(args[1:])))
-        target.sendMessage("§cAccount Demotion of Staff")
-        target.sendMessage("§cYour account lost its Staff permissions due to a violation of our staff rules")
-        target.sendMessage("§cYou must reapply to get your rank back and redo the required playtime")
+        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Demoted &b%s&e for &b%s" % (args[0]," ".join(args[1:]))))
+        target.sendMessage(chatcolor("&cAccount Demotion of Staff"))
+        target.sendMessage(chatcolor("&cYour account lost its Staff permissions due to a violation of our staff rules"))
+        target.sendMessage(chatcolor("&cYou must reapply to get your rank back and redo the required playtime"))
         for i in args[2:]:
-            target.sendMessage("§cReason: %s" % (i))
-        target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
+            target.sendMessage(chatcolor("&cReason: %s" % (i)))
+        target.sendMessage(chatcolor("If you believe this was a misunderstanding, appeal at discord"))
     elif cmd=="staff_ban":
         if not sender.hasPermission("staffmanager.staffban"):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
             return True
         
         if len(args)<1:
-            sender.sendMessage("§6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage("§6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         
         if d["staff"] == "":
-            sender.sendMessage("§6[Staff Manager] [INFO] STDOUT : Target wasn't staff, nothing has changed")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [INFO] STDOUT : Target wasn't staff, nothing has changed"))
             return True
         if len(args)<2:
-            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/staff_ban\" requires atleast 2 arguments (%s were given)" % (str(len(args))))
+            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] ParameterError : Command \"/staff_ban\" requires atleast 2 arguments (%s were given)" % (str(len(args)))))
             return True
         if len(args)<3:
-            sender.sendMessage("§c[Staff Manager] [WARN] STDOUT : You must provide a reason")
+            sender.sendMessage(chatcolor("&c[Staff Manager] [WARN] STDOUT : You must provide a reason"))
             return True
         dur=parse(args[1])
         if dur is None:
-            sender.sendMessage("§c[Staff Manager] [ERROR] TypeError : Argument 2 cannot be parsed as a valid timedelta")
+            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] TypeError : Argument 2 cannot be parsed as a valid timedelta"))
             return True
         #Run start
         d["banned"]= -1 if dur == -1 else now()+dur
         remove_staff(target.getName(),d["staff"])
         d["staff"]=""
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Staff Banned §b%s§e for §b\"%s\"§e expiring in §b%s" % (args[0],"§e,§b".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never")))
-        target.sendMessage("§cAccount Ban of Staff")
-        target.sendMessage("Your account lost its Staff permissions due to a violation of our staff rules")
-        target.sendMessage("You must wait out your ban, reapply to get your rank back and redo the required playtime")
+        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Staff Banned &b%s&e for &b\"%s\"&e expiring in &b%s" % (args[0],"&e,&b".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))))
+        target.sendMessage(chatcolor("&cAccount Ban of Staff"))
+        target.sendMessage(chatcolor("Your account lost its Staff permissions due to a violation of our staff rules"))
+        target.sendMessage(chatcolor("You must wait out your ban, reapply to get your rank back and redo the required playtime"))
         for i in args[2:]:
-            target.sendMessage("Reason: "+i)
-        target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
+            target.sendMessage(chatcolor("Reason: "+i))
+        target.sendMessage(chatcolor("If you believe this was a misunderstanding, appeal at discord"))
     elif cmd=="staff_unban":
         if not sender.hasPermission("staffmanager.staffunban"):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command"))
             return True
         
         if len(args)<1:
-            sender.sendMessage("§6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage("§6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
             return True
         u=uuid(target)
         ensure(u)
@@ -317,11 +321,11 @@ def onCommand(sender,label,args):
         d["banned"]=now()
         d["staff_playtime"] = 0
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Lifted Staff Ban of §b%s§e." % (args[0]))
-        target.sendMessage("§cAccount Ban of Staff")
-        target.sendMessage("Your account recently lost its Staff permissions due to a violation of our staff rules")
-        target.sendMessage("Please review the staff rules and click below to agree")
-        msg = TextComponent("§a[Reactivate my Account]")
+        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Lifted Staff Ban of &b%s&e." % (args[0])))
+        target.sendMessage(chatcolor("&cAccount Ban of Staff"))
+        target.sendMessage(chatcolor("Your account recently lost its Staff permissions due to a violation of our staff rules"))
+        target.sendMessage(chatcolor("Please review the staff rules and click below to agree"))
+        msg = TextComponent(chatcolor("&a[Reactivate my Account]"))
         msg.setClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND,
                 "/activate staff"
             ))
@@ -331,27 +335,27 @@ def onCommand(sender,label,args):
         target.spigot().sendMessage(msg)
     elif cmd=="activate":
         if len(args)<1:
-            sender.sendMessage("§6[Pyspigot / player_manager.py] [WARN] ParameterError : Well what are you gonna activate? (No changes were made)")
+            sender.sendMessage(chatcolor("&6[Pyspigot / player_manager.py] [WARN] ParameterError : Well what are you gonna activate? (No changes were made)"))
             return True
         if args[0] == "staff":
             if not hasattr(sender, "getUniqueId"):
-                sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command"))
                 return True
             if f["banned"] >= time.time() or f["banned"] == -1:
-                sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is staff banned")
+                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is staff banned"))
                 return True
             if f["locked"] >= time.time():
-                sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is suspended")
+                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is suspended"))
                 return True
             
             for p in Bukkit.getOnlinePlayers():
                 if p.isOp():
                     if f["staff"] == "":
-                        p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e agreed to staff rules and their account is elegible to apply§b" % (sender.getName()))
+                        p.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &b%s&e agreed to staff rules and their account is elegible to apply&b" % (sender.getName())))
                     elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
-                        p.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender didnt complete their required playtime yet")
+                        p.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender didnt complete their required playtime yet"))
                     else:
-                        p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e claimed staff and verified their account to have staff perms §b" % (sender.getName()))
+                        p.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &b%s&e claimed staff and verified their account to have staff perms &b" % (sender.getName())))
             
             #Run start
             f["banned"] = 0
@@ -361,30 +365,30 @@ def onCommand(sender,label,args):
             
             f["notify"] = 0
             #Run end
-            if f["staff"] != "": sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just claimed staff and verified their account to have staff perms §b")
+            if f["staff"] != "": sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &bYou&e just claimed staff and verified their account to have staff perms &b"))
             elif f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
-                sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet")
-            else: sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just acepted to staff rules and made your account elegible to apply§b")
+                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet"))
+            else: sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &bYou&e just acepted to staff rules and made your account elegible to apply&b"))
             return True
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command"))
             return True
         
         if len(args)<1:
-            sender.sendMessage("§6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage("§6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         
         if len(args)<=1:
-            sender.sendMessage("§6[Staff Manager] [WARN] ParameterError : What are you gonna punish them for? (Expected at least 2 arguments, got "+str(len(args))+")")
+            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : What are you gonna punish them for? (Expected at least 2 arguments, got "+str(len(args))+")"))
             return True
         
         # Run Start
@@ -472,7 +476,7 @@ def onCommand(sender,label,args):
     elif cmd=="status":
         
         if not hasattr(sender, "getUniqueId"):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+            sender.sendMessage("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
             return True
         
         d = f
@@ -549,9 +553,9 @@ def onCommand(sender,label,args):
             else:
                 status_text = "Active Staff"
                 staff_bar_value = 3
-            sender.sendMessage("§6Your current staff status:")
+            sender.sendMessage(chatcolor("&6Your current staff status:"))
             staff_bar = "[" + "#"*staff_bar_value + "-"*(3-staff_bar_value)  + "]"
-            sender.sendMessage("§6{} {}".format(staff_bar, status_text))
+            sender.sendMessage(chatcolor("&6{} {}".format(staff_bar, status_text)))
             if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
         if section_show == 2 or section_show == 0:
             sender.sendMessage("Punishments Tab:")
@@ -646,22 +650,22 @@ def session_notify(p):
     ensure(u)
     d=data[u]
     if d["staff"] != "" and eligible(d) and not _bit.read(local_session_notify[uuid(p)],0):
-        p.sendMessage("§a[Staff Manager] [INFO] STDOUT : You are now elegible to activate staff see /status")
+        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are now elegible to activate staff see /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],0,True)
     if 0<d["banned"]<=now() and not _bit.read(local_session_notify[uuid(p)],1):
-        p.sendMessage("§a[Staff Manager] [INFO] STDOUT : Your staff ban expired. See /status")
+        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : Your staff ban expired. See /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],1,True)
     if 0<d["locked"]<now() and not _bit.read(local_session_notify[uuid(p)],2):
-        p.sendMessage("§a[Staff Manager] [INFO] STDOUT : Your staff suspension expired. See /status")
+        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : Your staff suspension expired. See /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],2,True)
     if 0<now()<=d["banned"] and not _bit.read(d["notify"],3):
-        p.sendMessage("§a[Staff Manager] [INFO] STDOUT : You are Staff banned. See /status for more")
+        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are Staff banned. See /status for more")
         d["notify"] = _bit.write(d["notify"],3,True)
     if 0<now()<=d["locked"] and not _bit.read(d["notify"],4):
-        p.sendMessage("§a[Staff Manager] [INFO] STDOUT : You are Suspended for staff. See /status for more")
+        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are Suspended for staff. See /status for more")
         d["notify"] = _bit.write(d["notify"],4,True)
     if d["locked"]==-2 and not _bit.read(d["notify"],5):
-        p.sendMessage("§a[Staff Manager] [INFO] STDOUT : You are Demoted from staff. See /status for more")
+        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are Demoted from staff. See /status for more")
         d["notify"] = _bit.write(d["notify"],5,True)
 
 
