@@ -547,7 +547,7 @@ def onCommand(sender,label,args):
             elif d["staff"] == "":
                 status_text = "Non-Staff"
                 staff_bar_value = 1
-            elif f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
+            elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
                 status_text = "Pending staff (%s left)" % (str(datetime.timedelta(seconds=parse(gdata["ranks"][f["staff"]]["required_playtime"])-f["staff_playtime"])))
                 staff_bar_value = 1
             elif d["locked"] == -1:
