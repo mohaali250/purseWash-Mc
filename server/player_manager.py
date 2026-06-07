@@ -70,12 +70,10 @@ def ensure(u):
         "punishments": [],
         "notify": 0
     }
-    if u not in data:
-        data[u] = defaults.copy()
-    else:
-        for k, default in defaults.items():
-            if k not in data[u]:
-                data[u][k] = default
+    
+    for k, default in defaults.items():
+        if k not in data[u] or not isinstance(data[u][k], type(default)):
+            data[u][k] = default
 def parse(t):
     if t=="perm":
         return -1
