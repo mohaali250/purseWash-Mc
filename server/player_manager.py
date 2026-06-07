@@ -681,14 +681,14 @@ def handle_disconnect(event):
 
 
 
-def onJoin(self, event):
+def onJoin(event):
     handle_join(event)
 
-def onQuit(self, event):
+def onQuit(event):
     handle_disconnect(event)
 
 
-def onKick(self, event):
+def onKick(event):
     handle_disconnect(event)
 
 # starter variables
