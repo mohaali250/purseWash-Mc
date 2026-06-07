@@ -343,14 +343,13 @@ def onCommand(sender,label,args):
             if f["locked"] >= time.time():
                 sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is suspended")
                 return True
-            if parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
-                sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet")
-                return True
             
             for p in Bukkit.getOnlinePlayers():
                 if p.isOp():
                     if f["staff"] == "":
                         p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e agreed to staff rules and their account is elegible to apply§b" % (sender.getName()))
+                    elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
+                        p.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender didnt complete their required playtime yet")
                     else:
                         p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e claimed staff and verified their account to have staff perms §b" % (sender.getName()))
             
@@ -363,6 +362,8 @@ def onCommand(sender,label,args):
             f["notify"] = 0
             #Run end
             if f["staff"] != "": sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just claimed staff and verified their account to have staff perms §b")
+            elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
+                sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet")
             else: sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just acepted to staff rules and made your account elegible to apply§b")
             return True
     elif cmd=="punish":
