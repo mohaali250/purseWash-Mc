@@ -6,8 +6,10 @@ import pyspigot as ps
 
 from java.net import URL
 from java.util import Scanner
+from java.util import UUID
 
 from org.bukkit import Bukkit
+from org.bukkit import Statistic
 
 from org.bukkit.command import TabExecutor
 from java.util import Arrays
@@ -75,11 +77,14 @@ def now():
 def uuid(p):
     return str(p.getUniqueId())
 
+def get_total_playtime_seconds(u):
+    player = Bukkit.getPlayer(UUID.fromString(u))
+    return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
 
 def ensure(u):
     defaults = {
         "staff": "",
-        "staff_playtime": 0,
+        "staff_playtime": [],
         "locked": -1,
         "banned": 0,
         "punishments": {},
