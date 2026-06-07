@@ -31,20 +31,33 @@ from net.md_5.bungee.api.chat.hover.content import Text
 # functions
 
 def fetch_data():
-
     try:
-        stream=URL(URL_DATA).openStream()
-        scanner=Scanner(stream).useDelimiter("\\A")
-        response=scanner.next() if scanner.hasNext() else None
+        print("Fetching:", URL_DATA)
+
+        stream = URL(URL_DATA).openStream()
+        scanner = Scanner(stream).useDelimiter("\\A")
+
+        response = scanner.next() if scanner.hasNext() else None
         scanner.close()
+
+        print("Response:")
+        print(response)
+
         if response is None:
+            print("Response was None")
             return None
 
-        return json.loads(response)
+        obj = json.loads(response)
+
+        print("Parsed:")
+        print(obj)
+
+        return obj
+
     except Exception as ex:
-        Bukkit.getLogger().severe(
-            "[Player Manager] {}".format(ex)
-        )
+        print("EXCEPTION:", ex)
+        import traceback
+        traceback.print_exc()
         return None
 
 
