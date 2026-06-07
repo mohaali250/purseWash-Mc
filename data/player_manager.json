@@ -5,10 +5,12 @@
 			"kick":{}
 		},
 		"failed_report":{
-			"reason":"Failing to report"
+			"reason":"Failing to report",
+			"ban":"1d"
 		},
 		"failed_punishment":{
-			"reason":"Failing to Punish a rule breaking player"
+			"reason":"Failing to Punish a rule breaking player",
+			"staff_ban":"1wk"
 		},
 		"unauthorized_changes":{
 			"reason":"Changed/Updated contents of the server",
@@ -31,12 +33,19 @@
 		"threats_irl":{
 			"reason":"Threatened for irl things",
 			"mute":true,
-			"ban":"48wk"
+			"ban":"12wk"
 		},
-		"threats_mc":{
-			"reason":"Threatened ingame",
+		"threats_by_staff":{
+			"reason":"Threatened as a staff member",
 			"mute":"4wk",
-			"ban":"1wk"
+			"ban":"1wk",
+			"staff_ban":true
+		},
+		"threats_to_staff":{
+			"reason":"Threatened a staff member",
+			"mute":"15wk",
+			"ban":"12wk",
+			"staff_ban":true
 		},
 		"unauthorized_config_change":{
 			"reason":"Altered a config file without consent",
@@ -79,9 +88,13 @@
 		},
 		"duping":{
 			"reason":"Duping items",
-			"ban":"1wk",
+			"ban":"2wk",
 			"clear":{}
-		}
+		},
+		"nsfw":{
+			"reason":"Doing or talking about nsfw topics",
+			"ban":true
+		},
 	},
 	"ranks":{
 		"helper":{
