@@ -68,9 +68,12 @@ def ensure(u):
             "locked":-1,
             "banned":0,
             "punishments":[],
-            "notify":[]
+            "notify":0
         }
-
+    else:
+        for i, v in zip(["staff","staff_playtime","locked","banned","punishments","notify"],["",0,-1,0,[],0]):
+            if not isinstance(data[i],type(v)):
+                data[i] = v
 def parse(t):
     if t=="perm":
         return -1
@@ -656,7 +659,7 @@ class _bit:
     @staticmethod
     def read(integer,n):
         return (integer >> n) & 1
-    
+
     @staticmethod
     def write(integer,n,value):
         if value is None:
