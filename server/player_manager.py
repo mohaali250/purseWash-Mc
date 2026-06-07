@@ -139,8 +139,8 @@ def onCommand(sender,label,args):
         f=data[u]
     allowed = ["owner","manager"]
     if cmd=="promote":
-        if not any([sender.hasPermission("group."+i) for i in allowed]):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+        if not sender.hasPermission("staffmanager.promote"):
+            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
             return True
         
         if len(args)<1:
@@ -155,7 +155,7 @@ def onCommand(sender,label,args):
         ensure(u)
         d=data[u]
         if len(args)!=2:
-            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/promote\" requires exactely 2 arguments ("+str(len(args))+" were given)")
+            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/promote\" requires exactely 2 arguments (%s were given)" % (str(len(args))))
             return True
         if d["staff"] == "" and d["banned"] > time.time():
             sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Target is staff banned")
@@ -164,8 +164,8 @@ def onCommand(sender,label,args):
             sender.sendMessage("§b[Staff Manager] [INFO] STDOUT : Target will need to agree to the rules first before having staff perms")
 
         
-        sender.sendMessage("§a[Staff Manager] [INFO] Sucess : Promoted player §b" + args[0] + "§a for §b" + args[1] + "§a.")
-        target.sendMessage("§b[Staff Manager] [INFO] STDOUT : You are promoted for §a" + args[1] + "§b.")
+        sender.sendMessage(u"§a[Staff Manager] [INFO] Sucess : Promoted player §b%s§a for §b%s§a." % (args[0], args[1]))
+        target.sendMessage(u"§b[Staff Manager] [INFO] STDOUT : You are promoted for §a%s§b." % (args[1]))
         # Run start
         if len(d["staff"]) != "": remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
@@ -176,8 +176,8 @@ def onCommand(sender,label,args):
         else:
             session_notify(target)
     elif cmd=="suspend":
-        if not any([sender.hasPermission("group."+i) for i in allowed]):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+        if not sender.hasPermission("staffmanager.suspend"):
+            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
             return True
         
         if len(args)<1:
@@ -195,7 +195,7 @@ def onCommand(sender,label,args):
             sender.sendMessage("§6[Staff Manager] [INFO] STDOUT : Cannot suspend non-staff players, nothing has changed")
             return True
         if len(args)<2:
-            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/suspend\" requires atleast 2 arguments ("+str(len(args))+" were given)")
+            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/suspend\" requires atleast 2 arguments (%s were given)" % (str(len(args))))
             return True
         if len(args)<3:
             sender.sendMessage("§c[Staff Manager] [WARN] STDOUT : You must provide a reason")
@@ -209,16 +209,16 @@ def onCommand(sender,label,args):
         d["locked"]=now()+dur
         remove_staff(target.getName(),d["staff"])
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Suspended §b" + args[0] + "§e for §b" + ",".join(args[2:]) + "§e expiring in §b" + str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))
+        sender.sendMessage("§e[Staff Manager] STDOUT : Suspended §b%s§e for §b%s§e expiring in §b%s" % (args[0],",".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never")))
         target.sendMessage("§cAccount Suspension of Staff")
         target.sendMessage("§cYour account lost its Staff permissions due to a violation of our staff rules")
-        target.sendMessage("§cSuspension expires in §b"+str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))
+        target.sendMessage("§cSuspension expires in §b%s" % (str(datetime.timedelta(seconds=dur) if dur != -1 else "Never")))
         for i in args[2:]:
-            target.sendMessage("§cReason: "+i)
+            target.sendMessage("§cReason: %s" % (i))
         target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
     elif cmd=="demote":
-        if not any([sender.hasPermission("group."+i) for i in allowed]):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+        if not sender.hasPermission("staffmanager.demote"):
+            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
             return True
         
         if len(args)<1:
@@ -242,16 +242,16 @@ def onCommand(sender,label,args):
         d["staff"]=""
         d["locked"]=-2
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Demoted §b" + args[0] + "§e for §b" + " ".join(args[1:]))
+        sender.sendMessage("§e[Staff Manager] STDOUT : Demoted §b%s§e for §b%s" % (args[0]," ".join(args[1:])))
         target.sendMessage("§cAccount Demotion of Staff")
         target.sendMessage("§cYour account lost its Staff permissions due to a violation of our staff rules")
         target.sendMessage("§cYou must reapply to get your rank back and redo the required playtime")
         for i in args[2:]:
-            target.sendMessage("§cReason: "+i)
+            target.sendMessage("§cReason: %s" % (i))
         target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
     elif cmd=="staff_ban":
-        if not any([sender.hasPermission("group."+i) for i in allowed]):
-            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+        if not sender.hasPermission("staffmanager.staffban"):
+            sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command")
             return True
         
         if len(args)<1:
@@ -270,7 +270,7 @@ def onCommand(sender,label,args):
             sender.sendMessage("§6[Staff Manager] [INFO] STDOUT : Target wasn't staff, nothing has changed")
             return True
         if len(args)<2:
-            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/staff_ban\" requires atleast 2 arguments ("+str(len(args))+" were given)")
+            sender.sendMessage("§c[Staff Manager] [ERROR] ParameterError : Command \"/staff_ban\" requires atleast 2 arguments (%s were given)" % (str(len(args))))
             return True
         if len(args)<3:
             sender.sendMessage("§c[Staff Manager] [WARN] STDOUT : You must provide a reason")
@@ -284,7 +284,7 @@ def onCommand(sender,label,args):
         remove_staff(target.getName(),d["staff"])
         d["staff"]=""
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Staff Banned §b" + args[0] + "§e for §b\"" + "§e,§b".join(args[2:]) + "\"§e expiring in §b" + str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))
+        sender.sendMessage("§e[Staff Manager] STDOUT : Staff Banned §b%s§e for §b\"%s\"§e expiring in §b%s" % (args[0],"§e,§b".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never")))
         target.sendMessage("§cAccount Ban of Staff")
         target.sendMessage("Your account lost its Staff permissions due to a violation of our staff rules")
         target.sendMessage("You must wait out your ban, reapply to get your rank back and redo the required playtime")
@@ -292,7 +292,7 @@ def onCommand(sender,label,args):
             target.sendMessage("Reason: "+i)
         target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
     elif cmd=="staff_unban":
-        if not any([sender.hasPermission("group."+i) for i in allowed]):
+        if not sender.hasPermission("staffmanager.staffunban"):
             sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
             return True
         
@@ -311,7 +311,7 @@ def onCommand(sender,label,args):
         d["banned"]=now()
         d["staff_playtime"] = 0
         #Run end
-        sender.sendMessage("§e[Staff Manager] STDOUT : Lifted Staff Ban of §b" + args[0] + "§e.")
+        sender.sendMessage("§e[Staff Manager] STDOUT : Lifted Staff Ban of §b%s§e." % (args[0]))
         target.sendMessage("§cAccount Ban of Staff")
         target.sendMessage("Your account recently lost its Staff permissions due to a violation of our staff rules")
         target.sendMessage("Please review the staff rules and click below to agree")
@@ -345,7 +345,7 @@ def onCommand(sender,label,args):
                 return True
             for p in Bukkit.getOnlinePlayers():
                 if p.isOp():
-                    p.sendMessage("§e[Staff Manager] STDOUT : §b" + sender.getName() + "§e claimed staff and verified their account to have staff perms §b")
+                    p.sendMessage("§e[Staff Manager] STDOUT : §b%s§e claimed staff and verified their account to have staff perms §b" % (sender.getName()))
             
             #Run start
             f["banned"] = 0
@@ -358,7 +358,7 @@ def onCommand(sender,label,args):
             sender.sendMessage("§e[Staff Manager] STDOUT : §bYou§e just claimed staff and verified their account to have staff perms §b")
             return True
     elif cmd=="punish":
-        if not any([sender.hasPermission("group."+i) for i in allowed]):
+        if not sender.hasPermission("staffmanager.punish"):
             sender.sendMessage("§6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
             return True
         
@@ -451,9 +451,9 @@ def onCommand(sender,label,args):
             d["locked"] = 0
         if bn != 0:
             if bn == -1:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban "+args[0]+" \"Stack Start\"")
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban %s \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0],str(bn), "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
             else:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban "+args[0]+" "+str(bn)+"s \"Stack Start\"")
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban %s %ss \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0],str(bn), "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
         
         
         sender.sendMessage()
@@ -557,7 +557,7 @@ def onCommand(sender,label,args):
                     _any = True
                     sender.sendMessage("")
                     sender.sendMessage("Muted")
-                    sender.sendMessage("Time until mute expires: "+str(datetime.timedelta(seconds=now()-mute_info["unmute_timestamp"])))
+                    sender.sendMessage("Time until mute expires: %s" % (str(datetime.timedelta(seconds=now()-mute_info["unmute_timestamp"]))))
             else:
                 sender.sendMessage("No Data (mute_info returned None)")
             if not _any:
@@ -571,7 +571,7 @@ def onCommand(sender,label,args):
                     sender.sendMessage("Reason: "+i)
                     if len(v) != 0:
                         for n in v:
-                            sender.sendMessage("Rule Breaking Item: "+n)
+                            sender.sendMessage("Rule Breaking Item: %s" % (n))
                 sender.sendMessage("")
                 sender.sendMessage("If you believe you were punished unfairly join discord (/trigger discord) and apeal your ban in tickets")
     for p in Bukkit.getOnlinePlayers():
