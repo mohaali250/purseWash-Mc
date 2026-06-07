@@ -203,6 +203,7 @@ def onCommand(sender,label,args):
             sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] STDOUT : When the target completes their requirements they'll get notified"))
         else:
             session_notify(target)
+        return True
     elif cmd=="suspend":
         if not sender.hasPermission("staffmanager.suspend"):
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
