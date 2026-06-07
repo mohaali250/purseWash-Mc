@@ -550,7 +550,7 @@ def onCommand(sender,label,args):
                 status_text = "Active Staff"
                 staff_bar_value = 3
             sender.sendMessage("§6Your current staff status:")
-            staff_bar = "[" + u"\u2588"*staff_bar_value + " "*(3-staff_bar_value)  + "]"
+            staff_bar = "[" + "#"*staff_bar_value + "-"*(3-staff_bar_value)  + "]"
             sender.sendMessage("§6{} {}".format(staff_bar, status_text))
             if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
         if section_show == 2 or section_show == 0:
