@@ -190,7 +190,6 @@ def onCommand(sender,label,args):
             return True
         if d["staff"] == "" and d["locked"] == -1:
             sender.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : Target will need to agree to the rules first before having staff perms"))
-
         
         sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] Sucess : Promoted player &b%s&a for &b%s&a." % (args[0], args[1])))
         target.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : You are promoted for &a%s&b." % (args[1])))
@@ -539,6 +538,8 @@ def onCommand(sender,label,args):
             section_show = 1
         elif args[0] == "punishments":
             section_show = 2
+        elif args[0] == "raw_data":
+            section_show = 3
         
         if section_show == 1 or section_show == 0:
             status_text = "Null"
@@ -617,12 +618,12 @@ def onCommand(sender,label,args):
                             sender.sendMessage("Rule Breaking Item: %s" % (n))
                 sender.sendMessage("")
                 sender.sendMessage("If you believe you were punished unfairly join discord (/trigger discord) and apeal your ban in tickets")
-            if section_show == 3 or section_show == 0:
-                sender.sendMessage("Raw staff data:")
-                for i, v in d.items():
-                    sender.sendMessage("")
-                    sender.sendMessage("Key: %s" % (i))
-                    sender.sendMessage("Value: %s" % (v))
+        if section_show == 3:
+            sender.sendMessage("Raw staff data:")
+            for i, v in d.items():
+                sender.sendMessage("")
+                sender.sendMessage("Key: %s" % (i))
+                sender.sendMessage("Value: %s" % (v))
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
     save()
