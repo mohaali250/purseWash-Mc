@@ -591,6 +591,8 @@ def onTabComplete(sender,alias,args):
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="punish":
             return list(gdata["punishments"].keys())
+        if cmd=="promote":
+            return list(gdata["ranks"].keys())
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staff_ban","demote"]]):
             return ["\"" + args[-1] + "\""]
