@@ -71,9 +71,12 @@ def ensure(u):
         "notify": 0
     }
 
-    for k, default in defaults.items():
-        if k not in data[u] or not isinstance(data[u][k], type(default)):
-            data[u][k] = default
+    if u not in data:
+        data[u] = defaults.copy()
+    else:
+        for k, default in defaults.items():
+            if k not in data[u] or not isinstance(data[u][k], type(default)):
+                data[u][k] = default
 def parse(t):
     if t=="perm":
         return -1
