@@ -67,10 +67,10 @@ def ensure(u):
         "staff_playtime": 0,
         "locked": -1,
         "banned": 0,
-        "punishments": [],
+        "punishments": {},
         "notify": 0
     }
-    
+
     for k, default in defaults.items():
         if k not in data[u] or not isinstance(data[u][k], type(default)):
             data[u][k] = default
