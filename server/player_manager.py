@@ -76,7 +76,7 @@ def ensure(u):
 def pretty_timedelta(timeinterval):
     if not isinstance(timeinterval,int):
         return None
-    d = pretty_timedelta(timeinterval)
+    d = datetime.timedelta(seconds=timeinterval)
 
     if d.days != 0:
         st = "{} days, {:02d}:{:02d}".format(
