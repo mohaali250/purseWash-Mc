@@ -202,7 +202,6 @@ def onCommand(sender,label,args):
             sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] STDOUT : When the target completes their requirements they'll get notified"))
         else:
             session_notify(target)
-        return True
     elif cmd=="suspend":
         if not sender.hasPermission("staffmanager.suspend"):
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
@@ -378,6 +377,7 @@ def onCommand(sender,label,args):
             #Run start
             f["banned"] = 0
             f["locked"] = 0
+            f["punishments"] = {}
             if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
             
@@ -387,7 +387,6 @@ def onCommand(sender,label,args):
             elif f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
                 sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet"))
             else: sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &bYou&e just acepted to staff rules and made your account elegible to apply&b"))
-            return True
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command"))
@@ -488,9 +487,7 @@ def onCommand(sender,label,args):
         if kick:
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s \"Stack Start; %s\"; Stack End; Rejoin with that in mind" % (args[0], "\\\""+"\\\", \\\"".join(reason_stack)+"\\\"")) 
         
-        
         sender.sendMessage()
-        return True
     elif cmd=="status":
         
         if not hasattr(sender, "getUniqueId"):
