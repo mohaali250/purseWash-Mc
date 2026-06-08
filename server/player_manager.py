@@ -646,6 +646,8 @@ def onTabComplete(sender,alias,args):
             except Exception:
                 try:
                     num = parse(args[1])
+                    if num is None:
+                        return []
                 except Exception:
                     return [args[1]+c for c in ["s","min","h","d","wk"] if (args[1]+c).lower().startswith(args[1].lower())]
             return [args[1] + i for i in ["s","min","h","d","wk"]]
