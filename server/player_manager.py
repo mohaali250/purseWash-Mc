@@ -591,8 +591,6 @@ def onCommand(sender,label,args):
                 sender.sendMessage("")
                 sender.sendMessage("Key: %s" % (i))
                 sender.sendMessage("Value: %s" % (v))
-    print("GOT (reference): "+str(d))
-    print("GOT (database): "+str(data[u]))
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
@@ -639,7 +637,6 @@ def tick():
         session_notify(p)
     save()
 def session_notify(p):
-    return
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
     ensure(u)
