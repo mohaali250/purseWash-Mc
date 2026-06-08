@@ -591,6 +591,17 @@ def onCommand(sender,label,args):
                 sender.sendMessage("")
                 sender.sendMessage("Key: %s" % (i))
                 sender.sendMessage("Value: %s" % (v))
+    elif cmd=="apply":
+        sender.sendMessage("How to apply")
+        sender.sendMessage("")
+        sender.sendMessage("Requirements")
+        sender.sendMessage("1. Must be 13 or older")
+        sender.sendMessage("2. Must join our discord (/trigger discord)")
+        sender.sendMessage("3. Must respond and elaborate on all questions, this step will determine if you are accepted or not")
+        sender.sendMessage("4. Must have the required playtime (but you can apply before), but depends on what rank are you going for:")
+        for i in gdata["ranks"]:
+            sender.sendMessage("    %s: %s" % (i, str(datetime.timedelta(seconds=parse(gdata["ranks"][i]["required_playtime"])))))
+        sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks")
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
@@ -599,6 +610,8 @@ def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0]
+    if cmd=="apply":
+        return []
     if len(args)==1:
         if cmd=="activate":
             return typing_filter(args[0],["staff"])
@@ -701,7 +714,7 @@ with open(FILE,"r") as f:
     data=json.load(f)
 # Run  
     
-for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
+for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status","apply"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
 gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
