@@ -98,22 +98,22 @@
 	},
 	"ranks":{
 		"helper":{
-			"required_playtime":"5h"
+			"required_playtime":"9h"
 		},
 		"mod":{
-			"required_playtime":"5h"
+			"required_playtime":"9h"
 		},
 		"admin":{
-			"required_playtime":"8h"
-		},
-		"builder":{
 			"required_playtime":"12h"
 		},
+		"builder":{
+			"required_playtime":"24h"
+		},
 		"dev":{
-			"required_playtime":"18h"
+			"required_playtime":"36h"
 		},
 		"manager":{
-			"required_playtime":"36h"
+			"required_playtime":"96h"
 		}
 	}
 }
