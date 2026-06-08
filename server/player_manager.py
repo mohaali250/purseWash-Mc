@@ -486,7 +486,8 @@ def onCommand(sender,label,args):
         if not hasattr(sender, "getUniqueId"):
             sender.sendMessage("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
             return True
-        
+        d = f
+
         # banned?
         # .value
         #   -1 : Perm Ban
