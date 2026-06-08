@@ -589,11 +589,11 @@ def onCommand(sender,label,args):
                 sender.sendMessage("")
                 sender.sendMessage("Key: %s" % (i))
                 sender.sendMessage("Value: %s" % (v))
-    for p in Bukkit.getOnlinePlayers():
-        session_notify(p) 
     print("GOT (reference): "+str(d))
     print("GOT (database): "+str(data[u]))
     save()
+    for p in Bukkit.getOnlinePlayers():
+        session_notify(p) 
     return True
 def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
