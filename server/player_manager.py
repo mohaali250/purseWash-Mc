@@ -307,6 +307,7 @@ def onCommand(sender,label,args):
         #Run start
         d["banned"]=now()
         d["staff_playtime"] = 0
+        d["locked"] = 0
         #Run end
         sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Lifted Staff Ban of &b%s&e." % (args[0])))
         target.sendMessage(chatcolor("&cAccount Ban of Staff"))
