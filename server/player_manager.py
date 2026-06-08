@@ -55,6 +55,7 @@ def get_total_playtime_seconds(u):
     player = Bukkit.getPlayer(UUID.fromString(u))
     return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
 def ensure(u):
+    print("ENSURE BEFORE:", data.get(u))
     defaults = {
         "staff": "",
         "staff_playtime": get_total_playtime_seconds(u),
@@ -69,6 +70,7 @@ def ensure(u):
         for k, default in defaults.items():
             if k not in data[u] or not isinstance(data[u][k], type(default)):
                 data[u][k] = default
+    print("ENSURE AFTER:", data.get(u))
 def parse(t):
     if t=="perm":
         return -1
