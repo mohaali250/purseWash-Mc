@@ -603,8 +603,15 @@ def onCommand(sender,label,args):
             gdata["ranks"].items(),
             key=lambda item: parse(item[1]["required_playtime"])
         )
-        for i in sorted_ranks:
-            sender.sendMessage("    %s: %s" % (i, str(datetime.timedelta(seconds=parse(gdata["ranks"][i]["required_playtime"])))))
+        for rank, info in sorted_ranks:
+            sender.sendMessage(
+                "    %s: %s" % (
+                    rank,
+                    str(datetime.timedelta(
+                        seconds=parse(info["required_playtime"])
+                    ))
+                )
+            )
         sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks. Also check your playtime with [/playtime] and your staff status with [/status]")
     save()  
     for p in Bukkit.getOnlinePlayers():
