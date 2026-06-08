@@ -73,6 +73,21 @@ def ensure(u):
             if k not in data[u]:
                 data[u][k] = default
         print("AFTER ENSURE:", data[u])
+def pretty_timedelta(timeinterval):
+    if not isinstance(timeinterval,int):
+        return None
+    d = pretty_timedelta(timeinterval)
+
+    if d.days != 0:
+        st = f"{d.days} days, {d.hours:0>2}:{d.minutes:0>2}"
+    else:
+        st = f"{d.hours:0>2}:{d.minutes:0>2}"
+    if d.seconds != 0:
+        nd = f":{d.seconds:0>2}"
+    else:
+        nd = ""
+    return st + nd
+        
 def parse(t):
     if t=="perm":
         return -1
@@ -206,10 +221,10 @@ def onCommand(sender,label,args):
         d["locked"]=now()+dur
         remove_staff(target.getName(),d["staff"])
         #Run end
-        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Suspended &b%s&e for &b%s&e expiring in &b%s" % (args[0],",".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))))
+        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Suspended &b%s&e for &b%s&e expiring in &b%s" % (args[0],",".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never"))))
         target.sendMessage(chatcolor("&cAccount Suspension of Staff"))
         target.sendMessage(chatcolor("&cYour account lost its Staff permissions due to a violation of our staff rules"))
-        target.sendMessage(chatcolor("&cSuspension expires in &b%s" % (str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))))
+        target.sendMessage(chatcolor("&cSuspension expires in &b%s" % (str(pretty_timedelta(dur) if dur != -1 else "Never"))))
         for i in args[2:]:
             target.sendMessage("&cReason: %s" % (i))
         target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
@@ -281,7 +296,7 @@ def onCommand(sender,label,args):
         remove_staff(target.getName(),d["staff"])
         d["staff"]=""
         #Run end
-        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Staff Banned &b%s&e for &b\"%s\"&e expiring in &b%s" % (args[0],"&e,&b".join(args[2:]),str(datetime.timedelta(seconds=dur) if dur != -1 else "Never"))))
+        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Staff Banned &b%s&e for &b\"%s\"&e expiring in &b%s" % (args[0],"&e,&b".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never"))))
         target.sendMessage(chatcolor("&cAccount Ban of Staff"))
         target.sendMessage(chatcolor("Your account lost its Staff permissions due to a violation of our staff rules"))
         target.sendMessage(chatcolor("You must wait out your ban, reapply to get your rank back and redo the required playtime"))
@@ -535,7 +550,7 @@ def onCommand(sender,label,args):
                 status_text = "Non-Staff"
                 staff_bar_value = 1
             elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
-                status_text = "Pending staff (%s left)" % (str(datetime.timedelta(seconds=parse(gdata["ranks"][d["staff"]]["required_playtime"])-d["staff_playtime"])))
+                status_text = "Pending staff (%s left)" % (str(pretty_timedelta(parse(gdata["ranks"][d["staff"]]["required_playtime"])-d["staff_playtime"])))
                 staff_bar_value = 1
             elif d["locked"] == -1:
                 status_text = "Needs to agree to rules"
@@ -557,7 +572,7 @@ def onCommand(sender,label,args):
                 sender.sendMessage("")
                 
                 if max(d["locked"],d["banned"])-now() > 0:
-                    expires_time_text = str(datetime.timedelta(seconds=max(d["locked"],d["banned"])-now()))
+                    expires_time_text = str(pretty_timedelta(max(d["locked"],d["banned"])-now()))
                 elif d["banned"] == -1:
                     expires_time_text = "Never"
                 else:
@@ -569,7 +584,7 @@ def onCommand(sender,label,args):
                     _any = True
                     sender.sendMessage("")
                     sender.sendMessage("Muted")
-                    sender.sendMessage("Time until mute expires: %s" % (str(datetime.timedelta(seconds=mute_info["unmute_timestamp"]-now()) if mute_info["unmute_timestamp"] != -1 else "Never")))
+                    sender.sendMessage("Time until mute expires: %s" % (str(pretty_timedelta(mute_info["unmute_timestamp"]-now()) if mute_info["unmute_timestamp"] != -1 else "Never")))
             else:
                 sender.sendMessage("No Data (mute_info returned None)")
             if not _any:
@@ -607,9 +622,9 @@ def onCommand(sender,label,args):
             sender.sendMessage(
                 "    %s: %s" % (
                     rank,
-                    str(datetime.timedelta(
-                        seconds=parse(info["required_playtime"])
-                    ))
+                    str(pretty_timedelta(
+                        info["required_playtime"]
+                        ))
                 )
             )
         sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks. Also check your playtime with [/playtime] and your staff status with [/status]")
