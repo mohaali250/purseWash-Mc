@@ -80,23 +80,16 @@ def pretty_timedelta(timeinterval):
     hours = (timeinterval % 86400) // 3600
     minutes = (timeinterval % 3600) // 60
     seconds = timeinterval % 60
-
+    text = ""
     if days != 0:
-        return "%d days %dh %dmins" % (
-            days,
-            hours,
-            minutes
-        )
-    else:
-        st = "{d}h {d}mins".format(
-            hours,
-            minutes
-        )
+        text += "%d days " % (days)
+    if hours != 0:
+        text += "%d hrs " % (hours)
+    if minutes != 0:
+        text += "%d mins " % (minutes)
     if seconds != 0:
-        nd = " {d}secs".format(seconds)
-    else:
-        nd = ""
-    return st + nd
+        text += "%d secs " % (seconds)
+    return text[:-1]
         
 def parse(t):
     if t=="perm":
