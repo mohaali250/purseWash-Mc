@@ -82,18 +82,18 @@ def pretty_timedelta(timeinterval):
     seconds = timeinterval % 60
 
     if days != 0:
-        return "%d days %02dh %02dmins" % (
+        return "%d days %dh %dmins" % (
             days,
             hours,
             minutes
         )
     else:
-        st = "{:02d}h {:02d}mins".format(
+        st = "{d}h {d}mins".format(
             hours,
             minutes
         )
     if seconds != 0:
-        nd = " {:02d}secs".format(seconds)
+        nd = " {d}secs".format(seconds)
     else:
         nd = ""
     return st + nd
