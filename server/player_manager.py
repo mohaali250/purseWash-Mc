@@ -599,9 +599,13 @@ def onCommand(sender,label,args):
         sender.sendMessage("2. Must join our discord (/trigger discord)")
         sender.sendMessage("3. Must respond and elaborate on all questions, this step will determine if you are accepted or not")
         sender.sendMessage("4. Must have the required playtime (but you can apply before), but depends on what rank are you going for:")
-        for i in gdata["ranks"]:
+        sorted_ranks = sorted(
+            gdata["ranks"].items(),
+            key=lambda item: parse(item[1]["required_playtime"])
+        )
+        for i in sorted_ranks:
             sender.sendMessage("    %s: %s" % (i, str(datetime.timedelta(seconds=parse(gdata["ranks"][i]["required_playtime"])))))
-        sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks")
+        sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks. Also check your playtime with [/playtime] and your staff status with [/status]")
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
