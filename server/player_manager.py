@@ -76,21 +76,24 @@ def ensure(u):
 def pretty_timedelta(timeinterval):
     if not isinstance(timeinterval,int):
         return None
-    d = datetime.timedelta(seconds=timeinterval)
+    days = timeinterval // 86400
+    hours = (timeinterval % 86400) // 3600
+    minutes = (timeinterval % 3600) // 60
+    seconds = timeinterval % 60
 
-    if d.days != 0:
-        st = "{} days, {:02d}:{:02d}".format(
-            d.days,
-            d.hours,
-            d.minutes
+    if days != 0:
+        return "%d days, %02d:%02d" % (
+            days,
+            hours,
+            minutes
         )
     else:
         st = "{:02d}:{:02d}".format(
-            d.hours,
-            d.minutes
+            hours,
+            minutes
         )
-    if d.seconds != 0:
-        nd = ":{:02d}".format(d.seconds)
+    if seconds != 0:
+        nd = ":{:02d}".format(seconds)
     else:
         nd = ""
     return st + nd
