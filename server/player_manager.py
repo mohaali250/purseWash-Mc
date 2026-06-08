@@ -121,6 +121,7 @@ def get_mute_info(player_name):
 def chatcolor(msg):
     return ChatColor.translateAlternateColorCodes('&', msg)
 def onCommand(sender,label,args):
+    global data
     if gdata is None:
         print("[Staff] Failed to load remote config")
         return
