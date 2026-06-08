@@ -161,6 +161,7 @@ def onCommand(sender,label,args):
         print("BEFORE:", d)
         if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
+        save()
         print("AFTER:", d)
         # Run end
         if not eligible(d):
