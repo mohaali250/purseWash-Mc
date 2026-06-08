@@ -70,8 +70,7 @@ def ensure(u):
     else:
         print("BEFORE ENSURE:", data[u])
         for k, default in defaults.items():
-            if k not in data[u] or not isinstance(data[u][k], type(default)):
-                print("RESETTING", k)
+            if k not in data[u]:
                 data[u][k] = default
         print("AFTER ENSURE:", data[u])
 def parse(t):
