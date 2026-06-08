@@ -55,7 +55,6 @@ def get_total_playtime_seconds(u):
     player = Bukkit.getPlayer(UUID.fromString(u))
     return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
 def ensure(u):
-    print("ENSURE BEFORE:", data.get(u))
     defaults = {
         "staff": "",
         "staff_playtime": get_total_playtime_seconds(u),
@@ -70,7 +69,6 @@ def ensure(u):
         for k, default in defaults.items():
             if k not in data[u] or not isinstance(data[u][k], type(default)):
                 data[u][k] = default
-    print("ENSURE AFTER:", data.get(u))
 def parse(t):
     if t=="perm":
         return -1
@@ -123,7 +121,6 @@ def get_mute_info(player_name):
 def chatcolor(msg):
     return ChatColor.translateAlternateColorCodes('&', msg)
 def onCommand(sender,label,args):
-    global data
     if gdata is None:
         print("[Staff] Failed to load remote config")
         return
@@ -164,7 +161,6 @@ def onCommand(sender,label,args):
         print("BEFORE:", d)
         if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
-        save()
         print("AFTER:", d)
         # Run end
         if not eligible(d):
@@ -593,9 +589,9 @@ def onCommand(sender,label,args):
                 sender.sendMessage("Value: %s" % (v))
     print("GOT (reference): "+str(d))
     print("GOT (database): "+str(data[u]))
-    save()
-    #for p in Bukkit.getOnlinePlayers():
-    #    session_notify(p) 
+    save()  
+    for p in Bukkit.getOnlinePlayers():
+        session_notify(p) 
     return True
 def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
@@ -639,6 +635,7 @@ def tick():
         session_notify(p)
     save()
 def session_notify(p):
+    return
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
     ensure(u)
