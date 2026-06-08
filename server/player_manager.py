@@ -465,7 +465,6 @@ def onCommand(sender,label,args):
             sender.sendMessage("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
             return True
         
-        d = f
         # banned?
         # .value
         #   -1 : Perm Ban
@@ -535,8 +534,8 @@ def onCommand(sender,label,args):
             elif d["staff"] == "":
                 status_text = "Non-Staff"
                 staff_bar_value = 1
-            elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
-                status_text = "Pending staff (%s left)" % (str(datetime.timedelta(seconds=parse(gdata["ranks"][f["staff"]]["required_playtime"])-f["staff_playtime"])))
+            elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
+                status_text = "Pending staff (%s left)" % (str(datetime.timedelta(seconds=parse(gdata["ranks"][d["staff"]]["required_playtime"])-d["staff_playtime"])))
                 staff_bar_value = 1
             elif d["locked"] == -1:
                 status_text = "Needs to agree to rules"
