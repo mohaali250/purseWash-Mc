@@ -625,7 +625,8 @@ def onCommand(sender,label,args):
                 sender.sendMessage("Value: %s" % (v))
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
-    print("GOT: "+str(d))
+    print("GOT (reference): "+str(d))
+    print("GOT (database): "+str(data[u]))
     save()
     return True
 
