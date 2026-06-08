@@ -1,86 +1,59 @@
 # -*- coding: utf-8 -*-
-
 import json,random,datetime,time,re,os
-
 import pyspigot as ps
-
 from java.net import URL
 from java.util import Scanner
 from java.util import UUID
-
 from org.bukkit import Bukkit
 from org.bukkit import Statistic
-
 from org.bukkit.command import TabExecutor
 from java.util import Arrays
-
 from org.bukkit.configuration.file import YamlConfiguration
 from java.io import File
-
 from org.bukkit.event import Listener, EventHandler
 from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.player import PlayerQuitEvent
 from org.bukkit.event.player import PlayerKickEvent
-
 from org.bukkit import ChatColor
-
-
 from net.md_5.bungee.api.chat import TextComponent
 from net.md_5.bungee.api.chat import ClickEvent
 from net.md_5.bungee.api.chat import HoverEvent
 from net.md_5.bungee.api.chat.hover.content import Text
-
 # functions
-
 def fetch_data():
     try:
         print("Fetching:", URL_DATA)
-
         stream = URL(URL_DATA).openStream()
         scanner = Scanner(stream).useDelimiter("\\A")
-
         response = scanner.next() if scanner.hasNext() else None
         scanner.close()
-
         print("Response:")
         print(response)
-
         if response is None:
             print("Response was None")
             return None
-
         obj = json.loads(response)
-
         print("Parsed:")
         print(obj)
-
         return obj
-
     except Exception as ex:
         print("EXCEPTION:", ex)
         import traceback
         traceback.print_exc()
         return None
-
-
 def save():
     tmp = File(FILE + ".tmp")
     with open(tmp.getPath(), "w") as f:
         json.dump(data, f, indent=4)
-
     File(FILE).delete()
     tmp.renameTo(File(FILE))
-
 def now():
     return int(time.time()) 
-
 def uuid(p):
     return str(p.getUniqueId())
-
 def get_total_playtime_seconds(u):
     player = Bukkit.getPlayer(UUID.fromString(u))
     return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
-
 def ensure(u):
     defaults = {
         "staff": "",
@@ -90,7 +63,6 @@ def ensure(u):
         "punishments": {},
         "notify": 0
     }
-
     if u not in data:
         data[u] = defaults.copy()
     else:
@@ -109,16 +81,12 @@ def parse(t):
         elif u=="d": total+=n*86400
         elif u=="wk": total+=n*604800
     return total if total>0 else None
-
 def lp(cmd):
     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"lp "+cmd)
-
 def add_staff(name,rank):
     lp("user %s parent add %s"%(name,rank))
-
 def remove_staff(name,rank):
     lp("user %s parent remove %s"%(name,rank))
-
 def eligible(d):
     if d["staff"] == "":return False
     return not any([
@@ -126,8 +94,6 @@ def eligible(d):
         d["locked"] != 0,
         parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]
     ])
-
-
 def get_mute_info(player_name):
     player = Bukkit.getOfflinePlayer(player_name)
     if player is None:
@@ -152,10 +118,8 @@ def get_mute_info(player_name):
     except:
         pass
     return data
-
 def chatcolor(msg):
     return ChatColor.translateAlternateColorCodes('&', msg)
-
 def onCommand(sender,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
@@ -629,10 +593,8 @@ def onCommand(sender,label,args):
     print("GOT (database): "+str(data[u]))
     save()
     return True
-
 def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
-
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0]
     if len(args)==1:
@@ -663,8 +625,6 @@ def onTabComplete(sender,alias,args):
         if cmd=="punish":
             return typing_filter(args[-1],list(gdata["punishments"].keys()))
     return []
-
-
 def tick():
     for p in Bukkit.getOnlinePlayers():
         u=uuid(p)
@@ -674,8 +634,6 @@ def tick():
             d["staff_playtime"]+=60
         session_notify(p)
     save()
-
-
 def session_notify(p):
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
@@ -699,15 +657,10 @@ def session_notify(p):
     if d["locked"]==-2 and not _bit.read(d["notify"],5):
         p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are Demoted from staff. See /status for more")
         d["notify"] = _bit.write(d["notify"],5,True)
-
-
-
-
 class _bit:
     @staticmethod
     def read(integer,n):
         return (integer >> n) & 1
-
     @staticmethod
     def write(integer,n,value):
         if value is None:
@@ -717,8 +670,6 @@ class _bit:
         else:
             integer &= ~(1 << n)
         return integer
-
-
 def handle_join(event):
     global local_session_notify
     p = event.getPlayer()
@@ -727,50 +678,32 @@ def handle_join(event):
     d=data[u]
     local_session_notify[uuid(p)] = d["notify"]
     session_notify(p)
-
 def handle_disconnect(event):
     player = event.getPlayer()
     local_session_notify.pop(uuid(player), None)
     pass
-
-
-
 def onJoin(event):
     handle_join(event)
-
 def onQuit(event):
     handle_disconnect(event)
-
-
 def onKick(event):
     handle_disconnect(event)
-
 # starter variables
-
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
 local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlinePlayers()],[0]*len(Bukkit.getOnlinePlayers()))}
-
-
 if not os.path.exists(FILE):
     with open(FILE,"w") as f:
         json.dump({},f) 
-
 with open(FILE,"r") as f:
     data=json.load(f)
-
 # Run  
     
 for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
-
-
 gdata = fetch_data()
-
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
-
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
-
 print("[Staff] Loaded.")
