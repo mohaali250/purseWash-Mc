@@ -79,11 +79,18 @@ def pretty_timedelta(timeinterval):
     d = pretty_timedelta(timeinterval)
 
     if d.days != 0:
-        st = f"{d.days} days, {d.hours:0>2}:{d.minutes:0>2}"
+        st = "{} days, {:02d}:{:02d}".format(
+            d.days,
+            d.hours,
+            d.minutes
+        )
     else:
-        st = f"{d.hours:0>2}:{d.minutes:0>2}"
+        st = "{:02d}:{:02d}".format(
+            d.hours,
+            d.minutes
+        )
     if d.seconds != 0:
-        nd = f":{d.seconds:0>2}"
+        nd = ":{:02d}".format(d.seconds)
     else:
         nd = ""
     return st + nd
