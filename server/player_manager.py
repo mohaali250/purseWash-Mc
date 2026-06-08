@@ -634,7 +634,7 @@ def onCommand(sender,label,args):
                 "    %s: %s" % (
                     rank,
                     str(pretty_timedelta(
-                        info["required_playtime"]
+                        parse(info["required_playtime"])
                         ))
                 )
             )
