@@ -596,13 +596,17 @@ def onCommand(sender,label,args):
                 staff_bar_value = 1
             elif d["locked"] == -1:
                 status_text = "Needs to agree to rules"
-                staff_bar_value = 1
+                staff_bar_value = 2
+            elif d["locked"] == -3:
+                status_text = "Recently changed"
+                staff_bar_value = 2
             else:
                 status_text = "Active Staff"
                 staff_bar_value = 3
             sender.sendMessage(chatcolor("&6Your current staff status:"))
             staff_bar = "[" + "#"*staff_bar_value + "-"*(3-staff_bar_value)  + "]"
             sender.sendMessage(chatcolor("&6{} {}".format(staff_bar, status_text)))
+            sender.sendMessage(chatcolor("&a    Staff rank: " % (f["staff"])))
             if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
         if section_show == 2 or section_show == 0:
             sender.sendMessage("Punishments Tab:")
