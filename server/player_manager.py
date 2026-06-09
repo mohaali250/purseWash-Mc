@@ -85,7 +85,10 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
     }
     message_color = states[state]["default_color"]
     text = message_color+string.replace("%s", states[state]["highlight"]+"%s"+message_color) % variables
-    target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+"[Pyspigot/player_manager.py] [%s] %s : %s" % (states[state]["contents"],_type,text)))
+    if _type != "PRINT":
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+"[Pyspigot/player_manager.py] [%s] %s : %s" % (states[state]["contents"],_type,text)))
+    else:
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+"[Pyspigot/player_manager.py] [%s] %s" % (states[state]["contents"],text)))
 
 def ensure(u):
     print("ENSURE CALLED FOR", u)
@@ -205,10 +208,10 @@ def onCommand(sender,label,args):
             chat_log(sender,2,"Command \"/promote\" requires exactely 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
         if d["staff"] == "" and d["banned"] > time.time():
-            chat_log(sender,1,"Target %s is staff banned",variables=(args[0]),_type=exception_type.PERMISSION_ERROR)
+            chat_log(sender,1,"Target %s is staff banned",variables=(args[0]))
             return True
         
-        chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],args[1]),_type=exception_type.SUCCESS)
+        chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],args[1]))
         chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",args[1]))
         # Run start
         if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
@@ -225,54 +228,49 @@ def onCommand(sender,label,args):
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
+            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         if d["staff"] == "":
-            sender.sendMessage(chatcolor("&6[Staff Manager] [INFO] STDOUT : Cannot suspend non-staff players, nothing has changed"))
+            chat_log(sender,1,"Cannot suspend %s because they arent a staff member",variables=(args[0]))
             return True
         if len(args)<2:
-            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] ParameterError : Command \"/suspend\" requires atleast 2 arguments (%s were given)" % (str(len(args)))))
+            chat_log(sender,2,"Command \"/suspend\" requires atleast 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
         if len(args)<3:
-            sender.sendMessage(chatcolor("&c[Staff Manager] [WARN] STDOUT : You must provide a reason"))
+            chat_log(sender,1,"You must provide a reason")
             return True
         dur=parse(args[1])
         if dur is None:
-            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] TypeError : Argument 2 cannot be parsed as a valid timedelta"))
+            chat_log(sender,1,"%s returned none when parsed as a timedelta",variables=(args[1]),_type=exception_type.PARSE_ERROR)
             return True
         
         #Run start
         d["locked"]=now()+dur
         remove_staff(target.getName(),d["staff"])
         #Run end
-        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Suspended &b%s&e for &b%s&e expiring in &b%s" % (args[0],",".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never"))))
-        target.sendMessage(chatcolor("&cAccount Suspension of Staff"))
-        target.sendMessage(chatcolor("&cYour account lost its Staff permissions due to a violation of our staff rules"))
-        target.sendMessage(chatcolor("&cSuspension expires in &b%s" % (str(pretty_timedelta(dur) if dur != -1 else "Never"))))
-        for i in args[2:]:
-            target.sendMessage("&cReason: %s" % (i))
-        target.sendMessage("If you believe this was a misunderstanding, appeal at discord")
+        chat_log(sender,3,"Suspended %s for &a"+"&2,&a".join(args[2:])+"&2 expiring in %s.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        chat_log(target,0,"%s are now suspended from staff. More info on [/status]",variables=("You"))
     elif cmd=="demote":
         if not sender.hasPermission("staffmanager.demote"):
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
+            chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
         
         if len(args)<1:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
+            chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
+            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         if d["staff"] == "":
-            sender.sendMessage(chatcolor("&6[Staff Manager] [INFO] STDOUT : Target wasn't staff, nothing has changed"))
+            chat_log(sender,1,"Cannot demote %s because they arent a staff member",variables=(args[0]))
             return True
         
         #Run start
@@ -281,67 +279,57 @@ def onCommand(sender,label,args):
         d["staff"]=""
         d["locked"]=-2
         #Run end
-        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Demoted &b%s&e for &b%s" % (args[0]," ".join(args[1:]))))
-        target.sendMessage(chatcolor("&cAccount Demotion of Staff"))
-        target.sendMessage(chatcolor("&cYour account lost its Staff permissions due to a violation of our staff rules"))
-        target.sendMessage(chatcolor("&cYou must reapply to get your rank back and redo the required playtime"))
-        for i in args[2:]:
-            target.sendMessage(chatcolor("&cReason: %s" % (i)))
-        target.sendMessage(chatcolor("If you believe this was a misunderstanding, appeal at discord"))
+        chat_log(sender,3,"Demoted %s for &a"+"&2,&a".join(args[1:])+"&2.",variables=(args[0]))
+        chat_log(target,0,"%s are now demoted from staff. More info on [/status]",variables=("You"))
     elif cmd=="staff_ban":
         if not sender.hasPermission("staffmanager.staffban"):
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
+            chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
         
         if len(args)<1:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
+            chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
+            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         
         if d["staff"] == "":
-            sender.sendMessage(chatcolor("&6[Staff Manager] [INFO] STDOUT : Target wasn't staff, nothing has changed"))
+            chat_log(sender,1,"Cannot staff ban %s because they arent a staff member",variables=(args[0]))
             return True
         if len(args)<2:
-            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] ParameterError : Command \"/staff_ban\" requires atleast 2 arguments (%s were given)" % (str(len(args)))))
+            chat_log(sender,2,"Command \"/staff_ban\" requires atleast 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
         if len(args)<3:
-            sender.sendMessage(chatcolor("&c[Staff Manager] [WARN] STDOUT : You must provide a reason"))
+            chat_log(sender,1,"You must provide a reason")
             return True
         dur=parse(args[1])
         if dur is None:
-            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] TypeError : Argument 2 cannot be parsed as a valid timedelta"))
+            chat_log(sender,1,"%s returned none when parsed as a timedelta",variables=(args[1]),_type=exception_type.PARSE_ERROR)
             return True
         #Run start
         d["banned"]= -1 if dur == -1 else now()+dur
         remove_staff(target.getName(),d["staff"])
         d["staff"]=""
         #Run end
-        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Staff Banned &b%s&e for &b\"%s\"&e expiring in &b%s" % (args[0],"&e,&b".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never"))))
-        target.sendMessage(chatcolor("&cAccount Ban of Staff"))
-        target.sendMessage(chatcolor("Your account lost its Staff permissions due to a violation of our staff rules"))
-        target.sendMessage(chatcolor("You must wait out your ban, reapply to get your rank back and redo the required playtime"))
-        for i in args[2:]:
-            target.sendMessage(chatcolor("Reason: "+i))
-        target.sendMessage(chatcolor("If you believe this was a misunderstanding, appeal at discord"))
+        chat_log(sender,3,"Staff banned %s for &a"+"&2,&a".join(args[2:])+"&2 expiring in %s.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        chat_log(target,0,"%s are now banned from staff. More info on [/status]",variables=("You"))
     elif cmd=="staff_unban":
         if not sender.hasPermission("staffmanager.staffunban"):
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command"))
+            chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
         
         if len(args)<1:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
+            chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
+            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
@@ -349,76 +337,63 @@ def onCommand(sender,label,args):
         #Run start
         d["banned"]=now()
         d["staff_playtime"] = 0
-        d["locked"] = 0
+        d["locked"] = -2
         #Run end
-        sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : Lifted Staff Ban of &b%s&e." % (args[0])))
-        target.sendMessage(chatcolor("&cAccount Ban of Staff"))
-        target.sendMessage(chatcolor("Your account recently lost its Staff permissions due to a violation of our staff rules"))
-        target.sendMessage(chatcolor("Please review the staff rules and click below to agree"))
-        msg = TextComponent(chatcolor("&a[Reactivate my Account]"))
-        msg.setClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                "/activate staff"
-            ))
-        msg.setHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                [Text("By clicking this you agree to the staff rules")]
-            ))
-        target.spigot().sendMessage(msg)
+        chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        chat_log(target,0,"%s ban from staff is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
     elif cmd=="activate":
         if len(args)<1:
-            sender.sendMessage(chatcolor("&6[Pyspigot / player_manager.py] [WARN] ParameterError : Well what are you gonna activate? (No changes were made)"))
+            chat_log(sender,1,"Well, what are you gonna activate? (Expected String at argument 1, got None)",_type=exception_type.PARAMETER_ERROR)
             return True
         if args[0] == "staff":
             if not hasattr(sender, "getUniqueId"):
-                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command"))
+                chat_log(sender,1,"Sender is not a player",_type=exception_type.PERMISSION_ERROR)
                 return True
             if f["banned"] >= time.time() or f["banned"] == -1:
-                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is staff banned"))
+                chat_log(sender,1,"%s are staff banned, you cant activate staff. More info on [/status]",_type=exception_type.PERMISSION_ERROR)
                 return True
             if f["locked"] >= time.time():
-                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is suspended"))
+                chat_log(sender,1,"%s are suspended, you cant activate staff. More info on [/status]",_type=exception_type.PERMISSION_ERROR)
                 return True
             
             for p in Bukkit.getOnlinePlayers():
-                if p.isOp():
-                    if f["staff"] == "":
-                        p.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &b%s&e agreed to staff rules and their account is elegible to apply&b" % (sender.getName())))
-                    elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
-                        p.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender didnt complete their required playtime yet"))
-                    else:
-                        p.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &b%s&e claimed staff and verified their account to have staff perms &b" % (sender.getName())))
+                if f["locked"] < 0 and p.isOp():
+                    chat_log(p,0,"%s agreed to staff rules and is elegible for staff perms",variables=(sender.getName()))
+                elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
+                    chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),f["staff"]))
             
+            if f["staff"] < 0:
+                chat_log(p,0,"%s agreed to staff rules and are elegible for staff perms",variables=("You"))
+            elif f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
+                chat_log(sender,0,"%s dont have the required playtime yet. Check [/status] for how much playtime left",variables=("You"))
+            else:
+                chat_log(p,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",f["staff"]))
             #Run start
             f["banned"] = 0
             f["locked"] = 0
             f["punishments"] = {}
             if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
-            
-            f["notify"] = 0
             #Run end
-            if f["staff"] != "": sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &bYou&e just claimed staff and verified their account to have staff perms &b"))
-            elif f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
-                sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is didnt complete their required playtime yet"))
-            else: sender.sendMessage(chatcolor("&e[Staff Manager] STDOUT : &bYou&e just acepted to staff rules and made your account elegible to apply&b"))
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command"))
+            chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
         
         if len(args)<1:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
+            chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
+            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         
         if len(args)<=1:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : What are you gonna punish them for? (Expected at least 2 arguments, got "+str(len(args))+")"))
+            chat_log(sender,1,"ParameterError : What are you gonna punish them for? (Expected at least 2 arguments, got %s)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
         
         # Run Start
@@ -500,7 +475,7 @@ def onCommand(sender,label,args):
         if kick:
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s Stack Start | %s | Stack End; Rejoin with that in mind" % (args[0], " | ".join(reason_stack))) 
         
-        sender.sendMessage()
+        chat_log(sender,3,"Punished %s for &a"+"&2,&a".join(args[1:])+"&2.")
     elif cmd=="status":
         
         if not hasattr(sender, "getUniqueId"):
