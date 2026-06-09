@@ -54,6 +54,33 @@ def uuid(p):
 def get_total_playtime_seconds(u):
     player = Bukkit.getPlayer(UUID.fromString(u))
     return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
+def chat_log(target,state,string,variables=(),_type="PRINT"):
+    states = {
+        0: {
+            "contents": "INFO",
+            "default_color": "&3",
+            "highlight":"&a"
+        },
+        1: {
+            "contents": "WARN",
+            "default_color": "&6",
+            "highlight":"&a"
+        },
+        2: {
+            "contents": "ERROR",
+            "default_color": "&4",
+            "highlight":"&a"
+        },
+        3: {
+            "contents": "SUCCESS",
+            "default_color": "&2",
+            "highlight":"&a"
+        }
+    }
+    message_color = states[state]["default_color"]
+    text = message_color+string.replace("%s", states[state]["highlight"]+"%s"+message_color) % variables
+    target.sendMessage(ChatColor.translateAlternateColorCodes('&', "[Pyspigot/player_manager.py] [%s] %s : %s" % (states[state]["contents"],_type,text)))
+
 def ensure(u):
     print("ENSURE CALLED FOR", u)
     defaults = {
@@ -154,10 +181,12 @@ def onCommand(sender,label,args):
     allowed = ["owner","manager"]
     if cmd=="promote":
         if not sender.hasPermission("staffmanager.promote"):
+            chat_log(sender,1,"Sender is not permitted to use this command",_type="Permission Denied")
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
             return True
         
         if len(args)<1:
+            chat_log(sender,1,"Expected String for argument 1, got None",_type="Parameter Error")
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
@@ -470,11 +499,11 @@ def onCommand(sender,label,args):
             d["locked"] = 0
         if bn != 0:
             if bn == -1:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban %s \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban %s Stack Start | %s | Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], " | ".join(reason_stack)))
             else:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban %s %ss \"Stack Start; %s\"; Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], str(bn), "\\\""+"\\\", \\\"".join(reason_stack)+"\\\""))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban %s %ss Stack Start | %s | Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], str(bn), " | ".join(reason_stack)))
         if kick:
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s \"Stack Start; %s\"; Stack End; Rejoin with that in mind" % (args[0], "\\\""+"\\\", \\\"".join(reason_stack)+"\\\"")) 
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s Stack Start | %s | Stack End; Rejoin with that in mind" % (args[0], " | ".join(reason_stack))) 
         
         sender.sendMessage()
     elif cmd=="status":
