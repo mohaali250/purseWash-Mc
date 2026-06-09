@@ -596,7 +596,7 @@ def onCommand(sender,label,args):
                 status_text = "&aActive Staff"
                 status_bar = 4
             sender.sendMessage(
-                chatcolor("[&a%s&8%s] %s" % (
+                chatcolor("[&a%s&8%s&f] %s" % (
                     "#" * status_bar,
                     "-" * (4 - status_bar),
                     status_text
@@ -606,7 +606,7 @@ def onCommand(sender,label,args):
                 chatcolor("&7Rank: &b%s" % extended_staff_rank(d["staff"]))
             )
             sender.sendMessage("")
-            if d["staff"] != "":
+            if d["staff"] != "" and d["staff_playtime"] < gdata["ranks"][d["staff"]]["required_playtime"] :
                 required = parse(
                     gdata["ranks"][d["staff"]]["required_playtime"]
                 )
@@ -628,7 +628,7 @@ def onCommand(sender,label,args):
                 )
                 sender.sendMessage(
                     chatcolor(
-                        "[&a%s&8%s]"
+                        "[&a%s&8%s&f]"
                         % (
                             "|" * filled,
                             "|" * (20 - filled)
