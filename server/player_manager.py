@@ -597,8 +597,8 @@ def onCommand(sender,label,args):
                 status_bar = 4
             sender.sendMessage(
                 chatcolor("[&a%s&8%s] %s" % (
-                    "■" * status_bar,
-                    "□" * (4 - status_bar),
+                    "#" * status_bar,
+                    "-" * (4 - status_bar),
                     status_text
                 ))
             )
@@ -630,8 +630,8 @@ def onCommand(sender,label,args):
                     chatcolor(
                         "[&a%s&8%s]"
                         % (
-                            "■" * filled,
-                            "□" * (20 - filled)
+                            "|" * filled,
+                            "|" * (20 - filled)
                         )
                     )
                 )
