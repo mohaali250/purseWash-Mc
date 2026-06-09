@@ -520,7 +520,7 @@ def onCommand(sender,label,args):
         if kick:
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s Stack Start | %s | Stack End; Rejoin with that in mind" % (args[0], " | ".join(reason_stack))) 
         
-        chat_log(sender,3,"Punished %s for &a"+"&2,&a".join(args[1:])+"&2.")
+        chat_log(sender,3,"Punished %s for &a"+"&2,&a".join(args[1:])+"&2." % (args[0]))
     elif cmd=="status":
         
         if not hasattr(sender, "getUniqueId"):
@@ -798,21 +798,21 @@ def onCommand(sender,label,args):
     elif cmd=="apply":
         sender.sendMessage(chatcolor("&8:===================< &6APPLY &8>===================:"))
         sender.sendMessage("")
-    
+
         sender.sendMessage(chatcolor("&eRequirements"))
         sender.sendMessage(chatcolor("&71. &fMust be &e13+ years old"))
         sender.sendMessage(chatcolor("&72. &fJoin our Discord &7(/trigger discord)"))
         sender.sendMessage(chatcolor("&73. &fAnswer all questions honestly"))
         sender.sendMessage(chatcolor("&74. &fMeet the playtime requirement"))
         sender.sendMessage("")
-    
+
         sender.sendMessage(chatcolor("&eRank Requirements"))
-    
+
         sorted_ranks = sorted(
             gdata["ranks"].items(),
             key=lambda item: parse(item[1]["required_playtime"])
         )
-    
+
         for rank, info in sorted_ranks:
             sender.sendMessage(
                 chatcolor(
@@ -825,7 +825,7 @@ def onCommand(sender,label,args):
                     )
                 )
             )
-    
+
         sender.sendMessage("")
         sender.sendMessage(chatcolor("&eNotes"))
         sender.sendMessage(chatcolor("&8» &7You may apply before reaching the required playtime"))
