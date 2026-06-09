@@ -143,7 +143,8 @@ def pretty_timedelta(timeinterval):
         else:
             text += "%d seconds " % (seconds)
     return text[:-1]
-        
+def extended_staff_rank(string):
+    return gdata["ranks"][string]["extended_name"]
 def parse(t):
     if t=="perm":
         return -1
@@ -396,12 +397,12 @@ def onCommand(sender,label,args):
                 if f["locked"] < 0 and p.isOp():
                     chat_log(p,0,"%s agreed to staff rules and is elegible for staff perms",variables=(sender.getName()))
                 elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
-                    chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),f["staff"]))
+                    chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),extended_staff_rank(f["staff"])))
             
             if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
                 chat_log(sender,0,"%s dont have the required playtime yet. Check [/status] for how much playtime left",variables=("You"))
             else:
-                chat_log(p,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",f["staff"]))
+                chat_log(p,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",extended_staff_rank(f["staff"])))
             #Run start
             f["banned"] = 0
             f["locked"] = 0
@@ -592,7 +593,7 @@ def onCommand(sender,label,args):
                 status_text = "Non-Staff"
                 staff_bar_value = 1
             elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
-                status_text = "Pending staff (%s left) - Applying for %s" % (str(pretty_timedelta(parse(gdata["ranks"][d["staff"]]["required_playtime"])-d["staff_playtime"])),d["staff"])
+                status_text = "Pending staff (%s left) - Applying for %s" % (str(pretty_timedelta(parse(gdata["ranks"][d["staff"]]["required_playtime"])-d["staff_playtime"])),extended_staff_rank(d["staff"]))
                 staff_bar_value = 1
             elif d["locked"] == -1:
                 status_text = "Needs to agree to rules"
@@ -606,7 +607,7 @@ def onCommand(sender,label,args):
             sender.sendMessage(chatcolor("&6Your current staff status:"))
             staff_bar = "[" + "#"*staff_bar_value + "-"*(3-staff_bar_value)  + "]"
             sender.sendMessage(chatcolor("&6{} {}".format(staff_bar, status_text)))
-            sender.sendMessage(chatcolor("&a    Staff rank: %s" % (d["staff"])))
+            sender.sendMessage(chatcolor("&a    Staff rank: %s" % (extended_staff_rank(d["staff"]))))
             if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
         if section_show == 2 or section_show == 0:
             sender.sendMessage("Punishments Tab:")
