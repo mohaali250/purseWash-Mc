@@ -377,7 +377,7 @@ def onCommand(sender,label,args):
         else:
             chat_log(sender,3,"%s doesnt have a punishment to remove",variables=(args[0]))
 
-        d["notify"]=0
+        local_session_notify[uuid(sender)]=0
         #Run end
     elif cmd=="activate":
         if len(args)<1:
@@ -400,6 +400,10 @@ def onCommand(sender,label,args):
             elif f["staff"] != "":
                 chat_log(p,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",extended_staff_rank(f["staff"])))
             else:
+                f["banned"] = 0
+                f["locked"] = 0
+                f["punishments"] = {}
+                chat_log(sender,3,"%s reagreed to rules ",variables=("You"))
                 return True
             
             for p in Bukkit.getOnlinePlayers():
@@ -414,7 +418,7 @@ def onCommand(sender,label,args):
             f["punishments"] = {}
             if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
-                f["notify"] = 0
+                local_session_notify[uuid(sender)] = 0
             #Run end
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
