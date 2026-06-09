@@ -586,6 +586,12 @@ def onCommand(sender,label,args):
             elif d["banned"] != 0:
                 status_text = "&cStaff Banned"
                 status_bar = 0
+            elif 0 < now() < d["banned"]:
+                status_text = "&6Staff Banned"
+                status_bar = 2
+            elif 0 < d["banned"] < now():
+                status_text = "&6Staff Ban expired (do /activate staff)"
+                status_bar = 2
             elif 0 < now() < d["locked"]:
                 status_text = "&6Suspended"
                 status_bar = 2
@@ -721,12 +727,13 @@ def onCommand(sender,label,args):
                     sender.sendMessage("")
                     sender.sendMessage(chatcolor("&6Reason:"))
                     for reason, items in d["punishments"].items():
+                        sender.sendMessage("")
                         sender.sendMessage(chatcolor("&e- %s" % reason))
                         for item in items:
                             sender.sendMessage(
                                 chatcolor("&7  - %s" % item)
                             )
-                        sender.sendMessage("")
+            sender.sendMessage("")
             sender.sendMessage(
                 chatcolor("&8:==============================================:")
             )
