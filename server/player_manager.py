@@ -735,7 +735,7 @@ def onCommand(sender,label,args):
                             )
             sender.sendMessage("")
             sender.sendMessage(
-                chatcolor("&8:==============================================:")
+                chatcolor("&8:=============================================:")
             )
                     #sender.sendMessage("Punishments Tab:")
                     #sender.sendMessage("")
