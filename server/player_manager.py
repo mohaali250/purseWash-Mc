@@ -698,6 +698,11 @@ def onTabComplete(sender,alias,args):
                     return [args[1]+c for c in ["s","min","h","d","wk"] if (args[1]+c).lower().startswith(args[1].lower())]
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="status":
+            if args[0] == "set":
+                return typing_filter(
+                    args[1],
+                    [p.getName() for p in Bukkit.getOnlinePlayers()]
+                )
             return typing_filter(args[0],[p.getName() for p in Bukkit.getOnlinePlayers()])
         if cmd=="punish":
             return typing_filter(args[1],list(gdata["punishments"].keys()))
@@ -709,18 +714,35 @@ def onTabComplete(sender,alias,args):
         if cmd=="punish":
             return typing_filter(args[-1],list(gdata["punishments"].keys()))
         if cmd=="status":
-            ensure(uuid(Bukkit.getPlayer(args[1])))
+            # /status set <player>
+            target = Bukkit.getPlayer(args[1])
+            if target is None:
+                return []
+            u = uuid(target)
+            ensure(u)
+            # /status set <player> <key>
             if len(args) == 3:
-                return typing_filter(args[0],[i for i, v in data[uuid(Bukkit.getPlayer(args[1]))].items()])
+                return typing_filter(
+                    args[2],
+                    list(data[u].keys())
+                )
+            # /status set <player> <key> <type>
             if len(args) == 4:
                 types_list = []
                 for name in dir(__builtin__):
                     obj = getattr(__builtin__, name)
                     if isinstance(obj, type):
                         types_list.append(name)
-                return typing_filter(args[0],types_list)
+                return typing_filter(
+                    args[3],
+                    types_list
+                )
+            # /status set <player> <key> <type> <value>
             if len(args) == 5:
-                return [data[uuid(Bukkit.getPlayer(args[1]))][args[2]]]
+                current = data[u].get(args[2])
+                if isinstance(current, bool):
+                    return typing_filter(args[4], ["True", "False"])
+                return [str(current)]
     return []
 def tick():
     for p in Bukkit.getOnlinePlayers():
