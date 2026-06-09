@@ -108,22 +108,28 @@
 	},
 	"ranks":{
 		"helper":{
-			"required_playtime":"8h"
+			"required_playtime":"8h",
+			"extended_name":"Helper"
 		},
 		"mod":{
-			"required_playtime":"9h"
+			"required_playtime":"9h",
+			"extended_name":"Moderator"
 		},
 		"admin":{
-			"required_playtime":"12h"
+			"required_playtime":"12h",
+			"extended_name":"Administrator"
 		},
 		"builder":{
-			"required_playtime":"24h"
+			"required_playtime":"24h",
+			"extended_name":"Builder"
 		},
 		"dev":{
-			"required_playtime":"36h"
+			"required_playtime":"36h",
+			"extended_name":"Developer"
 		},
 		"manager":{
-			"required_playtime":"96h"
+			"required_playtime":"96h",
+			"extended_name":"Manager"
 		}
 	}
 }
