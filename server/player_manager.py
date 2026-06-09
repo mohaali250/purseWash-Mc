@@ -591,11 +591,11 @@ def onCommand(sender,label,args):
             elif d["staff"] == "":
                 status_text = "&7Non-Staff"
                 status_bar = 1
-            elif d["locked"] in [-1, -3]:
-                status_text = "&eNeeds Rule Agreement"
-                status_bar = 3
             elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
                 status_text = "&ePending Staff"
+                status_bar = 3
+            elif d["locked"] in [-1, -2, -3]:
+                status_text = "&eNeeds Rule Agreement"
                 status_bar = 3
             else:
                 status_text = "&aActive Staff"
