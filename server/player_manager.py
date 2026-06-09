@@ -796,27 +796,65 @@ def onCommand(sender,label,args):
             for i, v in d.items():
                 sender.sendMessage("Key: %s; Type: %s; Value: %s; | " % (i, str(type(v)),str(v)))
     elif cmd=="apply":
-        sender.sendMessage("How to apply")
+        sender.sendMessage(chatcolor("&8:===================< &6APPLY &8>===================:"))
         sender.sendMessage("")
-        sender.sendMessage("Requirements")
-        sender.sendMessage("1. Must be 13 or older")
-        sender.sendMessage("2. Must join our discord (/trigger discord)")
-        sender.sendMessage("3. Must respond and elaborate on all questions, this step will determine if you are accepted or not")
-        sender.sendMessage("4. Must have the required playtime (but you can apply before), but depends on what rank are you going for:")
+    
+        sender.sendMessage(chatcolor("&eRequirements"))
+        sender.sendMessage(chatcolor("&71. &fMust be &e13+ years old"))
+        sender.sendMessage(chatcolor("&72. &fJoin our Discord &7(/trigger discord)"))
+        sender.sendMessage(chatcolor("&73. &fAnswer all questions honestly"))
+        sender.sendMessage(chatcolor("&74. &fMeet the playtime requirement"))
+        sender.sendMessage("")
+    
+        sender.sendMessage(chatcolor("&eRank Requirements"))
+    
         sorted_ranks = sorted(
             gdata["ranks"].items(),
             key=lambda item: parse(item[1]["required_playtime"])
         )
+    
         for rank, info in sorted_ranks:
             sender.sendMessage(
-                "    %s: %s" % (
-                    extended_staff_rank(rank),
-                    str(pretty_timedelta(
-                        parse(info["required_playtime"])
-                        ))
+                chatcolor(
+                    "&8» &b%s &7- &f%s"
+                    % (
+                        extended_staff_rank(rank),
+                        pretty_timedelta(
+                            parse(info["required_playtime"])
+                        )
+                    )
                 )
             )
-        sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks. Also check your playtime with [/playtime] and your staff status with [/status]")
+    
+        sender.sendMessage("")
+        sender.sendMessage(chatcolor("&eNotes"))
+        sender.sendMessage(chatcolor("&8» &7You may apply before reaching the required playtime"))
+        sender.sendMessage(chatcolor("&8» &7Denied applications may be submitted again"))
+        sender.sendMessage(chatcolor("&8» &7Use &f/playtime &7to check progress"))
+        sender.sendMessage(chatcolor("&8» &7Use &f/status &7to view staff status"))
+        sender.sendMessage("")
+        sender.sendMessage(chatcolor("&8:====================================================:"))
+        #sender.sendMessage("How to apply")
+        #sender.sendMessage("")
+        #sender.sendMessage("Requirements")
+        #sender.sendMessage("1. Must be 13 or older")
+        #sender.sendMessage("2. Must join our discord (/trigger discord)")
+        #sender.sendMessage("3. Must respond and elaborate on all questions, this step will determine if you are accepted or not")
+        #sender.sendMessage("4. Must have the required playtime (but you can apply before), but depends on what rank are you going for:")
+        #sorted_ranks = sorted(
+        #    gdata["ranks"].items(),
+        #    key=lambda item: parse(item[1]["required_playtime"])
+        #)
+        #for rank, info in sorted_ranks:
+        #    sender.sendMessage(
+        #        "    %s: %s" % (
+        #            extended_staff_rank(rank),
+        #            str(pretty_timedelta(
+        #                parse(info["required_playtime"])
+        #                ))
+        #        )
+        #    )
+        #sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks. Also check your playtime with [/playtime] and your staff status with [/status]")
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
