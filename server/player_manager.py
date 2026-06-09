@@ -57,6 +57,9 @@ def get_total_playtime_seconds(u):
 
 exception_type = {}
 exception_type.PERMISSION_ERROR = "Permission Error"
+exception_type.PARAMETER_ERROR = "Paremeter Error"
+exception_type.PARSE_ERROR = "Parse Error"
+exception_type.SUCCESS = "Success"
 def chat_log(target,state,string,variables=(),_type="PRINT"):
     states = {
         0: {
@@ -189,13 +192,14 @@ def onCommand(sender,label,args):
             return True
         
         if len(args)<1:
-            chat_log(sender,1,"Expected String for argument 1, got None",_type="Parameter Error")
+            chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
+            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
