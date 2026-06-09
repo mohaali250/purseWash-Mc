@@ -82,7 +82,7 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
             "default_color": "&2",
             "highlight":"&a"
         },
-        3: {
+        4: {
             "contents": "NOTIFY",
             "default_color": "&e",
             "highlight":"&b"
@@ -187,7 +187,7 @@ def onCommand(sender,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
         return
-    cmd=label.split(" ")[0]
+    cmd=label.split(" ")[0].split(":")[-1]
     if hasattr(sender, "getUniqueId"):
         u=uuid(sender)
         ensure(u)
@@ -644,7 +644,7 @@ def onCommand(sender,label,args):
 def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
 def onTabComplete(sender,alias,args):
-    cmd=alias.split(" ")[0]
+    cmd=alias.split(" ")[0].split(":")[-1]
     if cmd=="apply":
         return []
     if len(args)==1:
