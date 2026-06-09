@@ -567,48 +567,117 @@ def onCommand(sender,label,args):
             section_show = 5
         
         if section_show == 1 or section_show == 0:
-            status_text = "Null"
-            check_punishments_tab_suggestion = False
-            staff_bar_value = 0
+            sender.sendMessage(chatcolor("&8:==================< &6STATUS &8>==================:"))
+            sender.sendMessage("")
+            status_text = "Unknown"
+            status_bar = 0
             if d["banned"] == -1:
-                status_text = "Staff Perm Banned"
-                staff_bar_value = 0
-            elif 0<d["banned"]<now():
-                status_text = "Staff Ban Expired"
-                check_punishments_tab_suggestion = True
-                staff_bar_value = 1
+                status_text = "&4Staff Permanently Banned"
+                status_bar = 0
             elif d["banned"] != 0:
-                status_text = "Staff Banned"
-                check_punishments_tab_suggestion = True
-                staff_bar_value = 0
-            elif 0<d["locked"]<now():
-                status_text = "Suspension Expired"
-                check_punishments_tab_suggestion = True
-                staff_bar_value = 2
-            elif 0<now()<d["locked"]:
-                status_text = "Suspended"
-                check_punishments_tab_suggestion = True
-                staff_bar_value = 2
+                status_text = "&cStaff Banned"
+                status_bar = 0
+            elif 0 < now() < d["locked"]:
+                status_text = "&6Suspended"
+                status_bar = 2
+            elif 0 < d["locked"] < now():
+                status_text = "&eSuspension Expired"
+                status_bar = 2
             elif d["staff"] == "":
-                status_text = "Non-Staff"
-                staff_bar_value = 1
+                status_text = "&7Non-Staff"
+                status_bar = 1
+            elif d["locked"] in [-1, -3]:
+                status_text = "&eNeeds Rule Agreement"
+                status_bar = 3
             elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
-                status_text = "Pending staff (%s left) - Applying for %s" % (str(pretty_timedelta(parse(gdata["ranks"][d["staff"]]["required_playtime"])-d["staff_playtime"])),extended_staff_rank(d["staff"]))
-                staff_bar_value = 1
-            elif d["locked"] == -1:
-                status_text = "Needs to agree to rules"
-                staff_bar_value = 2
-            elif d["locked"] == -3:
-                status_text = "Upgraded Rank (Reagree to rules)"
-                staff_bar_value = 2
+                status_text = "&ePending Staff"
+                status_bar = 3
             else:
-                status_text = "Active Staff"
-                staff_bar_value = 3
-            sender.sendMessage(chatcolor("&6Your current staff status:"))
-            staff_bar = "[" + "#"*staff_bar_value + "-"*(3-staff_bar_value)  + "]"
-            sender.sendMessage(chatcolor("&6{} {}".format(staff_bar, status_text)))
-            sender.sendMessage(chatcolor("&a    Staff rank: %s" % (extended_staff_rank(d["staff"]))))
-            if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
+                status_text = "&aActive Staff"
+                status_bar = 4
+            sender.sendMessage(
+                chatcolor("[&a%s&8%s] %s" % (
+                    "■" * status_bar,
+                    "□" * (4 - status_bar),
+                    status_text
+                ))
+            )
+            sender.sendMessage(
+                chatcolor("&7Rank: &b%s" % extended_staff_rank(d["staff"]))
+            )
+            sender.sendMessage("")
+            if d["staff"] != "":
+                required = parse(
+                    gdata["ranks"][d["staff"]]["required_playtime"]
+                )
+                current = d["staff_playtime"]
+                progress = min(
+                    1.0,
+                    float(current) / max(required, 1)
+                )
+                filled = int(progress * 20)
+                sender.sendMessage(
+                    chatcolor(
+                        "&7Time left: &f%s &7out of &f%s &7to get &b%s"
+                        % (
+                            pretty_timedelta(max(required - current, 0)),
+                            pretty_timedelta(required),
+                            extended_staff_rank(d["staff"])
+                        )
+                    )
+                )
+                sender.sendMessage(
+                    chatcolor(
+                        "[&a%s&8%s]"
+                        % (
+                            "■" * filled,
+                            "□" * (20 - filled)
+                        )
+                    )
+                )
+            sender.sendMessage("")
+            #status_text = "Null"
+            #check_punishments_tab_suggestion = False
+            #staff_bar_value = 0
+            #if d["banned"] == -1:
+            #    status_text = "Staff Perm Banned"
+            #    staff_bar_value = 0
+            #elif 0<d["banned"]<now():
+            #    status_text = "Staff Ban Expired"
+            #    check_punishments_tab_suggestion = True
+            #    staff_bar_value = 1
+            #elif d["banned"] != 0:
+            #    status_text = "Staff Banned"
+            #    check_punishments_tab_suggestion = True
+            #    staff_bar_value = 0
+            #elif 0<d["locked"]<now():
+            #    status_text = "Suspension Expired"
+            #    check_punishments_tab_suggestion = True
+            #    staff_bar_value = 2
+            #elif 0<now()<d["locked"]:
+            #    status_text = "Suspended"
+            #    check_punishments_tab_suggestion = True
+            #    staff_bar_value = 2
+            #elif d["staff"] == "":
+            #    status_text = "Non-Staff"
+            #    staff_bar_value = 1
+            #elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
+            #    status_text = "Pending staff (%s left) - Applying for %s" % (str(pretty_timedelta(parse(gdata["ranks"][d["staff"]]["required_playtime"])-d["staff_playtime"])),extended_staff_rank(d["staff"]))
+            #    staff_bar_value = 1
+            #elif d["locked"] == -1:
+            #    status_text = "Needs to agree to rules"
+            #    staff_bar_value = 2
+            #elif d["locked"] == -3:
+            #    status_text = "Upgraded Rank (Reagree to rules)"
+            #    staff_bar_value = 2
+            #else:
+            #    status_text = "Active Staff"
+            #    staff_bar_value = 3
+            #sender.sendMessage(chatcolor("&6Your current staff status:"))
+            #staff_bar = "[" + "#"*staff_bar_value + "-"*(3-staff_bar_value)  + "]"
+            #sender.sendMessage(chatcolor("&6{} {}".format(staff_bar, status_text)))
+            #sender.sendMessage(chatcolor("&a    Staff rank: %s" % (extended_staff_rank(d["staff"]))))
+            #if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
         if section_show == 2 or section_show == 0:
             sender.sendMessage("Punishments Tab:")
             sender.sendMessage("")
