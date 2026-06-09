@@ -54,6 +54,9 @@ def uuid(p):
 def get_total_playtime_seconds(u):
     player = Bukkit.getPlayer(UUID.fromString(u))
     return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
+
+exception_type = {}
+exception_type.PERMISSION_ERROR = "Permission Error"
 def chat_log(target,state,string,variables=(),_type="PRINT"):
     states = {
         0: {
@@ -79,7 +82,7 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
     }
     message_color = states[state]["default_color"]
     text = message_color+string.replace("%s", states[state]["highlight"]+"%s"+message_color) % variables
-    target.sendMessage(ChatColor.translateAlternateColorCodes('&', "[Pyspigot/player_manager.py] [%s] %s : %s" % (states[state]["contents"],_type,text)))
+    target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+"[Pyspigot/player_manager.py] [%s] %s : %s" % (states[state]["contents"],_type,text)))
 
 def ensure(u):
     print("ENSURE CALLED FOR", u)
@@ -181,7 +184,7 @@ def onCommand(sender,label,args):
     allowed = ["owner","manager"]
     if cmd=="promote":
         if not sender.hasPermission("staffmanager.promote"):
-            chat_log(sender,1,"Sender is not permitted to use this command",_type="Permission Denied")
+            chat_log(sender,1,"Sender is not permitted to use this command",_type=exception_type.PERMISSION_ERROR)
             sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
             return True
         
