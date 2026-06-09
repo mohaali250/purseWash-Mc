@@ -237,8 +237,8 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Target %s is staff banned",variables=(args[0]))
             return True
         
-        chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],args[1]))
-        chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",args[1]))
+        chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],extended_staff_rank(args[1])))
+        chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",extended_staff_rank(args[1])))
         # Run start
         if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
