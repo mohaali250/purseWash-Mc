@@ -81,6 +81,11 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
             "contents": "SUCCESS",
             "default_color": "&2",
             "highlight":"&a"
+        },
+        3: {
+            "contents": "NOTIFY",
+            "default_color": "&e",
+            "highlight":"&b"
         }
     }
     message_color = states[state]["default_color"]
@@ -334,13 +339,14 @@ def onCommand(sender,label,args):
         u=uuid(target)
         ensure(u)
         d=data[u]
+        dur = now() - d["banned"]
+        chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        chat_log(target,0,"%s ban from staff is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
         #Run start
         d["banned"]=now()
         d["staff_playtime"] = 0
         d["locked"] = -2
         #Run end
-        chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
-        chat_log(target,0,"%s ban from staff is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
     elif cmd=="activate":
         if len(args)<1:
             chat_log(sender,1,"Well, what are you gonna activate? (Expected String at argument 1, got None)",_type=exception_type.PARAMETER_ERROR)
@@ -684,22 +690,22 @@ def session_notify(p):
     ensure(u)
     d=data[u]
     if d["staff"] != "" and eligible(d) and not _bit.read(local_session_notify[uuid(p)],0):
-        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are now elegible to activate staff see /status")
+        chat_log(p,4,"You are now elegible to activate staff see /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],0,True)
     if 0<d["banned"]<=now() and not _bit.read(local_session_notify[uuid(p)],1):
-        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : Your staff ban expired. See /status")
+        chat_log(p,4,"Your staff ban expired. See /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],1,True)
     if 0<d["locked"]<now() and not _bit.read(local_session_notify[uuid(p)],2):
-        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : Your staff suspension expired. See /status")
+        chat_log(p,4,"Your staff suspension expired. See /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],2,True)
     if 0<now()<=d["banned"] and not _bit.read(d["notify"],3):
-        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are Staff banned. See /status for more")
+        chat_log(p,4,"You are Staff banned. See /status for more")
         d["notify"] = _bit.write(d["notify"],3,True)
     if 0<now()<=d["locked"] and not _bit.read(d["notify"],4):
-        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are Suspended for staff. See /status for more")
+        chat_log(p,4,"You are Suspended for staff. See /status for more")
         d["notify"] = _bit.write(d["notify"],4,True)
     if d["locked"]==-2 and not _bit.read(d["notify"],5):
-        p.sendMessage("&a[Staff Manager] [INFO] STDOUT : You are Demoted from staff. See /status for more")
+        chat_log(p,4,"You are Demoted from staff. See /status for more")
         d["notify"] = _bit.write(d["notify"],5,True)
 class _bit:
     @staticmethod
