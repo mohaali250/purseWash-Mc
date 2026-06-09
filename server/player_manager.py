@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json,random,datetime,time,re,os
+import json,random,datetime,time,re,os,__builtin__  # Python 2.7
 import pyspigot as ps
 from java.net import URL
 from java.util import Scanner
@@ -123,13 +123,25 @@ def pretty_timedelta(timeinterval):
     seconds = timeinterval % 60
     text = ""
     if days != 0:
-        text += "%d days " % (days)
+        if days == 1:
+            text += "%d day " % (days)
+        else:
+            text += "%d days " % (days)
     if hours != 0:
-        text += "%d hrs " % (hours)
+        if hours == 1:
+            text += "%d hr " % (hours)
+        else:
+            text += "%d hrs " % (hours)
     if minutes != 0:
-        text += "%d mins " % (minutes)
+        if minutes == 1:
+            text += "%d minute " % (minutes)
+        else:
+            text += "%d minutes " % (minutes)
     if seconds != 0:
-        text += "%d secs " % (seconds)
+        if seconds == 1:
+            text += "%d second " % (seconds)
+        else:
+            text += "%d seconds " % (seconds)
     return text[:-1]
         
 def parse(t):
@@ -339,13 +351,23 @@ def onCommand(sender,label,args):
         u=uuid(target)
         ensure(u)
         d=data[u]
-        dur = now() - d["banned"]
-        chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
-        chat_log(target,0,"%s ban from staff is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
+
         #Run start
-        d["banned"]=now()
-        d["staff_playtime"] = 0
-        d["locked"] = -2
+        if d["banned"] != 0:
+            dur = now() - d["banned"]
+            chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+            chat_log(target,4,"%s ban from staff is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
+            d["staff_playtime"] = 0
+            d["banned"]=now()
+        elif 0 < d["locked"]:
+            dur = now() - d["banned"]
+            chat_log(sender,3,"Lifted staff suspension of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+            chat_log(target,4,"%s staff suspension is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
+            d["locked"] = -2
+        else:
+            chat_log(sender,3,"%s doesnt have a punishment to remove",variables=(args[0]))
+
+        d["notify"]=0
         #Run end
     elif cmd=="activate":
         if len(args)<1:
@@ -531,6 +553,8 @@ def onCommand(sender,label,args):
             section_show = 2
         elif args[0] == "raw_data":
             section_show = 3
+        elif args[0] == "set":
+            section_show = 4
         
         if section_show == 1 or section_show == 0:
             status_text = "Null"
@@ -615,6 +639,13 @@ def onCommand(sender,label,args):
                 sender.sendMessage("")
                 sender.sendMessage("Key: %s" % (i))
                 sender.sendMessage("Value: %s" % (v))
+        if section_show == 4:
+            if hasattr(sender, "getUniqueId") and not uuid(sender)==OWNERUUID:
+                chat_log(sender,1,"%s are not permitted to use this command. Use console to run this instead",variables=("You"),_type=exception_type.PERMISSION_ERROR)
+                return True
+            ensure(uuid(Bukkit.getPlayer(args[1])))
+            exec("data[%s][args[2]] = %s(" ".join(args[4:]))" % (uuid(Bukkit.getPlayer(args[1])),args[3]))
+            print(d[uuid(Bukkit.getPlayer(args[1]))][args[2]])
     elif cmd=="apply":
         sender.sendMessage("How to apply")
         sender.sendMessage("")
@@ -651,7 +682,7 @@ def onTabComplete(sender,alias,args):
         if cmd=="activate":
             return typing_filter(args[0],["staff"])
         if cmd=="status":
-            return typing_filter(args[0],["staff","punishments"])
+            return typing_filter(args[0],["staff","punishments","set"])
         return typing_filter(args[0],[p.getName() for p in Bukkit.getOnlinePlayers()])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
@@ -665,6 +696,8 @@ def onTabComplete(sender,alias,args):
                 except Exception:
                     return [args[1]+c for c in ["s","min","h","d","wk"] if (args[1]+c).lower().startswith(args[1].lower())]
             return [args[1] + i for i in ["s","min","h","d","wk"]]
+        if cmd=="status":
+            return typing_filter(args[0],[p.getName() for p in Bukkit.getOnlinePlayers()])
         if cmd=="punish":
             return typing_filter(args[1],list(gdata["punishments"].keys()))
         if cmd=="promote":
@@ -674,6 +707,19 @@ def onTabComplete(sender,alias,args):
             return ["\"" + args[-1] + "\""]
         if cmd=="punish":
             return typing_filter(args[-1],list(gdata["punishments"].keys()))
+        if cmd=="status":
+            ensure(uuid(Bukkit.getPlayer(args[1])))
+            if len(args) == 3:
+                return typing_filter(args[0],[i for i, v in data[uuid(Bukkit.getPlayer(args[1]))].items()])
+            if len(args) == 4:
+                types_list = []
+                for name in dir(__builtin__):
+                    obj = getattr(__builtin__, name)
+                    if isinstance(obj, type):
+                        types_list.append(name)
+                return typing_filter(args[0],types_list)
+            if len(args) == 5:
+                return [data[uuid(Bukkit.getPlayer(args[1]))][args[2]]]
     return []
 def tick():
     for p in Bukkit.getOnlinePlayers():
@@ -741,6 +787,7 @@ def onKick(event):
 # starter variables
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
+OWNERUUID = "ce120874-48ad-45e8-a4c5-a70790a56934"
 local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlinePlayers()],[0]*len(Bukkit.getOnlinePlayers()))}
 if not os.path.exists(FILE):
     with open(FILE,"w") as f:
