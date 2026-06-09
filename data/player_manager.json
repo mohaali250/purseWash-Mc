@@ -40,7 +40,7 @@
 			"mute":"4wk",
 			"ban":"1wk",
 			"staff_ban":true
-		}
+		},
 		"unauthorized_config_change":{
 			"reason":"Altered a config file without consent",
 			"demote":{},
