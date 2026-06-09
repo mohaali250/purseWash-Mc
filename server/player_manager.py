@@ -407,9 +407,7 @@ def onCommand(sender,label,args):
                 return True
             
             for p in Bukkit.getOnlinePlayers():
-                if f["locked"] < 0 and p.isOp():
-                    chat_log(p,0,"%s agreed to staff rules and is elegible for staff perms",variables=(sender.getName()))
-                elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
+                if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                     chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),extended_staff_rank(f["staff"])))
             
             #Run start
