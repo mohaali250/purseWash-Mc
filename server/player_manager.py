@@ -640,7 +640,6 @@ def onCommand(sender,label,args):
                         )
                     )
                 )
-            sender.sendMessage("")
             #status_text = "Null"
             #check_punishments_tab_suggestion = False
             #staff_bar_value = 0
@@ -711,25 +710,15 @@ def onCommand(sender,label,args):
                         )
                     )
             if len(active) == 0:
-            
-                sender.sendMessage(
-                    chatcolor("&aStatus: Clean")
-                )
+                sender.sendMessage(chatcolor("&aStatus: Clean"))
             else:
-                sender.sendMessage(
-                    chatcolor("&cStatus: %s" % ", ".join(active))
-                )
+                sender.sendMessage(chatcolor("&cStatus: %s" % ", ".join(active)))
                 if len(d["punishments"]) != 0:
                     sender.sendMessage("")
-                    sender.sendMessage(
-                        chatcolor("&6Evidence:")
-                    )
+                    sender.sendMessage(chatcolor("&6Reason:"))
                     for reason, items in d["punishments"].items():
-                        sender.sendMessage(
-                            chatcolor("&e• %s" % reason)
-                        )
+                        sender.sendMessage(chatcolor("&e- %s" % reason))
                         for item in items:
-                        
                             sender.sendMessage(
                                 chatcolor("&7  - %s" % item)
                             )
