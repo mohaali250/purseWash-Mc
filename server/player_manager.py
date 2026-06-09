@@ -356,10 +356,10 @@ def onCommand(sender,label,args):
                 print("You cant run this command as CONSOLE")
                 return True
             if f["banned"] >= time.time() or f["banned"] == -1:
-                chat_log(sender,1,"%s are staff banned, you cant activate staff. More info on [/status]",_type=exception_type.PERMISSION_ERROR)
+                chat_log(sender,1,"%s are staff banned, you cant activate staff. More info on [/status]",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
             if f["locked"] >= time.time():
-                chat_log(sender,1,"%s are suspended, you cant activate staff. More info on [/status]",_type=exception_type.PERMISSION_ERROR)
+                chat_log(sender,1,"%s are suspended, you cant activate staff. More info on [/status]",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
             
             for p in Bukkit.getOnlinePlayers():
