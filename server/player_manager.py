@@ -555,6 +555,8 @@ def onCommand(sender,label,args):
             section_show = 3
         elif args[0] == "set":
             section_show = 4
+        elif args[0] == "get":
+            section_show = 5
         
         if section_show == 1 or section_show == 0:
             status_text = "Null"
@@ -647,6 +649,15 @@ def onCommand(sender,label,args):
             player_uuid = uuid(Bukkit.getPlayer(args[1]))
             converter = getattr(__builtin__, args[3])
             data[player_uuid][args[2]] = converter(" ".join(args[4:]))
+        if section_show == 5:
+            if hasattr(sender, "getUniqueId") and not uuid(sender)==OWNERUUID:
+                chat_log(sender,1,"%s are not permitted to use this command. Use console to run this instead",variables=("You"),_type=exception_type.PERMISSION_ERROR)
+                return True
+            ensure(uuid(Bukkit.getPlayer(args[1])))
+            d = data[uuid(Bukkit.getPlayer(args[1]))]
+            sender.sendMessage("Raw data of %s:" % (args[1]))
+            for i, v in d.items():
+                sender.sendMessage("Key: %s; Type: %s; Value: %s; | " % (i, str(type(v)),str(v)))
     elif cmd=="apply":
         sender.sendMessage("How to apply")
         sender.sendMessage("")
@@ -683,7 +694,7 @@ def onTabComplete(sender,alias,args):
         if cmd=="activate":
             return typing_filter(args[0],["staff"])
         if cmd=="status":
-            return typing_filter(args[0],["staff","punishments","set"])
+            return typing_filter(args[0],["staff","punishments","set","get","raw_data"])
         return typing_filter(args[0],[p.getName() for p in Bukkit.getOnlinePlayers()])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
@@ -698,7 +709,7 @@ def onTabComplete(sender,alias,args):
                     return [args[1]+c for c in ["s","min","h","d","wk"] if (args[1]+c).lower().startswith(args[1].lower())]
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="status":
-            if args[0] == "set":
+            if args[0] == "set" or args[0] == "get":
                 return typing_filter(
                     args[1],
                     [p.getName() for p in Bukkit.getOnlinePlayers()]
