@@ -650,6 +650,7 @@ def onCommand(sender,label,args):
                         )
                     )
                 )
+            sender.sendMessage("")
             #status_text = "Null"
             #check_punishments_tab_suggestion = False
             #staff_bar_value = 0
@@ -812,7 +813,7 @@ def onCommand(sender,label,args):
         for rank, info in sorted_ranks:
             sender.sendMessage(
                 "    %s: %s" % (
-                    rank,
+                    extended_staff_rank(rank),
                     str(pretty_timedelta(
                         parse(info["required_playtime"])
                         ))
