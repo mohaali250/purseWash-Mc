@@ -393,16 +393,20 @@ def onCommand(sender,label,args):
                 chat_log(sender,1,"%s are suspended, you cant activate staff. More info on [/status]",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
             
+            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
+                chat_log(sender,0,"%s dont have the required playtime yet. Check [/status] for how much playtime left",variables=("You"))
+                return True
+            elif f["staff"] != "":
+                chat_log(p,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",extended_staff_rank(f["staff"])))
+            else:
+                return True
+            
             for p in Bukkit.getOnlinePlayers():
                 if f["locked"] < 0 and p.isOp():
                     chat_log(p,0,"%s agreed to staff rules and is elegible for staff perms",variables=(sender.getName()))
                 elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                     chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),extended_staff_rank(f["staff"])))
             
-            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
-                chat_log(sender,0,"%s dont have the required playtime yet. Check [/status] for how much playtime left",variables=("You"))
-            else:
-                chat_log(p,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",extended_staff_rank(f["staff"])))
             #Run start
             f["banned"] = 0
             f["locked"] = 0
@@ -606,7 +610,7 @@ def onCommand(sender,label,args):
                 chatcolor("&7Rank: &b%s" % extended_staff_rank(d["staff"]))
             )
             sender.sendMessage("")
-            if d["staff"] != "" and d["staff_playtime"] < gdata["ranks"][d["staff"]]["required_playtime"] :
+            if d["staff"] != "" and d["locked"] < 0:
                 required = parse(
                     gdata["ranks"][d["staff"]]["required_playtime"]
                 )
