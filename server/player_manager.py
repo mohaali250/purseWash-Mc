@@ -615,7 +615,7 @@ def onCommand(sender,label,args):
                     1.0,
                     float(current) / max(required, 1)
                 )
-                filled = int(progress * 20)
+                filled = int(progress * 100)
                 sender.sendMessage(
                     chatcolor(
                         "&7Time left: &f%s &7out of &f%s &7to get &b%s"
@@ -631,7 +631,7 @@ def onCommand(sender,label,args):
                         "[&a%s&8%s&f]"
                         % (
                             "|" * filled,
-                            "|" * (20 - filled)
+                            "|" * (100 - filled)
                         )
                     )
                 )
