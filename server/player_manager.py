@@ -187,52 +187,40 @@ def onCommand(sender,label,args):
     allowed = ["owner","manager"]
     if cmd=="promote":
         if not sender.hasPermission("staffmanager.promote"):
-            chat_log(sender,1,"Sender is not permitted to use this command",_type=exception_type.PERMISSION_ERROR)
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
+            chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
         
         if len(args)<1:
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
             return True
         
         target=Bukkit.getPlayer(args[0])
         if target is None:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] Exception : Target returned none when parsed as a player, perphaps the player is offline?"))
             chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
         d=data[u]
         if len(args)!=2:
-            sender.sendMessage(chatcolor("&c[Staff Manager] [ERROR] ParameterError : Command \"/promote\" requires exactely 2 arguments (%s were given)" % (str(len(args)))))
+            chat_log(sender,2,"Command \"/promote\" requires exactely 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
         if d["staff"] == "" and d["banned"] > time.time():
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Target is staff banned"))
+            chat_log(sender,1,"Target %s is staff banned",variables=(args[0]),_type=exception_type.PERMISSION_ERROR)
             return True
-        if d["staff"] == "" and d["locked"] == -1:
-            sender.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : Target will need to agree to the rules first before having staff perms"))
         
-        sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] Sucess : Promoted player &b%s&a for &b%s&a." % (args[0], args[1])))
-        target.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : You are promoted for &a%s&b." % (args[1])))
+        chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],args[1]),_type=exception_type.SUCCESS)
+        chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",args[1]))
         # Run start
-        print("BEFORE:", d)
         if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
-        print("AFTER:", d)
         # Run end
-        if not eligible(d):
-            target.sendMessage(chatcolor("&b[Staff Manager] [INFO] STDOUT : You didnt yet complete the requirements, once you do you'll be notified"))
-            sender.sendMessage(chatcolor("&a[Staff Manager] [INFO] STDOUT : When the target completes their requirements they'll get notified"))
-        else:
-            session_notify(target)
     elif cmd=="suspend":
         if not sender.hasPermission("staffmanager.suspend"):
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not permitted to use this command"))
+            chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
         
         if len(args)<1:
-            sender.sendMessage(chatcolor("&6[Staff Manager] [WARN] ParameterError : Expected String for argument 1, got None"))
+            chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
         target=Bukkit.getPlayer(args[0])
