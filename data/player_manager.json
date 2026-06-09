@@ -35,18 +35,12 @@
 			"mute":true,
 			"ban":"12wk"
 		},
-		"threats_by_staff":{
-			"reason":"Threatened as a staff member",
+		"threats_mc":{
+			"reason":"Threatened in-game",
 			"mute":"4wk",
 			"ban":"1wk",
 			"staff_ban":true
-		},
-		"threats_to_staff":{
-			"reason":"Threatened a staff member",
-			"mute":"15wk",
-			"ban":"12wk",
-			"staff_ban":true
-		},
+		}
 		"unauthorized_config_change":{
 			"reason":"Altered a config file without consent",
 			"demote":{},
@@ -78,9 +72,25 @@
 			"reason":"Using chatbots inplemented into user messages to automate messages",
 			"mute":"2d"
 		},
-		"cheating.non-vanilla":{
-			"reason":"Using hacked clients for unfair advantage",
+		"cheating.attack":{
+			"reason":"Using hacked clients for unfair advantage (Damage related hacks)",
 			"ban":"2wk"
+		},
+		"cheating.fly":{
+			"reason":"Using hacked clients for unfair advantage (Fly / Movement related hacks)",
+			"ban":"2wk"
+		},
+		"cheating.ground_speed":{
+			"reason":"Using hacked clients for unfair advantage (Speed hacks)",
+			"ban":"2wk"
+		},
+		"cheating.reach":{
+			"reason":"Using hacked clients for unfair advantage (Damage related hacks)",
+			"ban":"2wk"
+		},
+		"cheating.auto_clicker":{
+			"reason":"Using hacked clients for unfair advantage (Speed click hacks)",
+			"ban":"5d"
 		},
 		"cheating.vanilla":{
 			"reason":"Using vanilla client bugs/ glitches to gain unfair advantage",
