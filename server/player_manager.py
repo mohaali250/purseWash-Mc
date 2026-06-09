@@ -347,7 +347,7 @@ def onCommand(sender,label,args):
             return True
         if args[0] == "staff":
             if not hasattr(sender, "getUniqueId"):
-                chat_log(sender,1,"Sender is not a player",_type=exception_type.PERMISSION_ERROR)
+                print("You cant run this command as CONSOLE")
                 return True
             if f["banned"] >= time.time() or f["banned"] == -1:
                 chat_log(sender,1,"%s are staff banned, you cant activate staff. More info on [/status]",_type=exception_type.PERMISSION_ERROR)
@@ -479,7 +479,7 @@ def onCommand(sender,label,args):
     elif cmd=="status":
         
         if not hasattr(sender, "getUniqueId"):
-            sender.sendMessage("&6[Staff Manager] [WARN] PermissoinDenied : Sender is not whitelisted to use this command")
+            print("You cant run this command as CONSOLE")
             return True
         d = f
 
