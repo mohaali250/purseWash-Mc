@@ -583,24 +583,21 @@ def onCommand(sender,label,args):
             if d["banned"] == -1:
                 status_text = "&4Staff Permanently Banned"
                 status_bar = 0
-            elif d["banned"] != 0:
-                status_text = "&cStaff Banned"
-                status_bar = 0
             elif 0 < now() < d["banned"]:
                 status_text = "&6Staff Banned"
-                status_bar = 2
+                status_bar = 1
             elif 0 < d["banned"] < now():
                 status_text = "&6Staff Ban expired (do /activate staff)"
                 status_bar = 2
             elif 0 < now() < d["locked"]:
                 status_text = "&6Suspended"
-                status_bar = 2
+                status_bar = 1
             elif 0 < d["locked"] < now():
                 status_text = "&eSuspension Expired"
                 status_bar = 2
             elif d["staff"] == "":
                 status_text = "&7Non-Staff"
-                status_bar = 1
+                status_bar = 2
             elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
                 status_text = "&ePending Staff"
                 status_bar = 3
