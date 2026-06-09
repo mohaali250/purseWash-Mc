@@ -684,43 +684,96 @@ def onCommand(sender,label,args):
             #sender.sendMessage(chatcolor("&a    Staff rank: %s" % (extended_staff_rank(d["staff"]))))
             #if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
         if section_show == 2 or section_show == 0:
-            sender.sendMessage("Punishments Tab:")
+            sender.sendMessage(chatcolor("&8:===============< &6PUNISHMENTS &8>================:"))
             sender.sendMessage("")
-            _any = False
-            if d["banned"] != 0 or 0<d["locked"]:
-                _any = True
-                sender.sendMessage(", ".join([i for i,v in zip(["Staff Ban","Suspended"],[d["banned"] != 0,0<d["locked"]]) if v]))
-                sender.sendMessage("")
-                
-                if max(d["locked"],d["banned"])-now() > 0:
-                    expires_time_text = str(pretty_timedelta(max(d["locked"],d["banned"])-now()))
-                elif d["banned"] == -1:
-                    expires_time_text = "Never"
-                else:
-                    expires_time_text = "Reagree to rules to lift ban"
-                sender.sendMessage("Time until %s expires: %s" % (", ".join([i for i,v in zip(["Staff Ban","Suspended"],[d["banned"] != 0,0<d["locked"]]) if v]),expires_time_text))
+            active = []
+            if d["banned"] == -1:
+                active.append("Staff Ban (Permanent)")
+            elif d["banned"] > now():
+                active.append(
+                    "Staff Ban (%s left)"
+                    % pretty_timedelta(d["banned"] - now())
+                )
+            if d["locked"] > now():
+                active.append(
+                    "Suspension (%s left)"
+                    % pretty_timedelta(d["locked"] - now())
+                )
             mute_info = get_mute_info(sender.getName())
-            if mute_info:
-                if mute_info["muted"]:
-                    _any = True
-                    sender.sendMessage("")
-                    sender.sendMessage("Muted")
-                    sender.sendMessage("Time until mute expires: %s" % (str(pretty_timedelta(mute_info["unmute_timestamp"]-now()) if mute_info["unmute_timestamp"] != -1 else "Never")))
+            if mute_info and mute_info["muted"]:
+                if mute_info["unmute_timestamp"] == -1:
+                    active.append("Mute (Permanent)")
+                else:
+                    active.append(
+                        "Mute (%s left)"
+                        % pretty_timedelta(
+                            mute_info["unmute_timestamp"] - now()
+                        )
+                    )
+            if len(active) == 0:
+            
+                sender.sendMessage(
+                    chatcolor("&aStatus: Clean")
+                )
             else:
-                sender.sendMessage("No Data (mute_info returned None)")
-            if not _any:
-                sender.sendMessage("No Punishments")
-            else:
-                sender.sendMessage("")
-                sender.sendMessage("Reason for punishments:")
-                for i, v in d["punishments"].items():
+                sender.sendMessage(
+                    chatcolor("&cStatus: %s" % ", ".join(active))
+                )
+                if len(d["punishments"]) != 0:
                     sender.sendMessage("")
-                    sender.sendMessage("Reason: "+i)
-                    if len(v) != 0:
-                        for n in v:
-                            sender.sendMessage("Rule Breaking Item: %s" % (n))
-                sender.sendMessage("")
-                sender.sendMessage("If you believe you were punished unfairly join discord (/trigger discord) and apeal your ban in tickets")
+                    sender.sendMessage(
+                        chatcolor("&6Evidence:")
+                    )
+                    for reason, items in d["punishments"].items():
+                        sender.sendMessage(
+                            chatcolor("&e• %s" % reason)
+                        )
+                        for item in items:
+                        
+                            sender.sendMessage(
+                                chatcolor("&7  - %s" % item)
+                            )
+                        sender.sendMessage("")
+            sender.sendMessage(
+                chatcolor("&8:==============================================:")
+            )
+                    #sender.sendMessage("Punishments Tab:")
+                    #sender.sendMessage("")
+                    #_any = False
+                    #if d["banned"] != 0 or 0<d["locked"]:
+                    #    _any = True
+                    #    sender.sendMessage(", ".join([i for i,v in zip(["Staff Ban","Suspended"],[d["banned"] != 0,0<d["locked"]]) if v]))
+                    #    sender.sendMessage("")
+                    #    
+                    #    if max(d["locked"],d["banned"])-now() > 0:
+                    #        expires_time_text = str(pretty_timedelta(max(d["locked"],d["banned"])-now()))
+                    #    elif d["banned"] == -1:
+                    #        expires_time_text = "Never"
+                    #    else:
+                    #        expires_time_text = "Reagree to rules to lift ban"
+                    #    sender.sendMessage("Time until %s expires: %s" % (", ".join([i for i,v in zip(["Staff Ban","Suspended"],[d["banned"] != 0,0<d["locked"]]) if v]),expires_time_text))
+                    #mute_info = get_mute_info(sender.getName())
+                    #if mute_info:
+                    #    if mute_info["muted"]:
+                    #        _any = True
+                    #        sender.sendMessage("")
+                    #        sender.sendMessage("Muted")
+                    #        sender.sendMessage("Time until mute expires: %s" % (str(pretty_timedelta(mute_info["unmute_timestamp"]-now()) if mute_info["unmute_timestamp"] != -1 else "Never")))
+                    #else:
+                    #    sender.sendMessage("No Data (mute_info returned None)")
+                    #if not _any:
+                    #    sender.sendMessage("No Punishments")
+                    #else:
+                    #    sender.sendMessage("")
+                    #    sender.sendMessage("Reason for punishments:")
+                    #    for i, v in d["punishments"].items():
+                    #        sender.sendMessage("")
+                    #        sender.sendMessage("Reason: "+i)
+                    #        if len(v) != 0:
+                    #            for n in v:
+                    #                sender.sendMessage("Rule Breaking Item: %s" % (n))
+                    #    sender.sendMessage("")
+                    #    sender.sendMessage("If you believe you were punished unfairly join discord (/trigger discord) and apeal your ban in tickets")
         if section_show == 3:
             sender.sendMessage("Raw staff data:")
             for i, v in d.items():
