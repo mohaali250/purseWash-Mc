@@ -644,8 +644,9 @@ def onCommand(sender,label,args):
                 chat_log(sender,1,"%s are not permitted to use this command. Use console to run this instead",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
             ensure(uuid(Bukkit.getPlayer(args[1])))
-            exec("data[%s][args[2]] = %s(" ".join(args[4:]))" % (uuid(Bukkit.getPlayer(args[1])),args[3]))
-            print(d[uuid(Bukkit.getPlayer(args[1]))][args[2]])
+            player_uuid = uuid(Bukkit.getPlayer(args[1]))
+            converter = getattr(__builtin__, args[3])
+            data[player_uuid][args[2]] = converter(" ".join(args[4:]))
     elif cmd=="apply":
         sender.sendMessage("How to apply")
         sender.sendMessage("")
