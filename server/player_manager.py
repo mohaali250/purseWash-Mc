@@ -55,11 +55,11 @@ def get_total_playtime_seconds(u):
     player = Bukkit.getPlayer(UUID.fromString(u))
     return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
 
-exception_type = {}
-exception_type.PERMISSION_ERROR = "Permission Error"
-exception_type.PARAMETER_ERROR = "Paremeter Error"
-exception_type.PARSE_ERROR = "Parse Error"
-exception_type.SUCCESS = "Success"
+class exception_type:
+    PERMISSION_ERROR = "Permission Error"
+    PARAMETER_ERROR = "Paremeter Error"
+    PARSE_ERROR = "Parse Error"
+    SUCCESS = "Success"
 def chat_log(target,state,string,variables=(),_type="PRINT"):
     states = {
         0: {
