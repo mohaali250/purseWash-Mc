@@ -169,6 +169,13 @@ def eligible(d):
         d["locked"] != 0,
         parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]
     ])
+def eligible_to_activate(d):
+    if d["staff"] == "":return False
+    return not any([
+        d["banned"] >= time.time() or d["banned"] == -1,
+        d["locked"] <= 0,
+        parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]
+    ])
 def get_mute_info(player_name):
     player = Bukkit.getOfflinePlayer(player_name)
     if player is None:
@@ -233,6 +240,7 @@ def onCommand(sender,label,args):
         # Run start
         if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
         d["staff"]=args[1]
+        d["locked"] = -3
         # Run end
     elif cmd=="suspend":
         if not sender.hasPermission("staffmanager.suspend"):
@@ -390,9 +398,7 @@ def onCommand(sender,label,args):
                 elif parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                     chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),f["staff"]))
             
-            if f["staff"] < 0:
-                chat_log(p,0,"%s agreed to staff rules and are elegible for staff perms",variables=("You"))
-            elif f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
+            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) > f["staff_playtime"]:
                 chat_log(sender,0,"%s dont have the required playtime yet. Check [/status] for how much playtime left",variables=("You"))
             else:
                 chat_log(p,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",f["staff"]))
@@ -402,6 +408,7 @@ def onCommand(sender,label,args):
             f["punishments"] = {}
             if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
+                f["notify"] = 0
             #Run end
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
@@ -769,7 +776,7 @@ def session_notify(p):
     u=uuid(p)
     ensure(u)
     d=data[u]
-    if d["staff"] != "" and eligible(d) and not _bit.read(local_session_notify[uuid(p)],0):
+    if d["staff"] != "" and eligible_to_activate(d) and not _bit.read(local_session_notify[uuid(p)],0):
         chat_log(p,4,"You are now elegible to activate staff see /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],0,True)
     if 0<d["banned"]<=now() and not _bit.read(local_session_notify[uuid(p)],1):
