@@ -163,7 +163,7 @@ def lp(cmd):
 def add_staff(name,rank):
     lp("user %s parent set %s"%(name,rank))
 def remove_staff(name,rank=""):
-    lp("user %s parent clear %s"%(name))
+    lp("user %s parent clear"%(name))
 def eligible(d):
     if d["staff"] == "":return False
     return not any([
