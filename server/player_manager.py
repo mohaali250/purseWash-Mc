@@ -61,7 +61,7 @@ class exception_type:
     PARSE_ERROR = "Parse Error"
     SUCCESS = "Success"
 def chat_log(target,state,string,variables=(),_type="PRINT"):
-    if target is None: return False
+    if not target.isOnline(): return False
     states = {
         0: {
             "contents": "INFO",
