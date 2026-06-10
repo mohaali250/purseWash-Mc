@@ -874,7 +874,7 @@ def onTabComplete(sender,alias,args):
         if p.getName().lower().startswith(args[-1].lower()):
             players.append(p.getName())
     for p in Bukkit.getOfflinePlayers():
-        if len(players) >= 200:
+        if len(players) >= 50:
             break
         if p.isOnline():
             continue
