@@ -881,16 +881,21 @@ def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
 def get_players(arg):
     players = []
+    added = set()
+    arg = arg.lower()
     for p in Bukkit.getOnlinePlayers():
-        if p.getName().lower().startswith(arg.lower()):
-            players.append(p.getName())
+        name = p.getName()
+        if name and name.lower().startswith(arg):
+            players.append(name)
+            added.add(name)
     for p in Bukkit.getOfflinePlayers():
         if len(players) >= 50:
             break
-        if p.isOnline():
+        name = p.getName()
+        if not name or name in added:
             continue
-        if p.getName().lower().startswith(arg.lower()):
-            players.append(p.getName())
+        if name.lower().startswith(arg):
+            players.append(name)
     return players
 
 def onTabComplete(sender,alias,args):
