@@ -371,14 +371,14 @@ def onCommand(sender,label,args):
 
         if d["banned"] != 0:
             _any = True
-            dur = now() - d["banned"]
+            dur = d["banned"] - now()
             chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
             chat_log(target,4,"%s ban from staff is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
             d["staff_playtime"] = 0
             d["banned"]=now()
         if 0 < d["locked"]:
             _any = True
-            dur = now() - d["banned"]
+            dur = d["banned"] - now()
             chat_log(sender,3,"Lifted staff suspension of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
             chat_log(target,4,"%s staff suspension is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
             d["locked"] = -2
