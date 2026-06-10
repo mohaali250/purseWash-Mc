@@ -518,7 +518,7 @@ def onCommand(sender,label,args):
         if kick:
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s Stack Start | %s | Stack End; Rejoin with that in mind" % (args[0], " | ".join(reason_stack))) 
         
-        chat_log(sender,3,"Punished %s for &a"+"&2,&a".join(args[1:])+"&2." % (args[0]))
+        chat_log(sender,3,"Punished %s for &a%s&2." % (args[0],"&2,&a".join(args[1:])))
     elif cmd=="status":
         
         if not hasattr(sender, "getUniqueId"):
