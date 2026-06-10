@@ -574,7 +574,7 @@ def onCommand(sender,label,args):
             section_show = 5
         
         if section_show == 1 or section_show == 0:
-            sender.sendMessage(chatcolor("&8:==================< &6STATUS &8>==================:"))
+            sender.sendMessage(chatcolor("&8:===================< &6STATUS &8>===================:"))
             sender.sendMessage("")
             status_text = "Unknown"
             status_bar = 0
@@ -689,7 +689,7 @@ def onCommand(sender,label,args):
             #sender.sendMessage(chatcolor("&a    Staff rank: %s" % (extended_staff_rank(d["staff"]))))
             #if check_punishments_tab_suggestion: sender.sendMessage("(Check Punishments tab for more info)")
         if section_show == 2 or section_show == 0:
-            sender.sendMessage(chatcolor("&8:===============< &6PUNISHMENTS &8>================:"))
+            sender.sendMessage(chatcolor("&8:================< &6PUNISHMENTS &8>=================:"))
             sender.sendMessage("")
             active = []
             if d["banned"] == -1:
@@ -730,9 +730,7 @@ def onCommand(sender,label,args):
                                 chatcolor("&7  - %s" % item)
                             )
             sender.sendMessage("")
-            sender.sendMessage(
-                chatcolor("&8:=============================================:")
-            )
+            sender.sendMessage(chatcolor("&8:====================================================:"))
                     #sender.sendMessage("Punishments Tab:")
                     #sender.sendMessage("")
                     #_any = False
@@ -828,7 +826,7 @@ def onCommand(sender,label,args):
         sender.sendMessage(chatcolor("&eNotes"))
         sender.sendMessage(chatcolor("&8» &7You may apply before reaching the required playtime"))
         sender.sendMessage(chatcolor("&8» &7Denied applications may be submitted again"))
-        sender.sendMessage(chatcolor("&8» &7Use &f/status &7to view staff status and to check progress"))
+        sender.sendMessage(chatcolor("&8» &7Use &f/status &7to view staff status"))
         sender.sendMessage("")
         sender.sendMessage(chatcolor("&8:====================================================:"))
         #sender.sendMessage("How to apply")
