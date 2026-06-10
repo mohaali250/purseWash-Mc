@@ -630,7 +630,7 @@ def onCommand(sender,label,args):
                 if max(required - current, 0) != 0:
                     sender.sendMessage(
                         chatcolor(
-                            "&7Time left: &f%s &7out of &f%s &7to get &b%s"
+                            "&7Time left: &f %s &7out of &f%s &7to get &b%s"
                             % (
                                 pretty_timedelta(max(required - current, 0)),
                                 pretty_timedelta(required),
