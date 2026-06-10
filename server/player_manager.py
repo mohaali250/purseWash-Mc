@@ -790,16 +790,16 @@ def onCommand(sender,label,args):
             if hasattr(sender, "getUniqueId") and not uuid(sender)==OWNERUUID:
                 chat_log(sender,1,"%s are not permitted to use this command. Use console to run this instead",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
-            ensure(uuid(Bukkit.getPlayer(args[1])))
-            player_uuid = uuid(Bukkit.getPlayer(args[1]))
+            ensure(uuid(Bukkit.getOfflinePlayer(args[1])))
+            player_uuid = uuid(Bukkit.getOfflinePlayer(args[1]))
             converter = getattr(__builtin__, args[3])
             data[player_uuid][args[2]] = converter(" ".join(args[4:]))
         if section_show == 5:
             if hasattr(sender, "getUniqueId") and not uuid(sender)==OWNERUUID:
                 chat_log(sender,1,"%s are not permitted to use this command. Use console to run this instead",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
-            ensure(uuid(Bukkit.getPlayer(args[1])))
-            d = data[uuid(Bukkit.getPlayer(args[1]))]
+            ensure(uuid(Bukkit.getOfflinePlayer(args[1])))
+            d = data[uuid(Bukkit.getOfflinePlayer(args[1]))]
             sender.sendMessage("Raw data of %s:" % (args[1]))
             for i, v in d.items():
                 sender.sendMessage("Key: %s; Type: %s; Value: %s; | " % (i, str(type(v)),str(v)))
@@ -990,14 +990,14 @@ class _bit:
         return integer
 def handle_join(event):
     global local_session_notify
-    p = event.getPlayer()
+    p = event.getOfflinePlayer()
     u=uuid(p)
     ensure(u)
     d=data[u]
     local_session_notify[uuid(p)] = d["notify"]
     session_notify(p)
 def handle_disconnect(event):
-    player = event.getPlayer()
+    player = event.getOfflinePlayer()
     local_session_notify.pop(uuid(player), None)
     pass
 def onJoin(event):
