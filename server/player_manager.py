@@ -61,6 +61,7 @@ class exception_type:
     PARSE_ERROR = "Parse Error"
     SUCCESS = "Success"
 def chat_log(target,state,string,variables=(),_type="PRINT"):
+    if target is None: return False
     states = {
         0: {
             "contents": "INFO",
@@ -223,10 +224,9 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        
-        target=Bukkit.getPlayer(args[0])
-        if target is None:
-            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
+        target=Bukkit.getOfflinePlayer(args[0])
+        if not target.hasPlayedBefore() and not target.isOnline():
+            chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
@@ -254,9 +254,9 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getPlayer(args[0])
-        if target is None:
-            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
+        target=Bukkit.getOfflinePlayer(args[0])
+        if not target.hasPlayedBefore() and not target.isOnline():
+            chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
@@ -290,9 +290,9 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getPlayer(args[0])
-        if target is None:
-            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
+        target=Bukkit.getOfflinePlayer(args[0])
+        if not target.hasPlayedBefore() and not target.isOnline():
+            chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
@@ -318,9 +318,9 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getPlayer(args[0])
-        if target is None:
-            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
+        target=Bukkit.getOfflinePlayer(args[0])
+        if not target.hasPlayedBefore() and not target.isOnline():
+            chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
@@ -355,9 +355,9 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getPlayer(args[0])
-        if target is None:
-            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
+        target=Bukkit.getOfflinePlayer(args[0])
+        if not target.hasPlayedBefore() and not target.isOnline():
+            chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
@@ -428,9 +428,9 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getPlayer(args[0])
-        if target is None:
-            chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
+        target=Bukkit.getOfflinePlayer(args[0])
+        if not target.hasPlayedBefore() and not target.isOnline():
+            chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
         u=uuid(target)
         ensure(u)
