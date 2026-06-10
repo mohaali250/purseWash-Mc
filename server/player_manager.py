@@ -873,14 +873,14 @@ def typing_filter(arg, options):
 def get_players(arg):
     players = []
     for p in Bukkit.getOnlinePlayers():
-        if p.getName().lower().startswith(args[-1].lower()):
+        if p.getName().lower().startswith(arg.lower()):
             players.append(p.getName())
     for p in Bukkit.getOfflinePlayers():
         if len(players) >= 50:
             break
         if p.isOnline():
             continue
-        if p.getName().lower().startswith(args[-1].lower()):
+        if p.getName().lower().startswith(arg.lower()):
             players.append(p.getName())
     return players
 
