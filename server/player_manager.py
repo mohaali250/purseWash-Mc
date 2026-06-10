@@ -888,7 +888,7 @@ def onTabComplete(sender,alias,args):
             return typing_filter(args[0],["staff"])
         if cmd=="status":
             return typing_filter(args[0],["staff","punishments","set","get","raw_data"])
-        return typing_filter(args[0],players)
+        return players
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
             try:
@@ -903,11 +903,8 @@ def onTabComplete(sender,alias,args):
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="status":
             if args[0] == "set" or args[0] == "get":
-                return typing_filter(
-                    args[1],
-                    players
-                )
-            return typing_filter(args[0],players)
+                return players
+            return players
         if cmd=="punish":
             return typing_filter(args[1],list(gdata["punishments"].keys()))
         if cmd=="promote":
