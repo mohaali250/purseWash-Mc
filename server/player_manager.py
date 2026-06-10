@@ -627,16 +627,27 @@ def onCommand(sender,label,args):
                     float(current) / max(required, 1)
                 )
                 filled = int(progress * 100)
-                sender.sendMessage(
-                    chatcolor(
-                        "&7Time left: &f%s &7out of &f%s &7to get &b%s"
-                        % (
-                            pretty_timedelta(max(required - current, 0)),
-                            pretty_timedelta(required),
-                            extended_staff_rank(d["staff"])
+                if max(required - current, 0) != 0
+                    sender.sendMessage(
+                        chatcolor(
+                            "&7Time left: &f%s &7out of &f%s &7to get &b%s"
+                            % (
+                                pretty_timedelta(max(required - current, 0)),
+                                pretty_timedelta(required),
+                                extended_staff_rank(d["staff"])
+                            )
                         )
                     )
-                )
+                else:
+                    sender.sendMessage(
+                        chatcolor(
+                            "&7You completed the&f%s&7 to claim get &b%s&f. Do /activate staff"
+                            % (
+                                pretty_timedelta(required),
+                                extended_staff_rank(d["staff"])
+                            )
+                        )
+                    )
                 sender.sendMessage(
                     chatcolor(
                         "[&a%s&8%s&f]"
