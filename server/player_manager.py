@@ -627,7 +627,7 @@ def onCommand(sender,label,args):
                     float(current) / max(required, 1)
                 )
                 filled = int(progress * 100)
-                if max(required - current, 0) != 0
+                if max(required - current, 0) != 0:
                     sender.sendMessage(
                         chatcolor(
                             "&7Time left: &f%s &7out of &f%s &7to get &b%s"
