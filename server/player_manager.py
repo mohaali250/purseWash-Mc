@@ -874,7 +874,7 @@ def onTabComplete(sender,alias,args):
         for p in Bukkit.getOfflinePlayers():
             if p.isOnline():
                 continue
-            players.append(p)
+            players.append(p.getName())
             if len(players) >= 200:
                 break
     cmd=alias.split(" ")[0].split(":")[-1]
