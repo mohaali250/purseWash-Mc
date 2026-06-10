@@ -495,7 +495,7 @@ def onCommand(sender,label,args):
         # Optimizing actions and apply
         d["punishments"] = {i: v for i,v in zip(reason_stack,proof_stack)}
         if clear:
-            target.getInventory().clear()
+            _bit.write(d["notify"],6,True)
         if demote:
             d["staff_playtime"]=0
             remove_staff(target.getName(),d["staff"])
@@ -980,6 +980,10 @@ def session_notify(p):
     if d["locked"]==-2 and not _bit.read(d["notify"],5):
         chat_log(p,4,"You are Demoted from staff. See /status for more")
         d["notify"] = _bit.write(d["notify"],5,True)
+    if _bit.read(d["notify"],6):
+        chat_log(p,4,"You just got cleared")
+        p.getInventory().clear()
+        d["notify"] = _bit.write(d["notify"],6,False)
 class _bit:
     @staticmethod
     def read(integer,n):
