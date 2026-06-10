@@ -52,8 +52,8 @@ def now():
 def uuid(p):
     return str(p.getUniqueId())
 def get_total_playtime_seconds(u):
-    player = Bukkit.getPlayer(UUID.fromString(u))
-    return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20
+    player = Bukkit.getOfflinePlayer(UUID.fromString(u))
+    return player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20 if not player is None else 0
 
 class exception_type:
     PERMISSION_ERROR = "Permission Error"
