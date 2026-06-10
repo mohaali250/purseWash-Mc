@@ -161,9 +161,9 @@ def parse(t):
 def lp(cmd):
     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"lp "+cmd)
 def add_staff(name,rank):
-    lp("user %s parent add %s"%(name,rank))
-def remove_staff(name,rank):
-    lp("user %s parent remove %s"%(name,rank))
+    lp("user %s parent set %s"%(name,rank))
+def remove_staff(name,rank=""):
+    lp("user %s parent clear %s"%(name))
 def eligible(d):
     if d["staff"] == "":return False
     return not any([
@@ -223,6 +223,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
+        
         target=Bukkit.getPlayer(args[0])
         if target is None:
             chat_log(sender,1,"Target %s returned none when parsed as a player, perphaps the player is offline?",variables=(args[0]),_type=exception_type.PARSE_ERROR)
@@ -233,16 +234,16 @@ def onCommand(sender,label,args):
         if len(args)!=2:
             chat_log(sender,2,"Command \"/promote\" requires exactely 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
-        if d["staff"] == "" and d["banned"] > time.time():
+        if d["staff"] == "" and (d["banned"] > time.time() or d["banned"]==-1):
             chat_log(sender,1,"Target %s is staff banned",variables=(args[0]))
             return True
         
         chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],extended_staff_rank(args[1])))
         chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",extended_staff_rank(args[1])))
         # Run start
-        if len(d["staff"]) != 0: remove_staff(target.getName(),d["staff"])
+        add_staff(target.getName(),"trainee")
         d["staff"]=args[1]
-        d["locked"] = -3
+        if d["locked"] < 0: d["locked"] = -3
         # Run end
     elif cmd=="suspend":
         if not sender.hasPermission("staffmanager.suspend"):
@@ -414,7 +415,7 @@ def onCommand(sender,label,args):
             f["banned"] = 0
             f["locked"] = 0
             f["punishments"] = {}
-            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
+            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) <     f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
                 local_session_notify[uuid(sender)] = 0
             #Run end
