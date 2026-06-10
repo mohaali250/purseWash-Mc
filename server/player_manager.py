@@ -574,7 +574,7 @@ def onCommand(sender,label,args):
             section_show = 5
         
         if section_show == 1 or section_show == 0:
-            sender.sendMessage(chatcolor("&8:======================< &6STATUS &8>======================:"))
+            sender.sendMessage(chatcolor("&8:=====================< &6STATUS &8>======================:"))
             sender.sendMessage("")
             status_text = "Unknown"
             status_bar = 0
