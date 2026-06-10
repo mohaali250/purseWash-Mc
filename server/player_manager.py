@@ -869,12 +869,10 @@ def onCommand(sender,label,args):
 def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
 def onTabComplete(sender,alias,args):
-    online = list(Bukkit.getOnlinePlayers())
-    offline = [
-        p for p in Bukkit.getOfflinePlayers()
-        if not p.isOnline()
-    ]
-    all_players = online + offline
+    players = (
+        list(Bukkit.getOnlinePlayers()) +
+        [p for p in Bukkit.getOfflinePlayers() if not p.isOnline()]
+    )[:200]
 
     cmd=alias.split(" ")[0].split(":")[-1]
     if cmd=="apply":
@@ -884,7 +882,7 @@ def onTabComplete(sender,alias,args):
             return typing_filter(args[0],["staff"])
         if cmd=="status":
             return typing_filter(args[0],["staff","punishments","set","get","raw_data"])
-        return typing_filter(args[0],all_players)
+        return typing_filter(args[0],players)
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
             try:
@@ -901,9 +899,9 @@ def onTabComplete(sender,alias,args):
             if args[0] == "set" or args[0] == "get":
                 return typing_filter(
                     args[1],
-                    all_players
+                    players
                 )
-            return typing_filter(args[0],all_players)
+            return typing_filter(args[0],players)
         if cmd=="punish":
             return typing_filter(args[1],list(gdata["punishments"].keys()))
         if cmd=="promote":
