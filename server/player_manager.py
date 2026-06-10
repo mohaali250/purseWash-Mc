@@ -869,11 +869,14 @@ def onCommand(sender,label,args):
 def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
 def onTabComplete(sender,alias,args):
-    players = (
-        list(Bukkit.getOnlinePlayers()) +
-        [p for p in Bukkit.getOfflinePlayers() if not p.isOnline()]
-    )[:200]
-
+    players = list(Bukkit.getOnlinePlayers())
+    if len(players) < 200:
+        for p in Bukkit.getOfflinePlayers():
+            if p.isOnline():
+                continue
+            players.append(p)
+            if len(players) >= 200:
+                break
     cmd=alias.split(" ")[0].split(":")[-1]
     if cmd=="apply":
         return []
