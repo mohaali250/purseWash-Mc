@@ -990,14 +990,14 @@ class _bit:
         return integer
 def handle_join(event):
     global local_session_notify
-    p = event.getOfflinePlayer()
+    p = event.getPlayer()
     u=uuid(p)
     ensure(u)
     d=data[u]
     local_session_notify[uuid(p)] = d["notify"]
     session_notify(p)
 def handle_disconnect(event):
-    player = event.getOfflinePlayer()
+    player = event.getPlayer()
     local_session_notify.pop(uuid(player), None)
     pass
 def onJoin(event):
