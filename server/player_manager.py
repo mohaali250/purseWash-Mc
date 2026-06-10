@@ -62,6 +62,8 @@ class exception_type:
     SUCCESS = "Success"
 def chat_log(target,state,string,variables=(),_type="PRINT"):
     if not target.isOnline(): return False
+    if not hasattr(target, "sendMessage"):
+        target = target.getPlayer()
     states = {
         0: {
             "contents": "INFO",
@@ -868,7 +870,7 @@ def onCommand(sender,label,args):
     return True
 def typing_filter(arg, options):
     return [c for c in options if c.lower().startswith(arg.lower())]
-def onTabComplete(sender,alias,args):
+def get_players(arg):
     players = []
     for p in Bukkit.getOnlinePlayers():
         if p.getName().lower().startswith(args[-1].lower()):
@@ -880,6 +882,9 @@ def onTabComplete(sender,alias,args):
             continue
         if p.getName().lower().startswith(args[-1].lower()):
             players.append(p.getName())
+    return players
+
+def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0].split(":")[-1]
     if cmd=="apply":
         return []
@@ -888,7 +893,7 @@ def onTabComplete(sender,alias,args):
             return typing_filter(args[0],["staff"])
         if cmd=="status":
             return typing_filter(args[0],["staff","punishments","set","get","raw_data"])
-        return players
+        return get_players(args[-1])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
             try:
@@ -903,8 +908,8 @@ def onTabComplete(sender,alias,args):
             return [args[1] + i for i in ["s","min","h","d","wk"]]
         if cmd=="status":
             if args[0] == "set" or args[0] == "get":
-                return players
-            return players
+                return get_players(args[-1])
+            return get_players(args[-1])
         if cmd=="punish":
             return typing_filter(args[1],list(gdata["punishments"].keys()))
         if cmd=="promote":
