@@ -281,7 +281,7 @@ def onCommand(sender,label,args):
         d["locked"]=now()+dur
         remove_staff(target.getName(),d["staff"])
         #Run end
-        chat_log(sender,3,"Suspended %s for &a"+"&2,&a".join(args[2:])+"&2 expiring in %s.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        chat_log(sender,3,"Suspended %s for \"%s\" expiring in %s.",variables=(args[0]," ".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
         chat_log(target,0,"%s are now suspended from staff. More info on [/status]",variables=("You"))
     elif cmd=="demote":
         if not sender.hasPermission("staffmanager.demote"):
@@ -309,7 +309,7 @@ def onCommand(sender,label,args):
         d["staff"]=""
         d["locked"]=-2
         #Run end
-        chat_log(sender,3,"Demoted %s for &a"+"&2,&a".join(args[1:])+"&2.",variables=(args[0]))
+        chat_log(sender,3,"Demoted %s for %s.",variables=(args[0]," ".join(args[1:])))
         chat_log(target,0,"%s are now demoted from staff. More info on [/status]",variables=("You"))
     elif cmd=="staff_ban":
         if not sender.hasPermission("staffmanager.staffban"):
@@ -346,10 +346,10 @@ def onCommand(sender,label,args):
         remove_staff(target.getName(),d["staff"])
         d["staff"]=""
         #Run end
-        chat_log(sender,3,"Staff banned %s for &a"+"&2,&a".join(args[2:])+"&2 expiring in %s.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        chat_log(sender,3,"Staff banned %s for \"%s\" expiring in %s.",variables=(args[0]," ".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
         chat_log(target,0,"%s are now banned from staff. More info on [/status]",variables=("You"))
-    elif cmd=="staff_unban":
-        if not sender.hasPermission("staffmanager.staffunban"):
+    elif cmd=="pardon":
+        if not sender.hasPermission("staffmanager.remove_punishment"):
             chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
         
@@ -389,6 +389,8 @@ def onCommand(sender,label,args):
         if not _any:
             chat_log(sender,3,"%s doesnt have a punishment to remove",variables=(args[0]))
 
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"unban %s" % (args[0]))
+
         local_session_notify[uuid(sender)]=0
         #Run end
     elif cmd=="activate":
@@ -426,7 +428,7 @@ def onCommand(sender,label,args):
             f["banned"] = 0
             f["locked"] = 0
             f["punishments"] = {}
-            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) <     f["staff_playtime"]:
+            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
                 local_session_notify[uuid(sender)] = 0
             #Run end
@@ -530,7 +532,7 @@ def onCommand(sender,label,args):
         if kick:
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s Stack Start | %s | Stack End; Rejoin with that in mind" % (args[0], " | ".join(reason_stack))) 
         
-        chat_log(sender,3,"Punished &a%s&2 for &a%s&2." % (args[0],"&2,&a".join(args[1:])))
+        chat_log(sender,3,"Punished &a%s&2 for &a%s&2." % (args[0],"&2, &a".join(args[1:])))
     elif cmd=="status":
         
         if not hasattr(sender, "getUniqueId"):
@@ -612,7 +614,7 @@ def onCommand(sender,label,args):
                 status_text = "&ePending Staff"
                 status_bar = 3
             elif d["locked"] in [-1, -2, -3]:
-                status_text = "&eNeeds Rule Agreement"
+                status_text = "&eNeeds Rule Agreement (do /activate staff)"
                 status_bar = 3
             else:
                 status_text = "&aActive Staff"
@@ -898,6 +900,10 @@ def get_players(arg):
             players.append(u"\u00A0"+name)
     return players
 
+def only_numbers(arg):
+    return "".join([i for i in arg if i in [str(v) for v in range(0, 10)]])
+
+
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0].split(":")[-1]
     if cmd=="apply":
@@ -910,16 +916,7 @@ def onTabComplete(sender,alias,args):
         return get_players(args[-1])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
-            try:
-                num = int(args[1])
-            except Exception:
-                try:
-                    num = parse(args[1])
-                    if num is None:
-                        return []
-                except Exception:
-                    return [args[1]+c for c in ["s","min","h","d","wk"] if (args[1]+c).lower().startswith(args[1].lower())]
-            return [args[1] + i for i in ["s","min","h","d","wk"]]
+            return [only_numbers(args[1]) + i for i in ["s","min","h","d","wk"]]
         if cmd=="status":
             if args[0] == "set" or args[0] == "get":
                 return get_players(args[-1])
@@ -930,7 +927,7 @@ def onTabComplete(sender,alias,args):
             return typing_filter(args[1],list(gdata["ranks"].keys()))
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staff_ban","demote"]]):
-            return ["\"" + args[-1] + "\""]
+            return [args[3:]]
         if cmd=="punish":
             return typing_filter(args[-1],list(gdata["punishments"].keys()))
         if cmd=="status":
@@ -1041,7 +1038,7 @@ with open(FILE,"r") as f:
     data=json.load(f)
 # Run  
     
-for c in ["promote","suspend","demote","staff_ban","staff_unban","punish","activate","status","apply"]:
+for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate","status","apply"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
 gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
