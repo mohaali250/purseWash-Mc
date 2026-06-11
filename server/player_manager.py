@@ -19,6 +19,7 @@ from net.md_5.bungee.api.chat import TextComponent
 from net.md_5.bungee.api.chat import ClickEvent
 from net.md_5.bungee.api.chat import HoverEvent
 from net.md_5.bungee.api.chat.hover.content import Text
+from ac.grim.grimac.api.events import FlagEvent
 # functions
 def fetch_data():
     try:
@@ -1026,6 +1027,12 @@ def onQuit(event):
     handle_disconnect(event)
 def onKick(event):
     handle_disconnect(event)
+
+def onFlag(event):
+    print(event.getClass().getName())
+    for m in event.getClass().getMethods():
+        print(m.getName())
+
 # starter variables
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
@@ -1044,5 +1051,6 @@ gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
+ps.listener.registerListener(onFlag, FlagEvent)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
 print("[Staff] Loaded.")
