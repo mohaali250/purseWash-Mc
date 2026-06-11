@@ -886,7 +886,7 @@ def get_players(arg):
     for p in Bukkit.getOnlinePlayers():
         name = p.getName()
         if name and name.lower().startswith(arg):
-            players.append(u"\u00A0"+name)
+            players.append(name)
             added.add(name)
     for p in Bukkit.getOfflinePlayers():
         if len(players) >= 50:
@@ -895,7 +895,7 @@ def get_players(arg):
         if not name or name in added:
             continue
         if name.lower().startswith(arg):
-            players.append(name)
+            players.append(u"\u00A0"+name)
     return players
 
 def onTabComplete(sender,alias,args):
