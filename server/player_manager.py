@@ -1028,14 +1028,15 @@ def onQuit(event):
 def onKick(event):
     handle_disconnect(event)
 
-def onFlag(event):
-    player = event.getPlayer()
+seen = set()
 
-    print("Player:", player.getName())
-    print("Check:", event.getCheck())
-    print("VL:", event.getViolations())
-    print("Verbose:", event.getVerbose())
-    print("Setback:", event.isSetback())
+def onFlag(event):
+    check = event.getCheck()
+    cls = check.getClass()
+    name = cls.getSimpleName()
+    package = cls.getPackage().getName()
+    if name not in seen:
+        print(package + "." + name)
 
 # starter variables
 FILE="plugins/PySpigot/staff.json"
