@@ -1047,6 +1047,7 @@ def onFlag(event):
         runCommand_MainThread("kick %s You got %s x%s. Server TPS: %s.If this was lag, try rejoining, if this keeps happening let the owner know" % (event.getPlayer().getName,flagName,event.getViolations(),tps))
     elif 50 < event.getViolations():
         runCommand_MainThread("punish %s cheating.%s" % (event.getPlayer().getName(),name.lower()))
+    print(cls.getPackage().getName())
 
 # starter variables
 FILE="plugins/PySpigot/staff.json"
