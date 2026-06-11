@@ -1028,6 +1028,14 @@ def onQuit(event):
 def onKick(event):
     handle_disconnect(event)
 
+def runCommand_MainThread(cmd):
+    Bukkit.getScheduler().runTask(
+        Bukkit.getPluginManager().getPlugin("PySpigot"),
+        lambda: Bukkit.dispatchCommand(
+            Bukkit.getConsoleSender(),
+            cmd
+        )
+    )
 
 def onFlag(event):
     check = event.getCheck()
@@ -1036,9 +1044,9 @@ def onFlag(event):
     name = cls.getPackage().getName().split(".")[-1]
     tps = Bukkit.getServer().getTPS()[0]  # 1-minute TPS
     if name == "prediction" and 150 < event.getViolations() and tps < 17:
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s You got %s x%s. Server TPS: %s.If this was lag, try rejoining, if this keeps happening let the owner know" % (event.getPlayer().getName,flagName,event.getViolations(),tps))
+        runCommand_MainThread(Bukkit.getConsoleSender(),"kick %s You got %s x%s. Server TPS: %s.If this was lag, try rejoining, if this keeps happening let the owner know" % (event.getPlayer().getName,flagName,event.getViolations(),tps))
     elif 50 < event.getViolations():
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"punish %s cheating.%s" % (event.getPlayer().getName(),name.lower()))
+        runCommand_MainThread(Bukkit.getConsoleSender(),"punish %s cheating.%s" % (event.getPlayer().getName(),name.lower()))
 
 # starter variables
 FILE="plugins/PySpigot/staff.json"
