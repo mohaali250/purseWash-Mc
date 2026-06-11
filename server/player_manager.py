@@ -1031,7 +1031,7 @@ def onKick(event):
 def runCommand_MainThread(cmd):
     Bukkit.getScheduler().runTask(
         Bukkit.getPluginManager().getPlugin("PySpigot"),
-        lambda: Bukkit.dispatchCommand(
+        lambda a : Bukkit.dispatchCommand(
             Bukkit.getConsoleSender(),
             cmd
         )
