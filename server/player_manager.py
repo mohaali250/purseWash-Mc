@@ -1029,9 +1029,13 @@ def onKick(event):
     handle_disconnect(event)
 
 def onFlag(event):
-    print(event.getClass().getName())
-    for m in event.getClass().getMethods():
-        print(m.getName())
+    player = event.getPlayer()
+
+    print("Player:", player.getName())
+    print("Check:", event.getCheck())
+    print("VL:", event.getViolations())
+    print("Verbose:", event.getVerbose())
+    print("Setback:", event.isSetback())
 
 # starter variables
 FILE="plugins/PySpigot/staff.json"
