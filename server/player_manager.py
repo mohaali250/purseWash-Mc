@@ -1028,15 +1028,17 @@ def onQuit(event):
 def onKick(event):
     handle_disconnect(event)
 
-seen = set()
 
 def onFlag(event):
     check = event.getCheck()
     cls = check.getClass()
-    name = cls.getSimpleName()
-    package = cls.getPackage().getName()
-    if name not in seen:
-        print(package + "." + name)
+    flagName = cls.getSimpleName()
+    name = cls.getPackage().getName().split(".")[-1]
+    tps = Bukkit.getServer().getTPS()[0]  # 1-minute TPS
+    if name == "prediction" and 150 < event.getViolations() and tps < 17:
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s You got %s x%s. Server TPS: %s.If this was lag, try rejoining, if this keeps happening let the owner know" % (event.getPlayer().getName,flagName,event.getViolations(),tps))
+    elif 50 < event.getViolations():
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"punish %s cheating.%s" % (event.getPlayer().getName(),name.lower()))
 
 # starter variables
 FILE="plugins/PySpigot/staff.json"
