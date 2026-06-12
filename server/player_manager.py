@@ -1144,7 +1144,7 @@ def onFlag(event):
             ))
 import pyspigot as ps
 from github.scarsz.discordsrv import DiscordSRV
-from github.scarsz.discordsrv.api import Subscribe, ListenerPriority
+from github.scarsz.discordsrv.api import Subscribe, ListenerPriority, PluginListener
 from github.scarsz.discordsrv.api.events import AccountLinkedEvent, AccountUnlinkedEvent
 
 # Global data placeholders (Assuming these are defined elsewhere in your script)
