@@ -1154,45 +1154,40 @@ from github.scarsz.discordsrv.api.events import AccountLinkedEvent, AccountUnlin
 # def runCommand_MainThread(cmd): ...
 # def chat_log(player, type, message, variables): ...
 
-class DiscordAccountListener(object):
+class DiscordAccountListener(PluginListener):
 
-    @Subscribe({"priority": ListenerPriority.NORMAL})
-    def on_link(self, event):
-        # Ensure we are handling the correct event type
-        if isinstance(event, AccountLinkedEvent):
-            player = event.getPlayer()
-            user = event.getUser() # You have access to the Discord user object here if needed
+    def __init__(self):
+        super(DiscordAccountListener, self).__init__()
 
-            u = uuid(player)
-            ensure(u)
-            d = data[u]
+    # Override the default event execution behavior of PluginListener
+    def onAccountLinked(self, event):
+        u = uuid(event.getPlayer())
+        ensure(u)
+        d = data[u]
 
-            if d["staff"] == "":
-                runCommand_MainThread(
-                    "lp user %s parent set linked" % player.getName()
-                )
-
-    @Subscribe({"priority": ListenerPriority.NORMAL})
-    def on_unlink(self, event):
-        # Ensure we are handling the correct event type
-        if isinstance(event, AccountUnlinkedEvent):
-            player = event.getPlayer()
-            
-            u = uuid(player)
-            ensure(u)
-            d = data[u]
-
-            d["locked"] = -4
+        if d["staff"] == "":
             runCommand_MainThread(
-                "lp user %s parent clear" % player.getName()
-            )  
-            
-            chat_log(
-                player, 
-                1, 
-                "%s staff perms are now suspended until you link a new discord account. Check [/status]", 
-                variables=("Your",)
+                "lp user %s parent set linked" % event.getPlayer().getName()
             )
+
+    def onAccountUnlinked(self, event):
+        player = event.getPlayer()
+        
+        u = uuid(player)
+        ensure(u)
+        d = data[u]
+
+        d["locked"] = -4
+        runCommand_MainThread(
+            "lp user %s parent clear" % player.getName()
+        )  
+        
+        chat_log(
+            player, 
+            1, 
+            "%s staff perms are now suspended until you link a new discord account. Check [/status]", 
+            variables=("Your",)
+        )
 
 # --- Registration & Lifecycle Management ---
 
