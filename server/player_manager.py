@@ -23,19 +23,14 @@ from ac.grim.grimac.api.events import FlagEvent
 # functions
 def fetch_data():
     try:
-        print("Fetching:", URL_DATA)
         stream = URL(URL_DATA).openStream()
         scanner = Scanner(stream).useDelimiter("\\A")
         response = scanner.next() if scanner.hasNext() else None
         scanner.close()
-        print("Response:")
-        print(response)
         if response is None:
             print("Response was None")
             return None
         obj = json.loads(response)
-        print("Parsed:")
-        print(obj)
         return obj
     except Exception as ex:
         print("EXCEPTION:", ex)
@@ -100,7 +95,6 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
         target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+"[Pyspigot/player_manager.py] [%s] %s" % (states[state]["contents"],text)))
 
 def ensure(u):
-    print("ENSURE CALLED FOR", u)
     defaults = {
         "staff": "",
         "staff_playtime": get_total_playtime_seconds(u),
@@ -110,14 +104,11 @@ def ensure(u):
         "notify": 0
     }
     if u not in data:
-        print("CREATING ENTRY")
         data[u] = defaults.copy()
     else:
-        print("BEFORE ENSURE:", data[u])
         for k, default in defaults.items():
             if k not in data[u]:
                 data[u][k] = default
-        print("AFTER ENSURE:", data[u])
 def pretty_timedelta(timeinterval):
     if not isinstance(timeinterval,int):
         return None
