@@ -656,9 +656,6 @@ def onCommand(sender,label,args):
             elif d["locked"] in [-1, -2, -3]:
                 status_text = "&eNeeds Rule Agreement (do /activate staff)"
                 status_bar = 3
-            elif d["locked"] == -4:
-                status_text = "&eYou must relink your Discord account to get staff perms again [/discord link])"
-                status_bar = 3
             else:
                 status_text = "&aActive Staff"
                 status_bar = 4
@@ -955,7 +952,7 @@ def onTabComplete(sender,alias,args):
         if cmd=="activate":
             return typing_filter(args[0],["staff"])
         if cmd=="status":
-            return typing_filter(args[0],["staff","punishments","set","get","as"])
+            return typing_filter(args[0],["staff","punishments","set","get","as"]) if sender.hasPermission("staffmanager.get_data") else typing_filter(args[0],["staff","punishments"])
         return get_players(args[-1])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
