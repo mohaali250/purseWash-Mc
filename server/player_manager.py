@@ -1039,17 +1039,72 @@ def runCommand_MainThread(cmd):
         )
     )
 
+import time
+
+
 def onFlag(event):
+    player = event.getPlayer()
+    uuid = str(player.getUniqueId())
     check = event.getCheck()
     cls = check.getClass()
     flagName = cls.getSimpleName()
-    name = cls.getPackage().getName().split(".")[-1]
-    tps = Bukkit.getServer().getTPS()[0]  # 1-minute TPS
-    if name == "prediction" and 150 < event.getViolations() and tps < 17:
-        runCommand_MainThread("kick %s You got %s x%s. Server TPS: %s.If this was lag, try rejoining, if this keeps happening let the owner know" % (event.getPlayer().getName,flagName,event.getViolations(),tps))
-    elif 50 < event.getViolations():
-        runCommand_MainThread("punish %s cheating.%s" % (event.getPlayer().getName(),name.lower()))
-    print(cls.getPackage().getName())
+    category = cls.getPackage().getName().split(".")[-1]
+    tps = Bukkit.getServer().getTPS()[0]
+    ping = player.getPing()
+    now = time.time()
+    # Ignore obvious lag situations
+    if tps < 17:
+        return
+    if ping > 300:
+        return
+    # Create player entry
+    if uuid not in flag_data:
+        flag_data[uuid] = {
+            "score": 0,
+            "last": now
+        }
+    data = flag_data[uuid]
+    # Decay score
+    minutes_passed = (now - data["last"]) / 60.0
+    decay = int(minutes_passed * DECAY_PER_MINUTE)
+    if decay > 0:
+        data["score"] = max(0, data["score"] - decay)
+        data["last"] = now
+    # Add weighted score
+    data["score"] += WEIGHTS.get(category.lower(), 2)
+    # Lag warning
+    if (
+        category == "prediction"
+        and event.getViolations() > 150
+        and ping > 250
+    ):
+        runCommand_MainThread(
+            "kick %s You got %s x%s. Ping: %sms. If this keeps happening contact staff."
+            % (
+                player.getName(),
+                flagName,
+                int(event.getViolations()),
+                ping
+            )
+        )
+        return
+    # Punish based on accumulated score
+    if data["score"] >= BAN_THRESHOLD:
+        runCommand_MainThread(
+            "punish %s cheating.%s"
+            % (player.getName(), category.lower())
+        )
+        # Prevent repeated punishments
+        data["score"] = 0
+    print(
+        "[Grim] %s | %s | score=%s | VL=%s | ping=%s"
+        % (
+            player.getName(),
+            category,
+            data["score"],
+            event.getViolations(),
+            ping
+            ))
 
 # starter variables
 FILE="plugins/PySpigot/staff.json"
@@ -1061,8 +1116,22 @@ if not os.path.exists(FILE):
         json.dump({},f) 
 with open(FILE,"r") as f:
     data=json.load(f)
+
+#function onFlag initializer
+
+# uuid -> {"score": int, "last": timestamp}
+flag_data = {}
+WEIGHTS = {
+    "prediction": 1,
+    "scaffolding": 5,
+    "combat": 10,
+    "reach": 15,
+    "aim": 15,
+}
+BAN_THRESHOLD = 100
+DECAY_PER_MINUTE = 5
+
 # Run  
-    
 for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate","status","apply"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
 gdata = fetch_data()
