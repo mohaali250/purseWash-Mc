@@ -572,17 +572,15 @@ def onCommand(sender,label,args):
             section_show = 1
         elif args[0] == "punishments":
             section_show = 2
-        elif args[0] == "raw_data":
-            section_show = 3
         elif args[0] == "set":
             section_show = 4
         elif args[0] == "get":
             section_show = 5
         elif args[0] == "as":
-            if not sender.hasPermission("staffmanager.status_as"):
+            if not sender.hasPermission("staffmanager.get_data"):
                 chat_log(sender,1,"%s are not permitted to use this argument/subcommand",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
-            section_show = 1
+            section_show = 0
             target=Bukkit.getOfflinePlayer(args[1].replace(u"\u00A0",""))
             if not target.hasPlayedBefore() and not target.isOnline():
                 chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[1]),_type=exception_type.PARSE_ERROR)
@@ -590,6 +588,7 @@ def onCommand(sender,label,args):
             u=uuid(target)
             ensure(u)
             d=data[u]
+            chat_log(sender,3,"Displaying %s as %s.",variables=("/status",args[1]))
         
         if section_show == 1 or section_show == 0:
             sender.sendMessage(chatcolor("&8:=====================< &6STATUS &8>======================:"))
@@ -797,12 +796,6 @@ def onCommand(sender,label,args):
                     #                sender.sendMessage("Rule Breaking Item: %s" % (n))
                     #    sender.sendMessage("")
                     #    sender.sendMessage("If you believe you were punished unfairly join discord (/trigger discord) and apeal your ban in tickets")
-        if section_show == 3:
-            sender.sendMessage("Raw staff data:")
-            for i, v in d.items():
-                sender.sendMessage("")
-                sender.sendMessage("Key: %s" % (i))
-                sender.sendMessage("Value: %s" % (v))
         if section_show == 4:
             if hasattr(sender, "getUniqueId") and not uuid(sender)==OWNERUUID:
                 chat_log(sender,1,"%s are not permitted to use this command. Use console to run this instead",variables=("You"),_type=exception_type.PERMISSION_ERROR)
@@ -812,11 +805,17 @@ def onCommand(sender,label,args):
             converter = getattr(__builtin__, args[3])
             data[player_uuid][args[2]] = converter(" ".join(args[4:]))
         if section_show == 5:
-            if hasattr(sender, "getUniqueId") and not uuid(sender)==OWNERUUID:
-                chat_log(sender,1,"%s are not permitted to use this command. Use console to run this instead",variables=("You"),_type=exception_type.PERMISSION_ERROR)
+            if not sender.hasPermission("staffmanager.get_data"):
+                chat_log(sender,1,"%s are not permitted to use this argument/subcommand",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
-            ensure(uuid(Bukkit.getOfflinePlayer(args[1])))
-            d = data[uuid(Bukkit.getOfflinePlayer(args[1]))]
+            section_show = 0
+            target=Bukkit.getOfflinePlayer(args[1].replace(u"\u00A0",""))
+            if not target.hasPlayedBefore() and not target.isOnline():
+                chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[1]),_type=exception_type.PARSE_ERROR)
+                return True
+            u=uuid(target)
+            ensure(u)
+            d=data[u]
             sender.sendMessage("Raw data of %s:" % (args[1]))
             for i, v in d.items():
                 sender.sendMessage("Key: %s; Type: %s; Value: %s; | " % (i, str(type(v)),str(v)))
@@ -916,7 +915,7 @@ def onTabComplete(sender,alias,args):
         if cmd=="activate":
             return typing_filter(args[0],["staff"])
         if cmd=="status":
-            return typing_filter(args[0],["staff","punishments","set","get","raw_data"])
+            return typing_filter(args[0],["staff","punishments","set","get","as"])
         return get_players(args[-1])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staff_ban"]]):
