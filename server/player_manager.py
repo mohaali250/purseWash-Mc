@@ -1232,7 +1232,7 @@ ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
 print(dir(DiscordSRV.api))
-DiscordSRV.api.registerListener(discord_listener)
+DiscordSRV.api.subscribe(discord_listener)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
 print("[Staff] Loaded.")
 
