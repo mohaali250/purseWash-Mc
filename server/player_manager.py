@@ -234,6 +234,11 @@ def onCommand(sender,label,args):
         if d["staff"] == "" and (d["banned"] > time.time() or d["banned"]==-1):
             chat_log(sender,1,"Target %s is staff banned",variables=(args[0]))
             return True
+        plugin = DiscordSRV.getPlugin()
+        manager = plugin.getAccountLinkManager()
+        if manager.getDiscordId(target.getUniqueId()) is None:
+            chat_log(sender,1,"Target %s didnt link their discord account.",variables=(args[0]))
+            return True
         
         chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],extended_staff_rank(args[1])))
         chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",extended_staff_rank(args[1])))
@@ -1198,6 +1203,7 @@ ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
+print(dir(DiscordSRV.api))
 ps.listener.registerListener(on_link, AccountLinkedEvent)
 ps.listener.registerListener(on_unlink, AccountUnlinkedEvent)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
