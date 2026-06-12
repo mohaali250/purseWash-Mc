@@ -1155,7 +1155,7 @@ from github.scarsz.discordsrv.api.events import AccountLinkedEvent, AccountUnlin
 # def runCommand_MainThread(cmd): ...
 # def chat_log(player, type, message, variables): ...
 
-class DiscordAccountListener(PluginListener):
+class DiscordAccountListener(object):
 
     def __init__(self):
         super(DiscordAccountListener, self).__init__()
