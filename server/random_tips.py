@@ -13,7 +13,7 @@ from net.md_5.bungee.api.chat import ClickEvent
 
 from net.md_5.bungee.api.chat.hover.content import Text
 
-URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/random_tips.json"
+URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/main/data/random_tips.json"
 
 def fetch_data():
     try:
