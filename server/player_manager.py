@@ -1142,35 +1142,68 @@ def onFlag(event):
             event.getViolations(),
             ping
             ))
+import pyspigot as ps
+from github.scarsz.discordsrv import DiscordSRV
+from github.scarsz.discordsrv.api import Subscribe, ListenerPriority
+from github.scarsz.discordsrv.api.events import AccountLinkedEvent, AccountUnlinkedEvent
 
-def on_link(event):
-    player = event.getPlayer()
-    user = event.getUser()
+# Global data placeholders (Assuming these are defined elsewhere in your script)
+# data = ... 
+# def uuid(player): ...
+# def ensure(u): ...
+# def runCommand_MainThread(cmd): ...
+# def chat_log(player, type, message, variables): ...
 
-    u=uuid(player)
-    ensure(u)
-    d=data[u]
+class DiscordAccountListener(object):
 
-    if d["staff"] == "":
-        runCommand_MainThread(
-            "lp user %s parent set linked" % player.getName()
-        )
+    @Subscribe(priority=ListenerPriority.NORMAL)
+    def on_link(self, event):
+        # Ensure we are handling the correct event type
+        if isinstance(event, AccountLinkedEvent):
+            player = event.getPlayer()
+            user = event.getUser() # You have access to the Discord user object here if needed
 
-def on_unlink(event):
-    player = event.getPlayer()
-    
-    u=uuid(player)
-    ensure(u)
-    d=data[u]
+            u = uuid(player)
+            ensure(u)
+            d = data[u]
 
-    d["locked"] = -4
-    runCommand_MainThread(
-        "lp user %s parent clear" % player.getName()
-    )  
-    chat_log(player,1,"%s staff perms are now suspended until you link a new discord account. Check [/status]",variables=("Your"))
+            if d["staff"] == "":
+                runCommand_MainThread(
+                    "lp user %s parent set linked" % player.getName()
+                )
+
+    @Subscribe(priority=ListenerPriority.NORMAL)
+    def on_unlink(self, event):
+        # Ensure we are handling the correct event type
+        if isinstance(event, AccountUnlinkedEvent):
+            player = event.getPlayer()
+            
+            u = uuid(player)
+            ensure(u)
+            d = data[u]
+
+            d["locked"] = -4
+            runCommand_MainThread(
+                "lp user %s parent clear" % player.getName()
+            )  
+            
+            chat_log(
+                player, 
+                1, 
+                "%s staff perms are now suspended until you link a new discord account. Check [/status]", 
+                variables=("Your",)
+            )
+
+# --- Registration & Lifecycle Management ---
+
+# Instantiate the listener object
+
+# Register it directly with DiscordSRV's API Manager
+# CRITICAL: This unregisters the listener when PySpigot reloads the script
 
 
 # starter variables
+discord_listener = DiscordAccountListener()
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
 OWNERUUID = "ce120874-48ad-45e8-a4c5-a70790a56934"
@@ -1204,7 +1237,11 @@ ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
 print(dir(DiscordSRV.api))
-ps.listener.registerListener(on_link, AccountLinkedEvent)
-ps.listener.registerListener(on_unlink, AccountUnlinkedEvent)
+DiscordSRV.api.registerListener(discord_listener)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
 print("[Staff] Loaded.")
+
+# Finish
+def on_unload():
+    DiscordSRV.api.unregisterListener(discord_listener)
+    ps.logger().info("DiscordSRV Account Link/Unlink listeners unregistered.")
