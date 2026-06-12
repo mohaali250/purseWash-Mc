@@ -578,6 +578,18 @@ def onCommand(sender,label,args):
             section_show = 4
         elif args[0] == "get":
             section_show = 5
+        elif args[0] == "as":
+            if not sender.hasPermission("staffmanager.status_as"):
+                chat_log(sender,1,"%s are not permitted to use this argument/subcommand",variables=("You"),_type=exception_type.PERMISSION_ERROR)
+                return True
+            section_show = 1
+            target=Bukkit.getOfflinePlayer(args[1].replace(u"\u00A0",""))
+            if not target.hasPlayedBefore() and not target.isOnline():
+                chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[1]),_type=exception_type.PARSE_ERROR)
+                return True
+            u=uuid(target)
+            ensure(u)
+            d=data[u]
         
         if section_show == 1 or section_show == 0:
             sender.sendMessage(chatcolor("&8:=====================< &6STATUS &8>======================:"))
