@@ -20,6 +20,9 @@ from net.md_5.bungee.api.chat import ClickEvent
 from net.md_5.bungee.api.chat import HoverEvent
 from net.md_5.bungee.api.chat.hover.content import Text
 from ac.grim.grimac.api.events import FlagEvent
+from github.scarsz.discordsrv import DiscordSRV
+from github.scarsz.discordsrv.api.events import AccountLinkedEvent
+from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent
 # functions
 def fetch_data():
     try:
@@ -294,10 +297,16 @@ def onCommand(sender,label,args):
         if d["staff"] == "":
             chat_log(sender,1,"Cannot demote %s because they arent a staff member",variables=(args[0]))
             return True
-        
+
+
         #Run start
+        plugin = DiscordSRV.getPlugin()
+        manager = plugin.getAccountLinkManager()
+        if manager.getDiscordId(target.getUniqueId()) is not None:
+            add_staff(target.getName(),"linked")
+        else:
+            remove_staff(target.getName())
         d["staff_playtime"]=0
-        remove_staff(target.getName(),d["staff"])
         d["staff"]=""
         d["locked"]=-2
         #Run end
@@ -383,6 +392,13 @@ def onCommand(sender,label,args):
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"unban %s" % (args[0]))
 
+        plugin = DiscordSRV.getPlugin()
+        manager = plugin.getAccountLinkManager()
+        if manager.getDiscordId(target.getUniqueId()) is not None:
+            add_staff(target.getName(),"linked")
+        else:
+            remove_staff(target.getName())
+
         local_session_notify[uuid(sender)]=0
         #Run end
     elif cmd=="activate":
@@ -423,6 +439,16 @@ def onCommand(sender,label,args):
             if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
                 add_staff(sender.getName(),f["staff"])
                 local_session_notify[uuid(sender)] = 0
+            d["staff_playtime"]=0
+            remove_staff(target.getName(),d["staff"])
+            d["staff"]=""
+            plugin = DiscordSRV.getPlugin()
+            manager = plugin.getAccountLinkManager()
+            if d["staff"] == "":
+                if manager.getDiscordId(target.getUniqueId()) is not None:
+                    add_staff(target.getName(),"linked")
+                else:
+                    remove_staff(target.getName())
             #Run end
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
@@ -503,6 +529,12 @@ def onCommand(sender,label,args):
             d["staff_playtime"]=0
             remove_staff(target.getName(),d["staff"])
             d["staff"]=""
+            plugin = DiscordSRV.getPlugin()
+            manager = plugin.getAccountLinkManager()
+            if manager.getDiscordId(target.getUniqueId()) is not None:
+                add_staff(target.getName(),"linked")
+            else:
+                remove_staff(target.getName())
         if mute != 0:
             if mute == -1:
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"mute "+args[0]+" perm")
@@ -618,6 +650,9 @@ def onCommand(sender,label,args):
                 status_bar = 3
             elif d["locked"] in [-1, -2, -3]:
                 status_text = "&eNeeds Rule Agreement (do /activate staff)"
+                status_bar = 3
+            elif d["locked"] == -4:
+                status_text = "&eYou must relink your Discord account to get staff perms again [/discord link])"
                 status_bar = 3
             else:
                 status_text = "&aActive Staff"
@@ -818,7 +853,7 @@ def onCommand(sender,label,args):
             d=data[u]
             sender.sendMessage("Raw data of %s:" % (args[1]))
             for i, v in d.items():
-                sender.sendMessage("Key: %s; Type: %s; Value: %s; | " % (i, str(type(v)),str(v)))
+                sender.sendMessage("Key: %20s; Type: %20s; Value: %20s; | " % (i, str(type(v)),str(v)))
     elif cmd=="apply":
         sender.sendMessage(chatcolor("&8:===================< &6APPLY &8>===================:"))
         sender.sendMessage("")
@@ -933,7 +968,7 @@ def onTabComplete(sender,alias,args):
             return [args[3:]]
         if cmd=="punish":
             return typing_filter(args[-1],list(gdata["punishments"].keys()))
-        if cmd=="status":
+        if cmd=="status" and args[0] == "set":
             # /status set <player>
             target = Bukkit.getOfflinePlayer(args[1])
             u = uuid(target)
@@ -1039,9 +1074,6 @@ def runCommand_MainThread(cmd):
         )
     )
 
-import time
-
-
 def onFlag(event):
     player = event.getPlayer()
     uuid = str(player.getUniqueId())
@@ -1106,6 +1138,33 @@ def onFlag(event):
             ping
             ))
 
+def on_link(event):
+    player = event.getPlayer()
+    user = event.getUser()
+
+    u=uuid(player)
+    ensure(u)
+    d=data[u]
+
+    if d["staff"] == "":
+        runCommand_MainThread(
+            "lp user %s parent set linked" % player.getName()
+        )
+
+def on_unlink(event):
+    player = event.getPlayer()
+    
+    u=uuid(player)
+    ensure(u)
+    d=data[u]
+
+    d["locked"] = -4
+    runCommand_MainThread(
+        "lp user %s parent clear" % player.getName()
+    )  
+    chat_log(player,1,"%s staff perms are now suspended until you link a new discord account. Check [/status]",variables=("Your"))
+
+
 # starter variables
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
@@ -1139,5 +1198,7 @@ ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
+ps.listener.registerListener(on_link, AccountLinkedEvent)
+ps.listener.registerListener(on_unlink, AccountUnlinkedEvent)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
 print("[Staff] Loaded.")
