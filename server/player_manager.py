@@ -1156,7 +1156,7 @@ from github.scarsz.discordsrv.api.events import AccountLinkedEvent, AccountUnlin
 
 class DiscordAccountListener(object):
 
-    @Subscribe(priority=ListenerPriority.NORMAL)
+    @Subscribe({"priority": ListenerPriority.NORMAL})
     def on_link(self, event):
         # Ensure we are handling the correct event type
         if isinstance(event, AccountLinkedEvent):
@@ -1172,7 +1172,7 @@ class DiscordAccountListener(object):
                     "lp user %s parent set linked" % player.getName()
                 )
 
-    @Subscribe(priority=ListenerPriority.NORMAL)
+    @Subscribe({"priority": ListenerPriority.NORMAL})
     def on_unlink(self, event):
         # Ensure we are handling the correct event type
         if isinstance(event, AccountUnlinkedEvent):
