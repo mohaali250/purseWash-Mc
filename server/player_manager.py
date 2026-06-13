@@ -694,7 +694,7 @@ def onCommand(sender,label,args):
                 else:
                     sender.sendMessage(
                         chatcolor(
-                            "&7You completed the&f%s&7 to claim get &b%s&7. Do &f/activate staff"
+                            "&7You completed the &f%s&7 to claim get &b%s&7. Do &f/activate staff"
                             % (
                                 pretty_timedelta(required),
                                 extended_staff_rank(d["staff"])
