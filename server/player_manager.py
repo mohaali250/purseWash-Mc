@@ -1078,13 +1078,14 @@ def runCommand_MainThread(cmd):
 
 def onFlag(event):
     player = event.getPlayer()
+    player = Bukkit.getPlayer(player.getName())
     uuid = str(player.getUniqueId())
     check = event.getCheck()
     cls = check.getClass()
     flagName = cls.getSimpleName()
     category = cls.getPackage().getName().split(".")[-1]
     tps = Bukkit.getServer().getTPS()[0]
-    ping = player.getPing()
+    ping = bplayer.getPing()
     now = time.time()
     # Ignore obvious lag situations
     if tps < 17:
