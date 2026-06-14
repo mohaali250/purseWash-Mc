@@ -14,6 +14,11 @@ from org.bukkit.event import Listener, EventHandler
 from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.player import PlayerQuitEvent
 from org.bukkit.event.player import PlayerKickEvent
+from org.bukkit.event.player import PlayerMoveEvent
+from org.bukkit.event.player import PlayerInteractEvent
+from org.bukkit.event.player import AsyncPlayerChatEvent
+from org.bukkit.event.player import PlayerCommandPreprocessEvent
+from org.bukkit.event.entity import EntityDamageEvent
 from org.bukkit.event.player import PlayerCommandPreprocessEvent
 from org.bukkit import ChatColor
 from net.md_5.bungee.api.chat import TextComponent
@@ -23,7 +28,8 @@ from net.md_5.bungee.api.chat.hover.content import Text
 from ac.grim.grimac.api.events import FlagEvent
 from github.scarsz.discordsrv import DiscordSRV
 from github.scarsz.discordsrv.api.events import AccountLinkedEvent
-from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent
+from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent~
+
 # functions
 def fetch_data():
     try:
@@ -1235,12 +1241,11 @@ DECAY_PER_MINUTE = 5
 # Run  
 for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate","status","apply"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
-for ev in [
-"org.bukkit.event.player.PlayerMoveEvent",
-"org.bukkit.event.player.PlayerInteractEvent",
-"org.bukkit.event.player.AsyncPlayerChatEvent",
-"org.bukkit.event.player.PlayerCommandPreprocessEvent",
-"org.bukkit.event.entity.EntityDamageEvent"]:
+for ev in [PlayerMoveEvent,
+    PlayerInteractEvent,
+    AsyncPlayerChatEvent,
+    PlayerCommandPreprocessEvent,
+    EntityDamageEvent]:
     ps.listener.register(activity,ev)
 gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
