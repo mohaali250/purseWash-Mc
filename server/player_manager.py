@@ -1205,7 +1205,7 @@ def on_non_originated_command_by_here(event):
 
 def check_afk():
     t = time.time()
-    for p in ps.server.getOnlinePlayers():
+    for p in Bukkit.getOnlinePlayers():
         if p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
             continue
 
