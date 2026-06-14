@@ -1204,6 +1204,10 @@ def check_afk():
 # Register the listener with PySpigot
 # 'Listener' is the name of your choice, 'on_command' is the function, and 'Normal' is the priority
 
+def on_command_event(event):
+    on_non_originated_command_by_here(event)
+    activity(event)
+
 # starter variables
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
@@ -1244,7 +1248,6 @@ for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate",
 for ev in [PlayerMoveEvent,
     PlayerInteractEvent,
     AsyncPlayerChatEvent,
-    PlayerCommandPreprocessEvent,
     EntityDamageEvent]:
     ps.listener.registerListener(activity,ev)
 gdata = fetch_data()
@@ -1252,7 +1255,7 @@ ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
-ps.listener.registerListener(on_non_originated_command_by_here, PlayerCommandPreprocessEvent)
+ps.listener.registerListener(on_command_event, PlayerCommandPreprocessEvent)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
 print("[Staff] Loaded.")
 
