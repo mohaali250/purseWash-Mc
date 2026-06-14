@@ -28,7 +28,7 @@ from net.md_5.bungee.api.chat.hover.content import Text
 from ac.grim.grimac.api.events import FlagEvent
 from github.scarsz.discordsrv import DiscordSRV
 from github.scarsz.discordsrv.api.events import AccountLinkedEvent
-from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent~
+from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent
 
 # functions
 def fetch_data():
