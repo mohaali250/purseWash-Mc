@@ -1030,16 +1030,25 @@ def mark(p):
         ps.sync.run(lambda:p.sendMessage("§eYou are now AFK. Your playtime is frozen!"))
 
 def activity(e):
-    players=[]
-    if hasattr(e,"getPlayer"):
+    if isinstance(e, PlayerMoveEvent):
+        f = e.getFrom()
+        t = e.getTo()
+        if (
+            f.getBlockX() == t.getBlockX() and
+            f.getBlockY() == t.getBlockY() and
+            f.getBlockZ() == t.getBlockZ()
+        ):
+            return
+    players = []
+    if hasattr(e, "getPlayer"):
         players.append(e.getPlayer())
-    if hasattr(e,"getEntity"):
-        x=e.getEntity()
-        if hasattr(x,"getUniqueId"):
+    if hasattr(e, "getEntity"):
+        x = e.getEntity()
+        if hasattr(x, "getUniqueId"):
             players.append(x)
-    if hasattr(e,"getDamager"):
-        x=e.getDamager()
-        if hasattr(x,"getUniqueId"):
+    if hasattr(e, "getDamager"):
+        x = e.getDamager()
+        if hasattr(x, "getUniqueId"):
             players.append(x)
     for p in players:
         if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
