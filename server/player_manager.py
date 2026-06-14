@@ -1167,7 +1167,7 @@ def on_afk_general(event):
     player = event.getPlayer()
     mark_action(player)
 
-def on_damage(event):
+def onDamage(event):
     attacker = event.getDamager()
 
     # only player-caused damage
@@ -1265,6 +1265,7 @@ ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onMove, PlayerMoveEvent)
+ps.listener.registerListener(onDamage, EntityDamageEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
 ps.listener.registerListener(on_command_event, PlayerCommandPreprocessEvent)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
