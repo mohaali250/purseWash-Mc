@@ -1257,8 +1257,7 @@ for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate",
     ps.command.registerCommand(onCommand, onTabComplete, c)
 for ev in [
     PlayerInteractEvent,
-    AsyncPlayerChatEvent,
-    EntityDamageEvent]:
+    AsyncPlayerChatEvent]:
     ps.listener.registerListener(on_afk_general,ev)
 gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
