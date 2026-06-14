@@ -1246,7 +1246,7 @@ for ev in [PlayerMoveEvent,
     AsyncPlayerChatEvent,
     PlayerCommandPreprocessEvent,
     EntityDamageEvent]:
-    ps.listener.register(activity,ev)
+    ps.listener.registerListener(activity,ev)
 gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
