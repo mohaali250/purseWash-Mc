@@ -1005,10 +1005,39 @@ def tick():
         u=uuid(p)
         ensure(u)
         d=data[u]
-        if d["banned"] == 0:
+        if d["banned"] == 0 and uuid(p) not in afk:
             d["staff_playtime"]+=60
         session_notify(p)
+    check_afk()
     save()
+def touch(p):
+    uid=p.getUniqueId()
+    last_action[uid]=time.time()
+    if uid in afk:
+        afk.remove(uid)
+        ps.sync.run(lambda:p.sendMessage("§aYou are no longer AFK. Your playtime is counting again!"))
+
+def mark(p):
+    uid=p.getUniqueId()
+    if uid not in afk:
+        afk.add(uid)
+        ps.sync.run(lambda:p.sendMessage("§eYou are now AFK. Your playtime is frozen!"))
+
+def activity(e):
+    players=[]
+    if hasattr(e,"getPlayer"):
+        players.append(e.getPlayer())
+    if hasattr(e,"getEntity"):
+        x=e.getEntity()
+        if hasattr(x,"getUniqueId"):
+            players.append(x)
+    if hasattr(e,"getDamager"):
+        x=e.getDamager()
+        if hasattr(x,"getUniqueId"):
+            players.append(x)
+    for p in players:
+        if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
+            touch(p)
 def session_notify(p):
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
@@ -1057,9 +1086,15 @@ def handle_join(event):
     d=data[u]
     local_session_notify[uuid(p)] = d["notify"]
     session_notify(p)
+    p=event.getPlayer()
+    if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):touch(p)
 def handle_disconnect(event):
     player = event.getPlayer()
     local_session_notify.pop(uuid(player), None)
+    p=event.getPlayer()
+    uid=p.getUniqueId()
+    last_action.pop(uid,None)
+    afk.discard(uid)
     pass
 def onJoin(event):
     handle_join(event)
@@ -1079,7 +1114,7 @@ def runCommand_MainThread(cmd):
 
 def onFlag(event):
     player = event.getPlayer()
-    player = Bukkit.getPlayer(player.getName())
+    bplayer = Bukkit.getPlayer(player.getName())
     uuid = str(player.getUniqueId())
     check = event.getCheck()
     cls = check.getClass()
@@ -1153,6 +1188,13 @@ def on_non_originated_command_by_here(event):
         player = event.getPlayer()
         chat_log(player,1,"You may not run this command!")
 
+def check_afk():
+    t=time.time()
+    for p in ps.server.getOnlinePlayers():
+        if p.hasPermission("staffmanager.fulfill_requirement_with_afk"):continue
+        uid=p.getUniqueId()
+        if t-last_action.get(uid,t)>=AFK_THRESHOLD:mark(p)
+
 # Register the listener with PySpigot
 # 'Listener' is the name of your choice, 'on_command' is the function, and 'Normal' is the priority
 
@@ -1166,6 +1208,14 @@ if not os.path.exists(FILE):
         json.dump({},f) 
 with open(FILE,"r") as f:
     data=json.load(f)
+
+# Anti AFk
+
+AFK_THRESHOLD=60
+CHECK_INTERVAL=20
+
+last_action={}
+afk=set()
 
 #function onFlag initializer
 
@@ -1181,9 +1231,17 @@ WEIGHTS = {
 BAN_THRESHOLD = 100
 DECAY_PER_MINUTE = 5
 
+
 # Run  
 for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate","status","apply"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
+for ev in [
+"org.bukkit.event.player.PlayerMoveEvent",
+"org.bukkit.event.player.PlayerInteractEvent",
+"org.bukkit.event.player.AsyncPlayerChatEvent",
+"org.bukkit.event.player.PlayerCommandPreprocessEvent",
+"org.bukkit.event.entity.EntityDamageEvent"]:
+    ps.listener.register(activity,ev)
 gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
