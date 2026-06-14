@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json,random,datetime,time,re,os,__builtin__  # Python 2.7
 import pyspigot as ps
+from java.io import File
 from java.net import URL
 from java.util import Scanner
 from java.util import UUID
@@ -9,11 +10,11 @@ from org.bukkit import Statistic
 from org.bukkit.command import TabExecutor
 from java.util import Arrays
 from org.bukkit.configuration.file import YamlConfiguration
-from java.io import File
 from org.bukkit.event import Listener, EventHandler
 from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.player import PlayerQuitEvent
 from org.bukkit.event.player import PlayerKickEvent
+from org.bukkit.event.player import PlayerCommandPreprocessEvent
 from org.bukkit import ChatColor
 from net.md_5.bungee.api.chat import TextComponent
 from net.md_5.bungee.api.chat import ClickEvent
@@ -1141,6 +1142,20 @@ def onFlag(event):
             ping
             ))
 
+
+def on_non_originated_command_by_here(event):
+    # Convert the command to lowercase to handle variations like /Kill or /KILL
+    message = event.getMessage().lower()
+    
+    # Check if the command starts with /kill and contains the all-entities selector (@e)
+    if message.startswith("/") and "kill @e" in message:
+        event.setCancelled(True)
+        player = event.getPlayer()
+        chat_log(player,1,"You may not run this command!")
+
+# Register the listener with PySpigot
+# 'Listener' is the name of your choice, 'on_command' is the function, and 'Normal' is the priority
+
 # starter variables
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
@@ -1174,6 +1189,7 @@ ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
+ps.listener.registerListener(on_non_originated_command_by_here, PlayerCommandPreprocessEvent)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
 print("[Staff] Loaded.")
 
