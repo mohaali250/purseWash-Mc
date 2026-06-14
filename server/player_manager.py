@@ -1204,11 +1204,18 @@ def on_non_originated_command_by_here(event):
         chat_log(player,1,"You may not run this command!")
 
 def check_afk():
-    t=time.time()
+    t = time.time()
     for p in ps.server.getOnlinePlayers():
-        if p.hasPermission("staffmanager.fulfill_requirement_with_afk"):continue
-        uid=p.getUniqueId()
-        if t-last_action.get(uid,t)>=AFK_THRESHOLD:mark(p)
+        if p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
+            continue
+
+        uid = p.getUniqueId()
+        idle = t - last_action.get(uid, t)
+
+        print("%s idle=%s" % (p.getName(), idle))
+
+        if idle >= AFK_THRESHOLD:
+            mark(p)
 
 # Register the listener with PySpigot
 # 'Listener' is the name of your choice, 'on_command' is the function, and 'Normal' is the priority
