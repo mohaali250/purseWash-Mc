@@ -1171,10 +1171,12 @@ def mark_action(player):
 
 def on_afk_general(event):
     player = event.getPlayer()
+    session_notify(player)
     mark_action(player)
 
 def onDamage(event):
     attacker = event.getDamager()
+    session_notify(attacker)
 
     # only player-caused damage
     if hasattr(attacker, "getUniqueId"):
@@ -1183,6 +1185,7 @@ def onDamage(event):
 
 def onMove(event):
     player = event.getPlayer()
+    session_notify(player)
     uid = player.getUniqueId()
 
     loc = player.getLocation()
@@ -1216,6 +1219,7 @@ def on_non_originated_command_by_here(event):
 def on_command_event(event):
     on_non_originated_command_by_here(event)
     player = event.getPlayer()
+    session_notify(player)
     mark_action(player)
 
 def get_idle_time(player):
