@@ -1011,7 +1011,7 @@ def tick():
         u=uuid(p)
         ensure(u)
         d=data[u]
-        if d["banned"] == 0 and AFK_THRESHOLD < get_idle_time(p):
+        if d["banned"] == 0 and get_idle_time(p) < AFK_THRESHOLD:
             d["staff_playtime"]+=60
         session_notify(p)
     save()
