@@ -1011,42 +1011,10 @@ def tick():
         u=uuid(p)
         ensure(u)
         d=data[u]
-        if d["banned"] == 0 and uuid(p) not in afk:
+        if d["banned"] == 0 and AFK_THRESHOLD < get_idle_time(p):
             d["staff_playtime"]+=60
         session_notify(p)
-    check_afk()
     save()
-def touch(p):
-    uid=p.getUniqueId()
-    last_action[uid]=time.time()
-    if uid in afk:
-        afk.remove(uid)
-        ps.sync.run(lambda:p.sendMessage("§aYou are no longer AFK. Your playtime is counting again!"))
-
-def mark(p):
-    print("AFK TRIGGERED:", p.getName())
-    uid = p.getUniqueId()
-    if uid not in afk:
-        afk.add(uid)
-        ps.sync.run(lambda: p.sendMessage("§eYou are now AFK. Your playtime is frozen!"))
-
-def activity(e):
-    players = []
-    if hasattr(e, "getPlayer"):
-        players.append(e.getPlayer())
-    if hasattr(e, "getEntity"):
-        ent = e.getEntity()
-        if hasattr(ent, "getUniqueId"):
-            players.append(ent)
-    if hasattr(e, "getDamager"):
-        ent = e.getDamager()
-        if hasattr(ent, "getUniqueId"):
-            players.append(ent)
-    for p in players:
-        if p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
-            continue
-        # OPTIONAL: ignore very minor interactions
-        touch(p)
 def session_notify(p):
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
@@ -1096,14 +1064,14 @@ def handle_join(event):
     local_session_notify[uuid(p)] = d["notify"]
     session_notify(p)
     p=event.getPlayer()
-    if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):touch(p)
+    if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):mark_action()
 def handle_disconnect(event):
     player = event.getPlayer()
     local_session_notify.pop(uuid(player), None)
     p=event.getPlayer()
     uid=p.getUniqueId()
     last_action.pop(uid,None)
-    afk.discard(uid)
+    last_move.pop(uid,None)
     pass
 def onJoin(event):
     handle_join(event)
@@ -1187,6 +1155,45 @@ def onFlag(event):
             ))
 
 
+
+def mark_action(player):
+    try:
+        uid = player.getUniqueId()
+        last_action[uid] = time.time()
+    except:
+        pass
+
+def on_afk_general(event):
+    player = event.getPlayer()
+    mark_action(player)
+
+def on_damage(event):
+    attacker = event.getDamager()
+
+    # only player-caused damage
+    if hasattr(attacker, "getUniqueId"):
+        mark_action(attacker)
+
+
+def onMove(event):
+    player = event.getPlayer()
+    uid = player.getUniqueId()
+
+    loc = player.getLocation()
+    x, y, z = loc.getX(), loc.getY(), loc.getZ()
+    yaw, pitch = loc.getYaw(), loc.getPitch()
+
+    if uid in last_move:
+        lx, ly, lz, lyaw, lpitch = last_move[uid]
+
+        # ignore tiny micro-movements (VERY important)
+        if abs(x - lx) < 0.15 and abs(y - ly) < 0.15 and abs(z - lz) < 0.15:
+            if abs(yaw - lyaw) < 2 and abs(pitch - lpitch) < 2:
+                return  # no real movement → do nothing
+
+    last_move[uid] = (x, y, z, yaw, pitch)
+    mark_action(player)
+
 def on_non_originated_command_by_here(event):
     # Convert the command to lowercase to handle variations like /Kill or /KILL
     message = event.getMessage().lower()
@@ -1197,32 +1204,19 @@ def on_non_originated_command_by_here(event):
         player = event.getPlayer()
         chat_log(player,1,"You may not run this command!")
 
-def check_afk():
-    t = time.time()
-    for p in Bukkit.getOnlinePlayers():
-        if p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
-            continue
-
-        uid = p.getUniqueId()
-        idle = t - last_action.get(uid, t)
-
-        print("%s idle=%s" % (p.getName(), idle))
-
-        if idle >= AFK_THRESHOLD:
-            mark(p)
-
-def onMove(event):
-    if event.getFrom().getBlockX() != event.getTo().getBlockX() \
-    or event.getFrom().getBlockY() != event.getTo().getBlockY() \
-    or event.getFrom().getBlockZ() != event.getTo().getBlockZ():
-        activity(event)
-
 # Register the listener with PySpigot
 # 'Listener' is the name of your choice, 'on_command' is the function, and 'Normal' is the priority
 
 def on_command_event(event):
     on_non_originated_command_by_here(event)
-    activity(event)
+    player = event.getPlayer()
+    mark_action(player)
+
+def get_idle_time(player):
+    uid = player.getUniqueId()
+    if uid not in last_action:
+        last_action[uid] = time.time()
+    return time.time() - last_action[uid]
 
 # starter variables
 FILE="plugins/PySpigot/staff.json"
@@ -1240,8 +1234,8 @@ with open(FILE,"r") as f:
 AFK_THRESHOLD=60
 CHECK_INTERVAL=20
 
-last_action={}
-afk=set()
+last_action = {}  # UUID -> timestamp
+last_move = {}    # UUID -> (x, y, z, yaw, pitch) 
 
 #function onFlag initializer
 
@@ -1265,7 +1259,7 @@ for ev in [
     PlayerInteractEvent,
     AsyncPlayerChatEvent,
     EntityDamageEvent]:
-    ps.listener.registerListener(activity,ev)
+    ps.listener.registerListener(on_afk_general,ev)
 gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
