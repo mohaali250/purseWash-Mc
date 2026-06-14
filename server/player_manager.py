@@ -1024,35 +1024,29 @@ def touch(p):
         ps.sync.run(lambda:p.sendMessage("§aYou are no longer AFK. Your playtime is counting again!"))
 
 def mark(p):
-    uid=p.getUniqueId()
+    print("AFK TRIGGERED:", p.getName())
+    uid = p.getUniqueId()
     if uid not in afk:
         afk.add(uid)
-        ps.sync.run(lambda:p.sendMessage("§eYou are now AFK. Your playtime is frozen!"))
+        ps.sync.run(lambda: p.sendMessage("§eYou are now AFK. Your playtime is frozen!"))
 
 def activity(e):
-    if isinstance(e, PlayerMoveEvent):
-        f = e.getFrom()
-        t = e.getTo()
-        if (
-            f.getBlockX() == t.getBlockX() and
-            f.getBlockY() == t.getBlockY() and
-            f.getBlockZ() == t.getBlockZ()
-        ):
-            return
     players = []
     if hasattr(e, "getPlayer"):
         players.append(e.getPlayer())
     if hasattr(e, "getEntity"):
-        x = e.getEntity()
-        if hasattr(x, "getUniqueId"):
-            players.append(x)
+        ent = e.getEntity()
+        if hasattr(ent, "getUniqueId"):
+            players.append(ent)
     if hasattr(e, "getDamager"):
-        x = e.getDamager()
-        if hasattr(x, "getUniqueId"):
-            players.append(x)
+        ent = e.getDamager()
+        if hasattr(ent, "getUniqueId"):
+            players.append(ent)
     for p in players:
-        if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
-            touch(p)
+        if p.hasPermission("staffmanager.fulfill_requirement_with_afk"):
+            continue
+        # OPTIONAL: ignore very minor interactions
+        touch(p)
 def session_notify(p):
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
@@ -1217,6 +1211,12 @@ def check_afk():
         if idle >= AFK_THRESHOLD:
             mark(p)
 
+def onMove(event):
+    if event.getFrom().getBlockX() != event.getTo().getBlockX() \
+    or event.getFrom().getBlockY() != event.getTo().getBlockY() \
+    or event.getFrom().getBlockZ() != event.getTo().getBlockZ():
+        activity(event)
+
 # Register the listener with PySpigot
 # 'Listener' is the name of your choice, 'on_command' is the function, and 'Normal' is the priority
 
@@ -1261,7 +1261,7 @@ DECAY_PER_MINUTE = 5
 # Run  
 for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate","status","apply"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
-for ev in [PlayerMoveEvent,
+for ev in [
     PlayerInteractEvent,
     AsyncPlayerChatEvent,
     EntityDamageEvent]:
@@ -1270,6 +1270,7 @@ gdata = fetch_data()
 ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
+ps.listener.registerListener(onMove, PlayerMoveEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
 ps.listener.registerListener(on_command_event, PlayerCommandPreprocessEvent)
 ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
