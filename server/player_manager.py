@@ -1042,6 +1042,14 @@ def session_notify(p):
         chat_log(p,4,"You just got cleared")
         p.getInventory().clear()
         d["notify"] = _bit.write(d["notify"],6,False)
+    if AFK_THRESHOLD < get_idle_time() and not _bit.read(d["notify"],7):
+        chat_log(p,4,"Your playtime is now frozen because you are AFK. Move around for your playtime to continue counting!")
+        p.getInventory().clear()
+        d["notify"] = _bit.write(d["notify"],7,True)
+    if get_idle_time < AFK_THRESHOLD and _bit.read(d["notify"],7):
+        chat_log(p,4,"Your playtime is counting again!")
+        p.getInventory().clear()
+        d["notify"] = _bit.write(d["notify"],7,False)
 class _bit:
     @staticmethod
     def read(integer,n):
@@ -1235,7 +1243,7 @@ AFK_THRESHOLD=60
 CHECK_INTERVAL=20
 
 last_action = {}  # UUID -> timestamp
-last_move = {}    # UUID -> (x, y, z, yaw, pitch) 
+last_move = {}    # UUID -> (x, y, z, yaw, pitch)
 
 #function onFlag initializer
 
