@@ -669,8 +669,8 @@ def onCommand(sender,label,args):
             sender.sendMessage(
                 chatcolor("&7Rank: &b%s" % extended_staff_rank(d["staff"]))
             )
-            sender.sendMessage("")
             if d["staff"] != "" and d["locked"] < 0:
+                sender.sendMessage("")
                 required = parse(
                     gdata["ranks"][d["staff"]]["required_playtime"]
                 )
