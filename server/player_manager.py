@@ -1248,12 +1248,12 @@ with open(FILE,"r") as f:
     data=json.load(f)
 
 TICK_LOOP_INTERVAL_MS = 1 * 1000
-SAVE_INTERVAL_MS = 60 * 100
+SAVE_INTERVAL_MS = 60 * 1000
 
 # Anti AFk
 
-AFK_THRESHOLD=60
-CHECK_INTERVAL=20
+AFK_THRESHOLD= 3 * 60
+CHECK_INTERVAL= 20
 
 last_action = {}  # UUID -> timestamp
 last_move = {}    # UUID -> (x, y, z, yaw, pitch)
