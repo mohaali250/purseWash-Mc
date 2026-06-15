@@ -18,7 +18,7 @@ from org.bukkit.event.player import PlayerMoveEvent
 from org.bukkit.event.player import PlayerInteractEvent
 from org.bukkit.event.player import AsyncPlayerChatEvent
 from org.bukkit.event.player import PlayerCommandPreprocessEvent
-from org.bukkit.event.entity import EntityDamageEvent
+from org.bukkit.event.entity import EntityDamageByEntityEvent
 from org.bukkit.event.player import PlayerCommandPreprocessEvent
 from org.bukkit import ChatColor
 from net.md_5.bungee.api.chat import TextComponent
@@ -47,7 +47,11 @@ def fetch_data():
         import traceback
         traceback.print_exc()
         return None
+last_save = time.time()
 def save():
+    global last_save
+    if time.time() < last_save + SAVE_INTERVAL_MS/1000:return
+    last_save = time.time()
     tmp = File(FILE + ".tmp")
     with open(tmp.getPath(), "w") as f:
         json.dump(data, f, indent=4)
@@ -73,28 +77,28 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
     states = {
         0: {
             "contents": "INFO",
-            "default_color": "&3",
-            "highlight":"&a"
+            "default_color": "&b",
+            "highlight":"&3"
         },
         1: {
             "contents": "WARN",
-            "default_color": "&6",
-            "highlight":"&a"
+            "default_color": "&e",
+            "highlight":"&6"
         },
         2: {
             "contents": "ERROR",
-            "default_color": "&4",
-            "highlight":"&a"
+            "default_color": "&c",
+            "highlight":"&4"
         },
         3: {
             "contents": "SUCCESS",
-            "default_color": "&2",
-            "highlight":"&a"
+            "default_color": "&a",
+            "highlight":"&2"
         },
         4: {
             "contents": "NOTIFY",
             "default_color": "&e",
-            "highlight":"&b"
+            "highlight":"&a"
         }
     }
     message_color = states[state]["default_color"]
@@ -452,15 +456,15 @@ def onCommand(sender,label,args):
                 add_staff(sender.getName(),f["staff"])
                 local_session_notify[uuid(sender)] = 0
             d["staff_playtime"]=0
-            remove_staff(target.getName(),d["staff"])
+            remove_staff(sender.getName(),d["staff"])
             d["staff"]=""
             plugin = DiscordSRV.getPlugin()
             manager = plugin.getAccountLinkManager()
             if d["staff"] == "":
-                if manager.getDiscordId(target.getUniqueId()) is not None:
-                    add_staff(target.getName(),"linked")
+                if manager.getDiscordId(sender.getUniqueId()) is not None:
+                    add_staff(sender.getName(),"linked")
                 else:
-                    remove_staff(target.getName())
+                    remove_staff(sender.getName())
             #Run end
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
@@ -1006,15 +1010,6 @@ def onTabComplete(sender,alias,args):
                     return typing_filter(args[4], ["True", "False"])
                 return [str(current)]
     return []
-def tick():
-    for p in Bukkit.getOnlinePlayers():
-        u=uuid(p)
-        ensure(u)
-        d=data[u]
-        if d["banned"] == 0 and get_idle_time(p) < AFK_THRESHOLD:
-            d["staff_playtime"]+=60
-        session_notify(p)
-    save()
 def session_notify(p):
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
@@ -1070,7 +1065,7 @@ def handle_join(event):
     local_session_notify[uuid(p)] = d["notify"]
     session_notify(p)
     p=event.getPlayer()
-    if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):mark_action()
+    if not p.hasPermission("staffmanager.fulfill_requirement_with_afk"):mark_action(p)
 def handle_disconnect(event):
     player = event.getPlayer()
     local_session_notify.pop(uuid(player), None)
@@ -1176,11 +1171,11 @@ def on_afk_general(event):
 
 def onDamage(event):
     attacker = event.getDamager()
-    session_notify(attacker)
-
     # only player-caused damage
     if hasattr(attacker, "getUniqueId"):
         mark_action(attacker)
+        session_notify(attacker)
+
 
 
 def onMove(event):
@@ -1228,6 +1223,19 @@ def get_idle_time(player):
         last_action[uid] = time.time()
     return time.time() - last_action[uid]
 
+last_tick = now()
+def tick():
+    global last_tick
+    for p in Bukkit.getOnlinePlayers():
+        u=uuid(p)
+        ensure(u)
+        d=data[u]
+        if d["banned"] == 0 and get_idle_time(p) < AFK_THRESHOLD:
+            d["staff_playtime"]+=(now()-last_tick)
+        session_notify(p)
+    last_tick = now()
+    save()
+
 # starter variables
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
@@ -1238,6 +1246,9 @@ if not os.path.exists(FILE):
         json.dump({},f) 
 with open(FILE,"r") as f:
     data=json.load(f)
+
+TICK_LOOP_INTERVAL_MS = 1 * 1000
+SAVE_INTERVAL_MS = 60 * 100
 
 # Anti AFk
 
@@ -1274,10 +1285,10 @@ ps.listener.registerListener(onJoin, PlayerJoinEvent)
 ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onMove, PlayerMoveEvent)
-ps.listener.registerListener(onDamage, EntityDamageEvent)
+ps.listener.registerListener(onDamage, EntityDamageByEntityEvent)
 ps.listener.registerListener(onFlag, FlagEvent)
 ps.listener.registerListener(on_command_event, PlayerCommandPreprocessEvent)
-ps.scheduler.scheduleRepeatingTask(tick, 1200, 1200)
+ps.scheduler.scheduleRepeatingTask(tick, TICK_LOOP_INTERVAL_MS//50, TICK_LOOP_INTERVAL_MS//50)
 print("[Staff] Loaded.")
 
 # Finish 
