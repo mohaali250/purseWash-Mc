@@ -29,6 +29,8 @@ from ac.grim.grimac.api.events import FlagEvent
 from github.scarsz.discordsrv import DiscordSRV
 from github.scarsz.discordsrv.api.events import AccountLinkedEvent
 from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent
+from net.luckperms.api import LuckPerms
+
 
 # functions
 def fetch_data():
@@ -111,6 +113,7 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
 def ensure(u):
     defaults = {
         "staff": "",
+        "lpgroup":str(get_primary_group(Bukkit.getPlayer(u)) if get_primary_group(Bukkit.getPlayer(u))!= DEFAULT_GROUP else ""),
         "staff_playtime": get_total_playtime_seconds(u),
         "locked": -1,
         "banned": 0,
@@ -170,8 +173,16 @@ def parse(t):
 def lp(cmd):
     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"lp "+cmd)
 def add_staff(name,rank):
+    u=uuid(Bukkit.getOfflinePlayer(name))
+    ensure(u)
+    d=data[u]
+    d["lpgroup"] = rank
     lp("user %s parent set %s"%(name,rank))
 def remove_staff(name,rank=""):
+    u=uuid(Bukkit.getOfflinePlayer(name))
+    ensure(u)
+    d=data[u]
+    d["lpgroup"] = DEFAULT_GROUP
     lp("user %s parent clear"%(name))
 def eligible(d):
     if d["staff"] == "":return False
@@ -1043,6 +1054,22 @@ def session_notify(p):
     if d["staff"] != "" and get_idle_time(p) < AFK_THRESHOLD and _bit.read(d["notify"],7):
         chat_log(p,4,"Your playtime is counting again!")
         d["notify"] = _bit.write(d["notify"],7,False)
+    if not is_legit_staff(p) and not _bit.read(d["notify"],8):
+        chat_log(p,1,"You have lp perms, however you are not elegible. Your username will have a \" [!] \" suffix that not even operators can remove to signal you arent a verified staff member or havent completed the requirements yet. To remove this sufix and join message, please either request a higher rank staff member to remove your lp perms, or apply here [/apply]")
+        lp('user %s meta setsuffix 511 " &6[&e!&6]&f"' % p.getName())
+        d["notify"] = _bit.write(d["notify"],8,True)
+    if is_legit_staff(p) and _bit.read(d["notify"],8):
+        lp('user %s meta removesuffix 511' % p.getName())
+        d["notify"] = _bit.write(d["notify"],8,True)
+def is_legit_staff(p):
+    u=uuid(p)
+    ensure(u)
+    d=data[u]
+    if any([i==get_primary_group(p) for i in gdata["ranks"].keys()]):
+        if d["lpgroup"] == get_primary_group(p):
+            return eligible(p)
+        return False
+    return True
 class _bit:
     @staticmethod
     def read(integer,n):
@@ -1089,6 +1116,14 @@ def runCommand_MainThread(cmd):
             cmd
         )
     )
+
+lp = Bukkit.getServicesManager().load(LuckPerms)
+
+def get_primary_group(player):
+    user = lp.getUserManager().getUser(player.getUniqueId())
+    if user is None:
+        return None
+    return user.getPrimaryGroup()
 
 def onFlag(event):
     player = event.getPlayer()
@@ -1180,7 +1215,6 @@ def onDamage(event):
 
 def onMove(event):
     player = event.getPlayer()
-    session_notify(player)
     uid = player.getUniqueId()
 
     loc = player.getLocation()
@@ -1197,6 +1231,7 @@ def onMove(event):
 
     last_move[uid] = (x, y, z, yaw, pitch)
     mark_action(player)
+    session_notify(player)
 
 def on_non_originated_command_by_here(event):
     # Convert the command to lowercase to handle variations like /Kill or /KILL
@@ -1240,6 +1275,7 @@ def tick():
 FILE="plugins/PySpigot/staff.json"
 URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
 OWNERUUID = "ce120874-48ad-45e8-a4c5-a70790a56934"
+DEFAULT_GROUP="default"
 local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlinePlayers()],[0]*len(Bukkit.getOnlinePlayers()))}
 if not os.path.exists(FILE):
     with open(FILE,"w") as f:
@@ -1268,6 +1304,7 @@ WEIGHTS = {
     "combat": 10,
     "reach": 15,
     "aim": 15,
+    "breaking":15,
 }
 BAN_THRESHOLD = 100
 DECAY_PER_MINUTE = 5
