@@ -113,7 +113,7 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
 def ensure(u):
     defaults = {
         "staff": "",
-        "lpgroup":str(get_primary_group(Bukkit.getPlayer(u)) if get_primary_group(Bukkit.getPlayer(u))!= DEFAULT_GROUP else ""),
+        "lpgroup":str(get_primary_group(Bukkit.getOfflinePlayer(u)) if get_primary_group(Bukkit.getOfflinePlayer(u))!= DEFAULT_GROUP else ""),
         "staff_playtime": get_total_playtime_seconds(u),
         "locked": -1,
         "banned": 0,
