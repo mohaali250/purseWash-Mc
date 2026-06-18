@@ -1054,9 +1054,9 @@ def session_notify(p):
     if d["staff"] != "" and get_idle_time(p) < AFK_THRESHOLD and _bit.read(d["notify"],7):
         chat_log(p,4,"Your playtime is counting again!")
         d["notify"] = _bit.write(d["notify"],7,False)
-    h = is_legit_staff(p)   
+    h = is_legit_staff(p)
     if (not h) and (not _bit.read(d["notify"],8)):
-        chat_log(p,1,"You have lp perms, however you are not elegible. Your username will have a \" [!] \" suffix that not even operators can remove to signal you arent a verified staff member or havent completed the requirements yet. To remove this sufix and join message, please either request a higher rank staff member to remove your lp perms, or apply here [/apply]")
+        #chat_log(p,1,"You have lp perms, however you are not elegible. Your username will have a \" [!] \" suffix that not even operators can remove to signal you arent a verified staff member or havent completed the requirements yet. To remove this sufix and join message, please either request a higher rank staff member to remove your lp perms, or apply here [/apply]")
         lp('user %s meta setsuffix 511 " &6[&e!&6]&f"' % p.getName())
         d["notify"] = _bit.write(d["notify"],8,True)
     if h and _bit.read(d["notify"],8):
