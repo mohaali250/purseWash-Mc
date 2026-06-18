@@ -1060,7 +1060,7 @@ def session_notify(p):
         d["notify"] = _bit.write(d["notify"],8,True)
     if is_legit_staff(p) and _bit.read(d["notify"],8):
         lp('user %s meta removesuffix 511' % p.getName())
-        d["notify"] = _bit.write(d["notify"],8,True)
+        d["notify"] = _bit.write(d["notify"],8,False)
 def is_legit_staff(p):
     u=uuid(p)
     ensure(u)
