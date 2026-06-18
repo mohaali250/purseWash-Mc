@@ -1068,7 +1068,7 @@ def is_legit_staff(p):
     d=data[u]
     if any([i==get_primary_group(p) for i in gdata["ranks"].keys()]):
         if d["lpgroup"] == get_primary_group(p):    
-            return eligible(p)
+            return eligible(d)
         return False
     return True
 class _bit:
