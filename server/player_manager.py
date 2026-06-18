@@ -1062,11 +1062,12 @@ def session_notify(p):
         lp('user %s meta removesuffix 511' % p.getName())
         d["notify"] = _bit.write(d["notify"],8,True)
 def is_legit_staff(p):
+    lpuser = lp.getUserManager().getUser(p.getUniqueId())
     u=uuid(p)
     ensure(u)
     d=data[u]
     if any([i==get_primary_group(p) for i in gdata["ranks"].keys()]):
-        if d["lpgroup"] == get_primary_group(p):
+        if d["lpgroup"] == get_primary_group(lpuser):    
             return eligible(p)
         return False
     return True
