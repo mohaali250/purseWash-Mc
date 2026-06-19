@@ -156,7 +156,7 @@ def pretty_timedelta(timeinterval):
             text += "%d seconds " % (seconds)
     return text[:-1]
 def extended_staff_rank(string):
-    if string == "": return "Default"
+    if string == "" or string == DEFAULT_GROUP: return DEFAULT_GROUP
     return gdata["ranks"][string]["extended_name"]
 def parse(t):
     if t=="perm":
