@@ -1138,72 +1138,120 @@ def get_primary_group(player):
     if user is None:
         return None
     return user.getPrimaryGroup()
+flag_data = {}
+
+WEIGHTS = {
+    # Movement / lag-sensitive
+    "prediction": 0.5,
+    "timer": 4,
+    "scaffolding": 8,
+
+    # Combat
+    "combat": 20,
+    "reach": 35,
+    "aim": 25,
+
+    # World interaction
+    "breaking": 20,
+    "blockplace": 20,
+    "inventory": 15,
+}
+
+BAN_THRESHOLD = 100
+DECAY_PER_MINUTE = 10
+
 
 def onFlag(event):
     player = event.getPlayer()
     bplayer = Bukkit.getPlayer(player.getName())
+    if bplayer is None:
+        return
     uuid = str(player.getUniqueId())
     check = event.getCheck()
     cls = check.getClass()
     flagName = cls.getSimpleName()
-    category = cls.getPackage().getName().split(".")[-1]
+    category = cls.getPackage().getName().split(".")[-1].lower()
     tps = Bukkit.getServer().getTPS()[0]
     ping = bplayer.getPing()
     now = time.time()
-    # Ignore obvious lag situations
+    # Ignore severe lag situations
     if tps < 17:
         return
-    if ping > 300:
+    if ping > 350:
         return
-    # Create player entry
+    # Create player record
     if uuid not in flag_data:
         flag_data[uuid] = {
-            "score": 0,
+            "score": 0.0,
             "last": now
         }
     data = flag_data[uuid]
-    # Decay score
+    # Score decay
     minutes_passed = (now - data["last"]) / 60.0
-    decay = int(minutes_passed * DECAY_PER_MINUTE)
-    if decay > 0:
-        data["score"] = max(0, data["score"] - decay)
-        data["last"] = now
-    # Add weighted score
-    data["score"] += WEIGHTS.get(category.lower(), 2)
-    # Lag warning
+    if minutes_passed > 0:
+        data["score"] = max(
+            0,
+            data["score"] - (minutes_passed * DECAY_PER_MINUTE)
+        )
+    data["last"] = now
+    # Base weight
+    weight = WEIGHTS.get(category, 3)
+    # Increase score for repeated VLs
+    vl = float(event.getViolations())
+    if vl >= 50:
+        weight *= 3
+    elif vl >= 20:
+        weight *= 2
+    elif vl >= 10:
+        weight *= 1.5
+    # High-confidence checks
+    if category == "reach":
+        weight *= 2
+    if flagName.lower().startswith("far"):
+        weight *= 2
+    if flagName.lower().startswith("inventory"):
+        weight *= 1.5
+    # Add score
+    data["score"] += weight
+    # Prediction lag kick
     if (
         category == "prediction"
-        and event.getViolations() > 150
+        and vl > 150
         and ping > 250
     ):
         runCommand_MainThread(
-            "kick %s You got %s x%s. Ping: %sms. If this keeps happening contact staff."
+            "kick %s You got %s x%s. Ping: %sms. "
+            "If this keeps happening contact staff."
             % (
                 player.getName(),
                 flagName,
-                int(event.getViolations()),
+                int(vl),
                 ping
             )
         )
         return
-    # Punish based on accumulated score
+    # Punishment
     if data["score"] >= BAN_THRESHOLD:
         runCommand_MainThread(
             "punish %s cheating.%s"
-            % (player.getName(), category.lower())
+            % (
+                player.getName(),
+                category
+            )
         )
-        # Prevent repeated punishments
         data["score"] = 0
     print(
-        "[Grim] %s | %s | score=%s | VL=%s | ping=%s"
+        "[Grim] %s | %s/%s | score=%.1f | VL=%s | ping=%s | tps=%.2f"
         % (
             player.getName(),
             category,
+            flagName,
             data["score"],
-            event.getViolations(),
-            ping
-            ))
-
+            int(vl),
+            ping,
+            tps
+        )
+    )
 
 
 def mark_action(player):
@@ -1307,21 +1355,6 @@ CHECK_INTERVAL= 20
 
 last_action = {}  # UUID -> timestamp
 last_move = {}    # UUID -> (x, y, z, yaw, pitch)
-
-#function onFlag initializer
-
-# uuid -> {"score": int, "last": timestamp}
-flag_data = {}
-WEIGHTS = {
-    "prediction": 1,
-    "scaffolding": 5,
-    "combat": 10,
-    "reach": 15,
-    "aim": 15,
-    "breaking":10,
-}
-BAN_THRESHOLD = 100
-DECAY_PER_MINUTE = 5
 
 
 # Run  
