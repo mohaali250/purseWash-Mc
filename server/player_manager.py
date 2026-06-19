@@ -591,6 +591,7 @@ def onCommand(sender,label,args):
             print("You cant run this command as CONSOLE")
             return True
         d = f
+        target = sender
 
         # banned?
         # .value
@@ -693,7 +694,7 @@ def onCommand(sender,label,args):
                 ))
             )
             sender.sendMessage(
-                chatcolor("&7Rank: &b%s" % extended_staff_rank(get_primary_group(p)))
+                chatcolor("&7Rank: &b%s" % extended_staff_rank(get_primary_group(target)))
             )
             if d["staff"] != "" and d["locked"] < 0:
                 sender.sendMessage("")
