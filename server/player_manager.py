@@ -2,11 +2,14 @@
 
 #This pyscript needs the following plugins to work:
 
-#GrimAc
 #LuckPerms
 #Paper/bukkit Server
 #Pyspigot
+
+# If you want more features these are optional plugins you can install!
+
 #DiscordSRV
+#GrimAc
 
 
 import json,random,datetime,time,re,os,__builtin__  # Python 2.7
@@ -59,19 +62,6 @@ else:
 
 CONFIG_FILE = File("plugins/PySpigot/staffmanager.yml")
 
-def section_to_dict(section):
-    result = {}
-
-    for key in section.getKeys(False):
-        value = section.get(key)
-
-        if isinstance(value, ConfigurationSection):
-            result[key] = section_to_dict(value)
-        else:
-            result[key] = value
-
-    return result
-
 if not CONFIG_FILE.exists():
     CONFIG_FILE.getParentFile().mkdirs()
 
@@ -81,7 +71,7 @@ if not CONFIG_FILE.exists():
     cfg.set("staff.warn-unverified-staff", True)
 
     cfg.set("afk.threshold-seconds", 180)
-    cfg.set("afk.fulfill-requirement-with-afk",False)
+    cfg.set("afk.fulfill-requirement-with-afk", False)
 
     cfg.set("tick.tick-ms", 1000)
     cfg.set("tick.save-ms", 60000)
@@ -109,14 +99,37 @@ if not CONFIG_FILE.exists():
 
 cfg = YamlConfiguration.loadConfiguration(CONFIG_FILE)
 
-config = section_to_dict(cfg)
+# STAFF SETTINGS
+REQUIRE_LINKED = cfg.getBoolean("staff.require-player-linked-for-staff",True)
+WARN_UNVERIFIED_STAFF = cfg.getBoolean("staff.warn-unverified-staff",True)
+# AFK SETTINGS
+AFK_THRESHOLD = cfg.getInt("afk.threshold-seconds",180)
+AFK_FULFILL = cfg.getBoolean("afk.fulfill-requirement-with-afk",False)
+# TICK SYSTEM
+TICK_LOOP_INTERVAL_MS = cfg.getInt("tick.tick-ms",1000)
+SAVE_INTERVAL_MS = cfg.getLong("tick.save-ms",60000)
+# ANTI-CHEAT
+AUTO_PUNISH = cfg.getBoolean("anti-cheat.auto-punish-for-cheating",True)
+BAN_THRESHOLD = cfg.getInt("anti-cheat.ban-threshold",100)
+DECAY_PER_MINUTE = cfg.getInt("anti-cheat.decay-per-minute",10)
+# BLOCKED COMMANDS
+BLOCK_ENFORCE = cfg.getBoolean("commands.blocked-commands.enforce",False)
+BLOCK_CONTAINS = cfg.getStringList("commands.blocked-commands.contains-exactly")
+if BLOCK_CONTAINS is None:
+    BLOCK_CONTAINS = ["kill @e"]
+BLOCK_STARTS = cfg.getStringList("commands.blocked-commands.starts-with") or [""]
+BLOCK_ENDS = cfg.getStringList("commands.blocked-commands.ends-with") or [""]
+# DATA PATHS
+FILE = cfg.getString(
+    "data.local-staff-data",
+    "plugins/PySpigot/staff.json"
+)
+URL_DATA = cfg.getString(
+    "data.constant-data-url-or-dir",
+    "https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
+)
 
-AFK_THRESHOLD = config["afk"]["threshold-seconds"]
-TICK_LOOP_INTERVAL_MS = config["tick"]["tick-ms"]
-SAVE_INTERVAL_MS = config["tick"]["save-ms"]
-FILE = config["data"]["local-staff-data"]
-URL_DATA = config["data"]["constant-data-url-or-dir"]
-AFK_FULFILL = config["data"]["fulfill-requirement-with-afk"]
+
 
 # functions
 def fetch_data():
@@ -350,7 +363,7 @@ def onCommand(sender,label,args):
         if DISCORD_EXISTS:
             plugin = DiscordSRV.getPlugin()
             manager = plugin.getAccountLinkManager()
-            if manager.getDiscordId(target.getUniqueId()) is None and config["staff"]["require-player-linked-for-staff"]:
+            if REQUIRE_LINKED and manager.getDiscordId(target.getUniqueId()) is None:
                 chat_log(sender,1,"Target %s didnt link their discord account.",variables=(args[0]))
                 return True
         chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],extended_staff_rank(args[1])))
@@ -655,10 +668,13 @@ def onCommand(sender,label,args):
             d["staff_playtime"]=0
             remove_staff(target.getName(),d["staff"])
             d["staff"]=""
-            plugin = DiscordSRV.getPlugin()
-            manager = plugin.getAccountLinkManager()
-            if manager.getDiscordId(target.getUniqueId()) is not None:
-                add_staff(target.getName(),"linked")
+            if DISCORD_EXISTS:
+                plugin = DiscordSRV.getPlugin()
+                manager = plugin.getAccountLinkManager()
+                if manager.getDiscordId(target.getUniqueId()) is not None:
+                    add_staff(target.getName(),"linked")
+                else:
+                    remove_staff(target.getName())
             else:
                 remove_staff(target.getName())
         if mute != 0:
@@ -1161,11 +1177,11 @@ def session_notify(p):
         chat_log(p,4,"Your playtime is counting again!")
         d["notify"] = _bit.write(d["notify"],7,False)
     h = is_legit_staff(p)
-    if config["staff"]["warn-unverified-staff"] and (not h) and (not _bit.read(local_session_notify[uuid(p)],8)):
+    if WARN_UNVERIFIED_STAFF and (not h) and (not _bit.read(local_session_notify[uuid(p)],8)):
         chat_log(p,1,"You have lp perms, however you are not elegible. Your username will have a \" [!] \" suffix that not even operators can remove to signal you arent a verified staff member or havent completed the requirements yet. To remove this sufix and join message, please either request a higher rank staff member to remove your lp perms, or apply here [/apply]")
         lp('user %s meta setsuffix 511 " &6[&e!&6]&f"' % p.getName())
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,True)
-    if config["staff"]["warn-unverified-staff"] and h and _bit.read(local_session_notify[uuid(p)],8):
+    if WARN_UNVERIFIED_STAFF and h and _bit.read(local_session_notify[uuid(p)],8):
         lp('user %s meta removesuffix 511' % p.getName())
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,False)
 def is_legit_staff(p):
@@ -1255,8 +1271,6 @@ WEIGHTS = {
     "inventory": 15,
 }
 
-BAN_THRESHOLD = config["anti-cheat"]["ban-threshold"]
-DECAY_PER_MINUTE = config["anti-cheat"]["decay-per-minute"]
 
 
 def onFlag(event):
@@ -1324,7 +1338,7 @@ def onFlag(event):
             tps
         )
     )
-    if not config["anti-cheat"]["auto-punish-for-cheating"]: return
+    if not AUTO_PUNISH: return
     if (
         category == "prediction"
         and vl > 150
@@ -1399,7 +1413,7 @@ def on_non_originated_command_by_here(event):
     message = event.getMessage().lower()
     
     # Check if the command starts with /kill and contains the all-entities selector (@e)
-    if config["commands"]["blocked-commands"]["enforce"] and (any([i in message for i in config["commands"]["blocked-commands"]["contains-exactly"]]) or any([message.startswith(i) for i in config["commands"]["blocked-commands"]["starts-with"]]) or any([message.endswith(i) for i in config["commands"]["blocked-commands"]["ends-with"]])):
+    if BLOCK_ENFORCE and (any([i in message for i in BLOCK_CONTAINS]) or any([message.startswith(i) for i in BLOCK_STARTS]) or any([message.endswith(i) for i in BLOCK_ENDS])):
         event.setCancelled(True)
         player = event.getPlayer()
         chat_log(player,1,"You may not run this command!")
