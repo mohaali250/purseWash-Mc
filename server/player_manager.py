@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+
+#This pyscript needs the following plugins to work:
+
+#GrimAc
+#LuckPerms
+#Paper/bukkit Server
+#Pyspigot
+#DiscordSRV
+
+
 import json,random,datetime,time,re,os,__builtin__  # Python 2.7
 import pyspigot as ps
 from java.io import File
@@ -9,6 +19,7 @@ from org.bukkit import Bukkit
 from org.bukkit import Statistic
 from org.bukkit.command import TabExecutor
 from java.util import Arrays
+from org.bukkit.configuration import ConfigurationSection
 from org.bukkit.configuration.file import YamlConfiguration
 from org.bukkit.event import Listener, EventHandler
 from org.bukkit.event.player import PlayerJoinEvent
@@ -25,12 +36,87 @@ from net.md_5.bungee.api.chat import TextComponent
 from net.md_5.bungee.api.chat import ClickEvent
 from net.md_5.bungee.api.chat import HoverEvent
 from net.md_5.bungee.api.chat.hover.content import Text
-from ac.grim.grimac.api.events import FlagEvent
-from github.scarsz.discordsrv import DiscordSRV
-from github.scarsz.discordsrv.api.events import AccountLinkedEvent
-from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent
-from net.luckperms.api import LuckPerms
+try:
+    from ac.grim.grimac.api.events import FlagEvent
+except ImportError as imp:
+    GRIM_EXISTS=False
+else:
+    GRIM_EXISTS=True
+try:
+    from github.scarsz.discordsrv import DiscordSRV
+    from github.scarsz.discordsrv.api.events import AccountLinkedEvent
+    from github.scarsz.discordsrv.api.events import AccountUnlinkedEvent
+except ImportError as imp:
+    DISCORD_EXISTS=False
+else:
+    DISCORD_EXISTS=True
+try:
+    from net.luckperms.api import LuckPerms
+except ImportError as imp:
+    LP_EXISTS=False
+else:
+    LP_EXISTS=True
 
+CONFIG_FILE = File("plugins/PySpigot/staffmanager.yml")
+
+def section_to_dict(section):
+    result = {}
+
+    for key in section.getKeys(False):
+        value = section.get(key)
+
+        if isinstance(value, ConfigurationSection):
+            result[key] = section_to_dict(value)
+        else:
+            result[key] = value
+
+    return result
+
+if not CONFIG_FILE.exists():
+    CONFIG_FILE.getParentFile().mkdirs()
+
+    cfg = YamlConfiguration()
+
+    cfg.set("staff.require-player-linked-for-staff", True)
+    cfg.set("staff.warn-unverified-staff", True)
+
+    cfg.set("afk.threshold-seconds", 180)
+    cfg.set("afk.fulfill-requirement-with-afk",False)
+
+    cfg.set("tick.tick-ms", 1000)
+    cfg.set("tick.save-ms", 60000)
+
+    cfg.set("anti-cheat.auto-punish-for-cheating",True)
+    cfg.set("anti-cheat.ban-threshold",100)
+    cfg.set("anti-cheat.decay-per-minute",10)
+
+    cfg.set("commands.blocked-commands.enforce",False)
+    cfg.set("commands.blocked-commands.contains-exactly",["kill @e"])
+    cfg.set("commands.blocked-commands.starts-with",[""])
+    cfg.set("commands.blocked-commands.ends-with",[""])
+
+    cfg.set(
+        "data.local-staff-data",
+        "plugins/PySpigot/staff.json"
+    )
+
+    cfg.set(
+        "data.constant-data-url-or-dir",
+        "https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
+    )
+
+    cfg.save(CONFIG_FILE)
+
+cfg = YamlConfiguration.loadConfiguration(CONFIG_FILE)
+
+config = section_to_dict(cfg)
+
+AFK_THRESHOLD = config["afk"]["threshold-seconds"]
+TICK_LOOP_INTERVAL_MS = config["tick"]["tick-ms"]
+SAVE_INTERVAL_MS = config["tick"]["save-ms"]
+FILE = config["data"]["local-staff-data"]
+URL_DATA = config["data"]["constant-data-url-or-dir"]
+AFK_FULFILL = config["data"]["fulfill-requirement-with-afk"]
 
 # functions
 def fetch_data():
@@ -261,12 +347,12 @@ def onCommand(sender,label,args):
         if d["staff"] == "" and (d["banned"] > time.time() or d["banned"]==-1):
             chat_log(sender,1,"Target %s is staff banned",variables=(args[0]))
             return True
-        plugin = DiscordSRV.getPlugin()
-        manager = plugin.getAccountLinkManager()
-        if manager.getDiscordId(target.getUniqueId()) is None:
-            chat_log(sender,1,"Target %s didnt link their discord account.",variables=(args[0]))
-            return True
-        
+        if DISCORD_EXISTS:
+            plugin = DiscordSRV.getPlugin()
+            manager = plugin.getAccountLinkManager()
+            if manager.getDiscordId(target.getUniqueId()) is None and config["staff"]["require-player-linked-for-staff"]:
+                chat_log(sender,1,"Target %s didnt link their discord account.",variables=(args[0]))
+                return True
         chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],extended_staff_rank(args[1])))
         chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",extended_staff_rank(args[1])))
         # Run start
@@ -332,12 +418,15 @@ def onCommand(sender,label,args):
 
 
         #Run start
-        plugin = DiscordSRV.getPlugin()
-        manager = plugin.getAccountLinkManager()
-        if manager.getDiscordId(target.getUniqueId()) is not None:
-            add_staff(target.getName(),"linked")
+        if DISCORD_EXISTS:
+            plugin = DiscordSRV.getPlugin()
+            manager = plugin.getAccountLinkManager()
+            if manager.getDiscordId(sender.getUniqueId()) is not None:
+                add_staff(sender.getName(),"linked")
+            else:
+                remove_staff(sender.getName())
         else:
-            remove_staff(target.getName())
+            remove_staff(sender.getName())
         d["staff_playtime"]=0
         d["staff"]=""
         d["locked"]=-2
@@ -424,12 +513,15 @@ def onCommand(sender,label,args):
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"unban %s" % (args[0]))
 
-        plugin = DiscordSRV.getPlugin()
-        manager = plugin.getAccountLinkManager()
-        if manager.getDiscordId(target.getUniqueId()) is not None:
-            add_staff(target.getName(),"linked")
+        if DISCORD_EXISTS:
+            plugin = DiscordSRV.getPlugin()
+            manager = plugin.getAccountLinkManager()
+            if manager.getDiscordId(sender.getUniqueId()) is not None:
+                add_staff(sender.getName(),"linked")
+            else:
+                remove_staff(sender.getName())
         else:
-            remove_staff(target.getName())
+            remove_staff(sender.getName())
 
         local_session_notify[uuid(sender)]=0
         #Run end
@@ -466,10 +558,13 @@ def onCommand(sender,label,args):
                 f["punishments"] = {}
                 d["staff"]=""
                 d["staff_playtime"]=0
-                plugin = DiscordSRV.getPlugin()
-                manager = plugin.getAccountLinkManager()
-                if manager.getDiscordId(sender.getUniqueId()) is not None:
-                    add_staff(sender.getName(),"linked")
+                if DISCORD_EXISTS:
+                    plugin = DiscordSRV.getPlugin()
+                    manager = plugin.getAccountLinkManager()
+                    if manager.getDiscordId(sender.getUniqueId()) is not None:
+                        add_staff(sender.getName(),"linked")
+                    else:
+                        remove_staff(sender.getName())
                 else:
                     remove_staff(sender.getName())
             else:
@@ -1059,18 +1154,18 @@ def session_notify(p):
         chat_log(p,4,"You just got cleared")
         p.getInventory().clear()
         d["notify"] = _bit.write(d["notify"],6,False)
-    if d["staff"] != "" and AFK_THRESHOLD < get_idle_time(p) and not _bit.read(d["notify"],7):
+    if d["staff"] != "" and not AFK_FULFILL and AFK_THRESHOLD < get_idle_time(p) and not _bit.read(d["notify"],7):
         chat_log(p,4,"Your playtime is now frozen because you are AFK. Move around for your playtime to continue counting!")
         d["notify"] = _bit.write(d["notify"],7,True)
-    if d["staff"] != "" and get_idle_time(p) < AFK_THRESHOLD and _bit.read(d["notify"],7):
+    if d["staff"] != "" and not AFK_FULFILL and get_idle_time(p) < AFK_THRESHOLD and _bit.read(d["notify"],7):
         chat_log(p,4,"Your playtime is counting again!")
         d["notify"] = _bit.write(d["notify"],7,False)
     h = is_legit_staff(p)
-    if (not h) and (not _bit.read(local_session_notify[uuid(p)],8)):
+    if config["staff"]["warn-unverified-staff"] and (not h) and (not _bit.read(local_session_notify[uuid(p)],8)):
         chat_log(p,1,"You have lp perms, however you are not elegible. Your username will have a \" [!] \" suffix that not even operators can remove to signal you arent a verified staff member or havent completed the requirements yet. To remove this sufix and join message, please either request a higher rank staff member to remove your lp perms, or apply here [/apply]")
         lp('user %s meta setsuffix 511 " &6[&e!&6]&f"' % p.getName())
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,True)
-    if h and _bit.read(local_session_notify[uuid(p)],8):
+    if config["staff"]["warn-unverified-staff"] and h and _bit.read(local_session_notify[uuid(p)],8):
         lp('user %s meta removesuffix 511' % p.getName())
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,False)
 def is_legit_staff(p):
@@ -1160,8 +1255,8 @@ WEIGHTS = {
     "inventory": 15,
 }
 
-BAN_THRESHOLD = 100
-DECAY_PER_MINUTE = 10
+BAN_THRESHOLD = config["anti-cheat"]["ban-threshold"]
+DECAY_PER_MINUTE = config["anti-cheat"]["decay-per-minute"]
 
 
 def onFlag(event):
@@ -1217,6 +1312,19 @@ def onFlag(event):
     # Add score
     data["score"] += weight
     # Prediction lag kick
+    print(
+        "[Grim] %s | %s/%s | score=%.1f | VL=%s | ping=%s | tps=%.2f"
+        % (
+            player.getName(),
+            category,
+            flagName,
+            data["score"],
+            int(vl),
+            ping,
+            tps
+        )
+    )
+    if not config["anti-cheat"]["auto-punish-for-cheating"]: return
     if (
         category == "prediction"
         and vl > 150
@@ -1243,18 +1351,6 @@ def onFlag(event):
             )
         )
         data["score"] = 0
-    print(
-        "[Grim] %s | %s/%s | score=%.1f | VL=%s | ping=%s | tps=%.2f"
-        % (
-            player.getName(),
-            category,
-            flagName,
-            data["score"],
-            int(vl),
-            ping,
-            tps
-        )
-    )
 
 
 def mark_action(player):
@@ -1303,7 +1399,7 @@ def on_non_originated_command_by_here(event):
     message = event.getMessage().lower()
     
     # Check if the command starts with /kill and contains the all-entities selector (@e)
-    if message.startswith("/") and "kill @e" in message:
+    if config["commands"]["blocked-commands"]["enforce"] and (any([i in message for i in config["commands"]["blocked-commands"]["contains-exactly"]]) or any([message.startswith(i) for i in config["commands"]["blocked-commands"]["starts-with"]]) or any([message.endswith(i) for i in config["commands"]["blocked-commands"]["ends-with"]])):
         event.setCancelled(True)
         player = event.getPlayer()
         chat_log(player,1,"You may not run this command!")
@@ -1330,15 +1426,13 @@ def tick():
         u=uuid(p)
         ensure(u)
         d=data[u]
-        if d["banned"] == 0 and get_idle_time(p) < AFK_THRESHOLD:
+        if d["banned"] == 0 and (get_idle_time(p) < AFK_THRESHOLD or AFK_FULFILL):
             d["staff_playtime"]+=(now()-last_tick)
         session_notify(p)
     last_tick = now()
     save()
 
 # starter variables
-FILE="plugins/PySpigot/staff.json"
-URL_DATA="https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
 OWNERUUID = "ce120874-48ad-45e8-a4c5-a70790a56934"
 DEFAULT_GROUP="default"
 local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlinePlayers()],[0]*len(Bukkit.getOnlinePlayers()))}
@@ -1347,14 +1441,6 @@ if not os.path.exists(FILE):
         json.dump({},f) 
 with open(FILE,"r") as f:
     data=json.load(f)
-
-TICK_LOOP_INTERVAL_MS = 1 * 1000
-SAVE_INTERVAL_MS = 60 * 1000
-
-# Anti AFk
-
-AFK_THRESHOLD= 3 * 60
-CHECK_INTERVAL= 20
 
 last_action = {}  # UUID -> timestamp
 last_move = {}    # UUID -> (x, y, z, yaw, pitch)
@@ -1373,7 +1459,7 @@ ps.listener.registerListener(onQuit, PlayerQuitEvent)
 ps.listener.registerListener(onKick, PlayerKickEvent)
 ps.listener.registerListener(onMove, PlayerMoveEvent)
 ps.listener.registerListener(onDamage, EntityDamageByEntityEvent)
-ps.listener.registerListener(onFlag, FlagEvent)
+if GRIM_EXISTS: ps.listener.registerListener(onFlag, FlagEvent)
 ps.listener.registerListener(on_command_event, PlayerCommandPreprocessEvent)
 ps.scheduler.scheduleRepeatingTask(tick, TICK_LOOP_INTERVAL_MS//50, TICK_LOOP_INTERVAL_MS//50)
 print("[Staff] Loaded.")
