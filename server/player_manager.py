@@ -677,6 +677,9 @@ def onCommand(sender,label,args):
             elif d["staff"] == "":
                 status_text = "&7Non-Staff"
                 status_bar = 2
+            elif d["lpgroup"] in gdata["ranks"] and parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
+                status_text = "&eActive Staff (Pending staff upgrade)"
+                status_bar = 4
             elif parse(gdata["ranks"][d["staff"]]["required_playtime"]) > d["staff_playtime"]:
                 status_text = "&ePending Staff"
                 status_bar = 3
