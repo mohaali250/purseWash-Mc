@@ -1318,7 +1318,7 @@ WEIGHTS = {
     "combat": 10,
     "reach": 15,
     "aim": 15,
-    "breaking":15,
+    "breaking":10,
 }
 BAN_THRESHOLD = 100
 DECAY_PER_MINUTE = 5
