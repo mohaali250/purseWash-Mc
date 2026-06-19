@@ -433,6 +433,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Well, what are you gonna activate? (Expected String at argument 1, got None)",_type=exception_type.PARAMETER_ERROR)
             return True
         if args[0] == "staff":
+            d = f
             if not hasattr(sender, "getUniqueId"):
                 print("You cant run this command as CONSOLE")
                 return True
@@ -1055,13 +1056,13 @@ def session_notify(p):
         chat_log(p,4,"Your playtime is counting again!")
         d["notify"] = _bit.write(d["notify"],7,False)
     h = is_legit_staff(p)
-    if (not h) and (not _bit.read(d["notify"],8)):
+    if (not h) and (not _bit.read(local_session_notify[uuid(p)],8)):
         chat_log(p,1,"You have lp perms, however you are not elegible. Your username will have a \" [!] \" suffix that not even operators can remove to signal you arent a verified staff member or havent completed the requirements yet. To remove this sufix and join message, please either request a higher rank staff member to remove your lp perms, or apply here [/apply]")
         lp('user %s meta setsuffix 511 " &6[&e!&6]&f"' % p.getName())
-        d["notify"] = _bit.write(d["notify"],8,True)
-    if h and _bit.read(d["notify"],8):
+        d["notify"] = _bit.write(local_session_notify[uuid(p)],8,True)
+    if h and _bit.read(local_session_notify[uuid(p)],8):
         lp('user %s meta removesuffix 511' % p.getName())
-        d["notify"] = _bit.write(d["notify"],8,False)
+        d["notify"] = _bit.write(local_session_notify[uuid(p)],8,False)
 def is_legit_staff(p):
     u=uuid(p)
     ensure(u)
