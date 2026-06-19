@@ -656,7 +656,7 @@ def onCommand(sender,label,args):
             sender.sendMessage("")
             status_text = "Unknown"
             status_bar = 0
-            if not is_legit_staff(p):
+            if not is_legit_staff(target):
                 status_text = "&6Unverified staff"
                 status_bar = 4
             elif d["banned"] == -1:
