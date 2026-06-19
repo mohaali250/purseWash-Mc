@@ -113,7 +113,7 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
 def ensure(u):
     defaults = {
         "staff": "",
-        "lpgroup":str(get_primary_group(Bukkit.getOfflinePlayer(u)) if get_primary_group(Bukkit.getOfflinePlayer(u))!= DEFAULT_GROUP else ""),
+        "lpgroup":str(get_primary_group(Bukkit.getOfflinePlayer(u))),
         "staff_playtime": get_total_playtime_seconds(u),
         "locked": -1,
         "banned": 0,
@@ -1127,7 +1127,7 @@ def runCommand_MainThread(cmd):
 luckperms = Bukkit.getServicesManager().load(LuckPerms)
 
 def get_primary_group(player):
-    user = luckperms.getUserManager().getUser(player.getUniqueId())
+    user = luckperms.getUserManager().loadUser(uuid(player)).join()
     if user is None:
         return None
     return user.getPrimaryGroup()
