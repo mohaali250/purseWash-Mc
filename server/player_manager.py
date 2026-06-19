@@ -1127,7 +1127,11 @@ def runCommand_MainThread(cmd):
 luckperms = Bukkit.getServicesManager().load(LuckPerms)
 
 def get_primary_group(player):
-    user = luckperms.getUserManager().loadUser(uuid(player)).join()
+    if isinstance(player, str):
+        uid = UUID.fromString(player)
+    else:
+        uid = player.getUniqueId()
+    user = luckperms.getUserManager().loadUser(uid).join()
     if user is None:
         return None
     return user.getPrimaryGroup()
