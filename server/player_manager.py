@@ -265,7 +265,7 @@ def onCommand(sender,label,args):
         chat_log(sender,3,"Promoted player %s for %s.",variables=(args[0],extended_staff_rank(args[1])))
         chat_log(target,0,"%s are promoted for %s. Check [/status] for more info!",variables=("You",extended_staff_rank(args[1])))
         # Run start
-        add_staff(target.getName(),"trainee")
+        if d["staff"] == "":add_staff(target.getName(),"trainee")
         d["staff"]=args[1]
         if d["locked"] < 0: d["locked"] = -3
         # Run end
@@ -655,7 +655,10 @@ def onCommand(sender,label,args):
             sender.sendMessage("")
             status_text = "Unknown"
             status_bar = 0
-            if d["banned"] == -1:
+            if not is_legit_staff(p):
+                status_text = "&6Unverified staff"
+                status_bar = 4
+            elif d["banned"] == -1:
                 status_text = "&4Staff Permanently Banned"
                 status_bar = 0
             elif 0 < now() < d["banned"]:
@@ -690,7 +693,7 @@ def onCommand(sender,label,args):
                 ))
             )
             sender.sendMessage(
-                chatcolor("&7Rank: &b%s" % extended_staff_rank(d["staff"]))
+                chatcolor("&7Rank: &b%s" % extended_staff_rank(get_primary_group(p)))
             )
             if d["staff"] != "" and d["locked"] < 0:
                 sender.sendMessage("")
