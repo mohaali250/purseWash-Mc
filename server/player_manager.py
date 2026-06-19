@@ -1059,10 +1059,10 @@ def session_notify(p):
     if (not h) and (not _bit.read(local_session_notify[uuid(p)],8)):
         chat_log(p,1,"You have lp perms, however you are not elegible. Your username will have a \" [!] \" suffix that not even operators can remove to signal you arent a verified staff member or havent completed the requirements yet. To remove this sufix and join message, please either request a higher rank staff member to remove your lp perms, or apply here [/apply]")
         lp('user %s meta setsuffix 511 " &6[&e!&6]&f"' % p.getName())
-        d["notify"] = _bit.write(local_session_notify[uuid(p)],8,True)
+        local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,True)
     if h and _bit.read(local_session_notify[uuid(p)],8):
         lp('user %s meta removesuffix 511' % p.getName())
-        d["notify"] = _bit.write(local_session_notify[uuid(p)],8,False)
+        local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,False)
 def is_legit_staff(p):
     u=uuid(p)
     ensure(u)
