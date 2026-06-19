@@ -454,35 +454,33 @@ def onCommand(sender,label,args):
                 return True
             elif f["staff"] != "":
                 chat_log(sender,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",extended_staff_rank(f["staff"])))
-            else:
+                add_staff(sender.getName(),f["staff"])
+                local_session_notify[uuid(sender)] = 0
                 f["banned"] = 0
                 f["locked"] = 0
                 f["punishments"] = {}
-                chat_log(sender,3,"%s reagreed to rules ",variables=("You"))
-                return True
-            
-            for p in Bukkit.getOnlinePlayers():
-                if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
-                    chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),extended_staff_rank(f["staff"])))
-            
-            #Run start
-            f["banned"] = 0
-            f["locked"] = 0
-            f["punishments"] = {}
-            if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
-                add_staff(sender.getName(),f["staff"])
+            elif 0 < now() < f["banned"]:
                 local_session_notify[uuid(sender)] = 0
-            d["staff_playtime"]=0
-            remove_staff(sender.getName(),d["staff"])
-            d["staff"]=""
-            plugin = DiscordSRV.getPlugin()
-            manager = plugin.getAccountLinkManager()
-            if d["staff"] == "":
+                f["banned"] = 0
+                f["locked"] = 0
+                f["punishments"] = {}
+                d["staff"]=""
+                d["staff_playtime"]=0
+                plugin = DiscordSRV.getPlugin()
+                manager = plugin.getAccountLinkManager()
                 if manager.getDiscordId(sender.getUniqueId()) is not None:
                     add_staff(sender.getName(),"linked")
                 else:
                     remove_staff(sender.getName())
-            #Run end
+            else:
+                f["banned"] = 0
+                f["locked"] = -2
+                f["punishments"] = {}
+                chat_log(sender,3,"%s reagreed to rules ",variables=("You"))
+            
+            for p in Bukkit.getOnlinePlayers():
+                if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
+                    chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),extended_staff_rank(f["staff"])))
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
             chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
