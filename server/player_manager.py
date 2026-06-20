@@ -264,7 +264,7 @@ def pretty_timedelta(timeinterval):
             text += "%d seconds " % (seconds)
     return text[:-1]
 def extended_staff_rank(string):
-    extended_ranks = {DEFAULT_GROUP:"Default","trainee":"Trainee","linked":"Linked"}
+    extended_ranks = {DEFAULT_GROUP:"Default","trainee":"Trainee","linked":"Linked","owner":"Owner"}
     if string in gdata["ranks"].keys():
         return gdata["ranks"][string]["extended_name"]
     elif string in extended_ranks.keys():
