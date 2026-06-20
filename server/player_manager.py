@@ -1421,6 +1421,10 @@ def on_non_originated_command_by_here(event):
     # Convert the command to lowercase to handle variations like /Kill or /KILL
     message = event.getMessage().lower()
     
+    BLOCK_STARTS = [i for i in BLOCK_STARTS if i != ""]
+    BLOCK_ENDS = [i for i in BLOCK_ENDS if i != ""]
+    BLOCK_CONTAINS = [i for i in BLOCK_CONTAINS if i != ""]
+
     # Check if the command starts with /kill and contains the all-entities selector (@e)
     if BLOCK_ENFORCE and (any([i in message for i in BLOCK_CONTAINS]) or any([message.startswith(i) for i in BLOCK_STARTS]) or any([message.endswith(i) for i in BLOCK_ENDS])):
         event.setCancelled(True)
