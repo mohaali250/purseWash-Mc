@@ -573,6 +573,9 @@ def onCommand(sender,label,args):
                 f["banned"] = 0
                 f["locked"] = 0
                 f["punishments"] = {}
+                if WARN_UNVERIFIED_STAFF:
+                    lp('user %s meta removesuffix 511' % p.getName())
+                    local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,False)
             elif 0 < now() < f["banned"]:
                 local_session_notify[uuid(sender)] = 0
                 f["banned"] = 0
