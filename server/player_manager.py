@@ -62,63 +62,67 @@ else:
 
 CONFIG_FILE = File("plugins/PySpigot/staffmanager.yml")
 
+config_defaults = {
+    "staff.require-player-linked-for-staff": True,
+    "staff.warn-unverified-staff": True,
+    "afk.threshold-seconds": 180,
+    "afk.fulfill-requirement-with-afk": False,
+    "tick.tick-ms": 1000,
+    "tick.save-ms": 60000,
+    "anti-cheat.auto-punish-for-cheating": True,
+    "anti-cheat.ban-threshold": 100,
+    "anti-cheat.decay-per-minute": 10,
+    "commands.blocked-commands.enforce": False,
+    "commands.blocked-commands.contains-exactly": ["kill @e"],
+    "commands.blocked-commands.starts-with": [""],
+    "commands.blocked-commands.ends-with": [""],
+    "messages.error-message-format":"[Pyspigot/player_manager.py] [{state}] {type} : {message}",
+    "messages.info-message-format":"[Pyspigot/player_manager.py] [{state}] {message}",
+    "data.local-staff-data": "plugins/PySpigot/staff.json",
+    "data.constant-data-url-or-dir":
+        "https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json",
+}
+
 if not CONFIG_FILE.exists():
     CONFIG_FILE.getParentFile().mkdirs()
-
-    cfg = YamlConfiguration()
-
-    cfg.set("staff.require-player-linked-for-staff", True)
-    cfg.set("staff.warn-unverified-staff", True)
-
-    cfg.set("afk.threshold-seconds", 180)
-    cfg.set("afk.fulfill-requirement-with-afk", False)
-
-    cfg.set("tick.tick-ms", 1000)
-    cfg.set("tick.save-ms", 60000)
-
-    cfg.set("anti-cheat.auto-punish-for-cheating",True)
-    cfg.set("anti-cheat.ban-threshold",100)
-    cfg.set("anti-cheat.decay-per-minute",10)
-
-    cfg.set("commands.blocked-commands.enforce",False)
-    cfg.set("commands.blocked-commands.contains-exactly",["kill @e"])
-    cfg.set("commands.blocked-commands.starts-with",[""])
-    cfg.set("commands.blocked-commands.ends-with",[""])
-
-    cfg.set(
-        "data.local-staff-data",
-        "plugins/PySpigot/staff.json"
-    )
-
-    cfg.set(
-        "data.constant-data-url-or-dir",
-        "https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
-    )
-
-    cfg.save(CONFIG_FILE)
+    CONFIG_FILE.createNewFile()
 
 cfg = YamlConfiguration.loadConfiguration(CONFIG_FILE)
 
+changed = False
+
+
+for path, value in config_defaults.items():
+    if not cfg.isSet(path):
+        cfg.set(path, value)
+        changed = True
+
+if changed:
+    cfg.save(CONFIG_FILE)
+
 # STAFF SETTINGS
-REQUIRE_LINKED = cfg.getBoolean("staff.require-player-linked-for-staff",True)
-WARN_UNVERIFIED_STAFF = cfg.getBoolean("staff.warn-unverified-staff",True)
+REQUIRE_LINKED = cfg.getBoolean("staff.require-player-linked-for-staff")
+WARN_UNVERIFIED_STAFF = cfg.getBoolean("staff.warn-unverified-staff")
 # AFK SETTINGS
-AFK_THRESHOLD = cfg.getInt("afk.threshold-seconds",180)
-AFK_FULFILL = cfg.getBoolean("afk.fulfill-requirement-with-afk",False)
+AFK_THRESHOLD = cfg.getInt("afk.threshold-seconds")
+AFK_FULFILL = cfg.getBoolean("afk.fulfill-requirement-with-afk")
 # TICK SYSTEM
-TICK_LOOP_INTERVAL_MS = cfg.getInt("tick.tick-ms",1000)
-SAVE_INTERVAL_MS = cfg.getLong("tick.save-ms",60000)
+TICK_LOOP_INTERVAL_MS = cfg.getInt("tick.tick-ms")
+SAVE_INTERVAL_MS = cfg.getLong("tick.save-ms")
 # ANTI-CHEAT
-AUTO_PUNISH = cfg.getBoolean("anti-cheat.auto-punish-for-cheating",True)
-BAN_THRESHOLD = cfg.getInt("anti-cheat.ban-threshold",100)
-DECAY_PER_MINUTE = cfg.getInt("anti-cheat.decay-per-minute",10)
+AUTO_PUNISH = cfg.getBoolean("anti-cheat.auto-punish-for-cheating")
+BAN_THRESHOLD = cfg.getInt("anti-cheat.ban-threshold")
+DECAY_PER_MINUTE = cfg.getInt("anti-cheat.decay-per-minute")
 # BLOCKED COMMANDS
-BLOCK_ENFORCE = cfg.getBoolean("commands.blocked-commands.enforce",False)
-BLOCK_CONTAINS = cfg.getStringList("commands.blocked-commands.contains-exactly")
-if BLOCK_CONTAINS is None:
-    BLOCK_CONTAINS = ["kill @e"]
+BLOCK_ENFORCE = cfg.getBoolean("commands.blocked-commands.enforce")
+BLOCK_CONTAINS = cfg.getStringList(
+    "commands.blocked-commands.contains-exactly"
+) or ["kill @e"]
 BLOCK_STARTS = cfg.getStringList("commands.blocked-commands.starts-with") or [""]
 BLOCK_ENDS = cfg.getStringList("commands.blocked-commands.ends-with") or [""]
+# MESSAGES
+ERROR_MESSAGE_FORMAT=cfg.getString("messages.error-message-format")
+INFO_MESSAGE_FORMAT=cfg.getString("messages.info-message-format")
 # DATA PATHS
 FILE = cfg.getString(
     "data.local-staff-data",
@@ -129,7 +133,12 @@ URL_DATA = cfg.getString(
     "https://raw.githubusercontent.com/mohaali250/purseWash-Mc/refs/heads/main/data/player_manager.json"
 )
 
-
+# Config validator
+try:
+    ERROR_MESSAGE_FORMAT.format(state="state",type="type",message="message")
+    INFO_MESSAGE_FORMAT.format(state="state",type="Null",message="message")
+except (KeyError, ValueError) as ex:
+    raise ValueError("Malformed config file: Only {state}, {type} and {message} are supported as variables")
 
 # functions
 def fetch_data():
@@ -168,7 +177,7 @@ def get_total_playtime_seconds(u):
 
 class exception_type:
     PERMISSION_ERROR = "Permission Error"
-    PARAMETER_ERROR = "Paremeter Error"
+    PARAMETER_ERROR = "Parameter Error"
     PARSE_ERROR = "Parse Error"
     SUCCESS = "Success"
 def chat_log(target,state,string,variables=(),_type="PRINT"):
@@ -205,9 +214,9 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
     message_color = states[state]["default_color"]
     text = message_color+string.replace("%s", states[state]["highlight"]+"%s"+message_color) % variables
     if _type != "PRINT":
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+"[Pyspigot/player_manager.py] [%s] %s : %s" % (states[state]["contents"],_type,text)))
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+ERROR_MESSAGE_FORMAT.format(state=states[state]["contents"],type=_type,message=text)))
     else:
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+"[Pyspigot/player_manager.py] [%s] %s" % (states[state]["contents"],text)))
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+INFO_MESSAGE_FORMAT.format(state=states[state]["contents"],type="Null",message=text)))
 
 def ensure(u):
     defaults = {
