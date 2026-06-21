@@ -210,9 +210,9 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
     message_color = states[state]["default_color"]
     text = message_color+string.replace("%s", states[state]["highlight"]+"%s"+message_color) % variables
     if _type != "PRINT":
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+ERROR_MESSAGE_FORMAT.format(state=states[state]["contents"],type=_type,message=text,default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+ERROR_MESSAGE_FORMAT.format(state=states[state]["contents"],type=_type,message=text).format(default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
     else:
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+INFO_MESSAGE_FORMAT.format(state=states[state]["contents"],type="Null",message=text,default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+INFO_MESSAGE_FORMAT.format(state=states[state]["contents"],type="Null",message=text).format(default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
 
 def ensure(u):
     defaults = {
