@@ -73,9 +73,7 @@ config_defaults = {
     "anti-cheat.ban-threshold": 100,
     "anti-cheat.decay-per-minute": 10,
     "commands.blocked-commands.enforce": False,
-    "commands.blocked-commands.contains-exactly": ["kill @e"],
-    "commands.blocked-commands.starts-with": [""],
-    "commands.blocked-commands.ends-with": [""],
+    "commands.blocked-commands.regex-patterns": ["kill @e"],
     "messages.error-message-format":"[Pyspigot/player_manager.py] [{state}] {type} : {message}",
     "messages.info-message-format":"[Pyspigot/player_manager.py] [{state}] {message}",
     "data.local-staff-data": "plugins/PySpigot/staff.json",
@@ -115,11 +113,7 @@ BAN_THRESHOLD = cfg.getInt("anti-cheat.ban-threshold")
 DECAY_PER_MINUTE = cfg.getInt("anti-cheat.decay-per-minute")
 # BLOCKED COMMANDS
 BLOCK_ENFORCE = cfg.getBoolean("commands.blocked-commands.enforce")
-BLOCK_CONTAINS = cfg.getStringList(
-    "commands.blocked-commands.contains-exactly"
-) or ["kill @e"]
-BLOCK_STARTS = cfg.getStringList("commands.blocked-commands.starts-with") or [""]
-BLOCK_ENDS = cfg.getStringList("commands.blocked-commands.ends-with") or [""]
+BLOCKED_COMMANDS = cfg.getStringList("commands.blocked-commands.regex-patterns") or [""]
 # MESSAGES
 ERROR_MESSAGE_FORMAT=cfg.getString("messages.error-message-format")
 INFO_MESSAGE_FORMAT=cfg.getString("messages.info-message-format")
@@ -1423,16 +1417,13 @@ def onMove(event):
 def on_non_originated_command_by_here(event):
     # Convert the command to lowercase to handle variations like /Kill or /KILL
     message = event.getMessage().lower()
-    
-    BLOCK_STARTS = [i for i in BLOCK_STARTS if i != ""]
-    BLOCK_ENDS = [i for i in BLOCK_ENDS if i != ""]
-    BLOCK_CONTAINS = [i for i in BLOCK_CONTAINS if i != ""]
-
-    # Check if the command starts with /kill and contains the all-entities selector (@e)
-    if BLOCK_ENFORCE and (any([i in message for i in BLOCK_CONTAINS]) or any([message.startswith(i) for i in BLOCK_STARTS]) or any([message.endswith(i) for i in BLOCK_ENDS])):
+    blocked = any(
+        re.search(pattern, message)
+        for pattern in BLOCKED_COMMANDS
+    )
+    if BLOCK_ENFORCE and blocked:
         event.setCancelled(True)
-        player = event.getPlayer()
-        chat_log(player,1,"You may not run this command!")
+        chat_log(event.getPlayer(), 1, "You may not run this command!")
 
 # Register the listener with PySpigot
 # 'Listener' is the name of your choice, 'on_command' is the function, and 'Normal' is the priority
