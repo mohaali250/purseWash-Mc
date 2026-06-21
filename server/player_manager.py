@@ -536,7 +536,7 @@ def onCommand(sender,label,args):
 
         _any = False
 
-        if d["banned"] != 0:
+        if 0 < now() < d["banned"] or d["banned"] == -1:
             _any = True
             dur = d["banned"] - now()
             chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if d["banned"] != -1 else "Never")))
@@ -552,7 +552,7 @@ def onCommand(sender,label,args):
                     remove_staff(target.getName())
             else:
                 remove_staff(target.getName())
-        if 0 < d["locked"]:
+        if 0 < now() < d["locked"]:
             _any = True
             dur = d["banned"] - now()
             chat_log(sender,3,"Lifted staff suspension of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur))))
