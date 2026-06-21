@@ -208,11 +208,38 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
     if state not in states:
         raise ValueError("Invalid chat state: %s" % state)
     message_color = states[state]["default_color"]
-    text = message_color+string.replace("%s", states[state]["highlight"]+"%s"+message_color) % variables
+    text = (
+        message_color +
+        string.replace(
+            "%s",
+            states[state]["highlight"] + "%s" + message_color
+        )
+    ) % variables
+    
+    text = text.format(
+        default_color=states[state]["default_color"],
+        highlight=states[state]["highlight"]
+    )
     if _type != "PRINT":
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+ERROR_MESSAGE_FORMAT.format(state=states[state]["contents"],type=_type,message=text,default_color=states[state]["default_color"],highlight=states[state]["highlight"]).format(default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
+        msg = ERROR_MESSAGE_FORMAT.format(
+            state=states[state]["contents"],
+            type=_type,
+            message=text,
+            default_color=states[state]["default_color"],
+            highlight=states[state]["highlight"]
+        )
     else:
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+INFO_MESSAGE_FORMAT.format(state=states[state]["contents"],type="Null",message=text,default_color=states[state]["default_color"],highlight=states[state]["highlight"]).format(default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
+        msg = INFO_MESSAGE_FORMAT.format(
+            state=states[state]["contents"],
+            type="Null",
+            message=text,
+            default_color=states[state]["default_color"],
+            highlight=states[state]["highlight"]
+        )
+
+    target.sendMessage(
+        ChatColor.translateAlternateColorCodes('&', msg)
+    )
 
 def ensure(u):
     defaults = {
