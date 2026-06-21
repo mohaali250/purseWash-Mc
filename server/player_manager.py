@@ -564,6 +564,8 @@ def onCommand(sender,label,args):
                 return True
             elif f["staff"] != "":
                 chat_log(sender,0,"%s agreed to staff rules and are now a staff member (%s). You have now gained perms for this rank. Check [/status] for more info",variables=("You",extended_staff_rank(f["staff"])))
+                for p in Bukkit.getOnlinePlayers():
+                    chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),extended_staff_rank(f["staff"])))
                 add_staff(sender.getName(),f["staff"])
                 local_session_notify[uuid(sender)] = 0
                 f["banned"] = 0
@@ -571,7 +573,7 @@ def onCommand(sender,label,args):
                 f["punishments"] = {}
                 if WARN_UNVERIFIED_STAFF:
                     lp('user %s meta removesuffix 511' % sender.getName())
-                    local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],8,False)
+                    local_session_notify[uuid(sender)] = _bit.write(local_session_notify[uuid(sender)],8,False)
             elif 0 < now() < f["banned"]:
                 local_session_notify[uuid(sender)] = 0
                 f["banned"] = 0
@@ -594,9 +596,7 @@ def onCommand(sender,label,args):
                 f["punishments"] = {}
                 chat_log(sender,3,"%s reagreed to rules ",variables=("You"))
             
-            for p in Bukkit.getOnlinePlayers():
-                if f["staff"] != "" and parse(gdata["ranks"][f["staff"]]["required_playtime"]) < f["staff_playtime"]:
-                    chat_log(p,0,"%s agreed to staff rules and now is a staff member. Congradulate our new %s!",variables=(sender.getName(),extended_staff_rank(f["staff"])))
+            
     elif cmd=="punish":
         if not sender.hasPermission("staffmanager.punish"):
             chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
