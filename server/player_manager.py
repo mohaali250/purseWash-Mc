@@ -129,10 +129,10 @@ URL_DATA = cfg.getString(
 
 # Config validator
 try:
-    ERROR_MESSAGE_FORMAT.format(state="state",type="type",message="message")
-    INFO_MESSAGE_FORMAT.format(state="state",type="Null",message="message")
+    ERROR_MESSAGE_FORMAT.format(state="state",type="type",message="message",default_color="",highlight="")
+    INFO_MESSAGE_FORMAT.format(state="state",type="Null",message="message",default_color="",highlight="")
 except (KeyError, ValueError) as ex:
-    raise ValueError("Malformed config file: Only {state}, {type} and {message} are supported as variables")
+    raise ValueError("Malformed config file: Only {state}, {type}, {message}, {default_color} and {highlight} are supported as variables.\n%s" % (ex))
 
 # functions
 def fetch_data():
@@ -174,43 +174,45 @@ class exception_type:
     PARAMETER_ERROR = "Parameter Error"
     PARSE_ERROR = "Parse Error"
     SUCCESS = "Success"
+states = {
+    0: {
+        "contents": "INFO",
+        "default_color": "&b",
+        "highlight":"&3"
+    },
+    1: {
+        "contents": "WARN",
+        "default_color": "&e",
+        "highlight":"&6"
+    },
+    2: {
+        "contents": "ERROR",
+        "default_color": "&c",
+        "highlight":"&4"
+    },
+    3: {
+        "contents": "SUCCESS",
+        "default_color": "&a",
+        "highlight":"&2"
+    },
+    4: {
+        "contents": "NOTIFY",
+        "default_color": "&e",
+        "highlight":"&a"
+    }
+}
 def chat_log(target,state,string,variables=(),_type="PRINT"):
     if not target.isOnline(): return False
     if not hasattr(target, "sendMessage"):
         target = target.getPlayer()
-    states = {
-        0: {
-            "contents": "INFO",
-            "default_color": "&b",
-            "highlight":"&3"
-        },
-        1: {
-            "contents": "WARN",
-            "default_color": "&e",
-            "highlight":"&6"
-        },
-        2: {
-            "contents": "ERROR",
-            "default_color": "&c",
-            "highlight":"&4"
-        },
-        3: {
-            "contents": "SUCCESS",
-            "default_color": "&a",
-            "highlight":"&2"
-        },
-        4: {
-            "contents": "NOTIFY",
-            "default_color": "&e",
-            "highlight":"&a"
-        }
-    }
+    if state not in states:
+        raise ValueError("Invalid chat state: %s" % state)
     message_color = states[state]["default_color"]
     text = message_color+string.replace("%s", states[state]["highlight"]+"%s"+message_color) % variables
     if _type != "PRINT":
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+ERROR_MESSAGE_FORMAT.format(state=states[state]["contents"],type=_type,message=text)))
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+ERROR_MESSAGE_FORMAT.format(state=states[state]["contents"],type=_type,message=text,default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
     else:
-        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+INFO_MESSAGE_FORMAT.format(state=states[state]["contents"],type="Null",message=text)))
+        target.sendMessage(ChatColor.translateAlternateColorCodes('&', states[state]["default_color"]+INFO_MESSAGE_FORMAT.format(state=states[state]["contents"],type="Null",message=text,default_color=states[state]["default_color"],highlight=states[state]["highlight"])))
 
 def ensure(u):
     defaults = {
