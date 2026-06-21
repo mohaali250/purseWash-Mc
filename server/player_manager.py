@@ -215,7 +215,7 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
             states[state]["highlight"] + "%s" + message_color
         )
     ) % variables
-    
+
     text = text.format(
         default_color=states[state]["default_color"],
         highlight=states[state]["highlight"]
@@ -539,14 +539,23 @@ def onCommand(sender,label,args):
         if d["banned"] != 0:
             _any = True
             dur = d["banned"] - now()
-            chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+            chat_log(sender,3,"Lifted staff ban of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if d["banned"] != -1 else "Never")))
             chat_log(target,4,"%s ban from staff is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
             d["staff_playtime"] = 0
             d["banned"]=now()
+            if DISCORD_EXISTS:
+                plugin = DiscordSRV.getPlugin()
+                manager = plugin.getAccountLinkManager()
+                if manager.getDiscordId(target.getUniqueId()) is not None:
+                    add_staff(target.getName(),"linked")
+                else:
+                    remove_staff(target.getName())
+            else:
+                remove_staff(target.getName())
         if 0 < d["locked"]:
             _any = True
             dur = d["banned"] - now()
-            chat_log(sender,3,"Lifted staff suspension of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur) if dur != -1 else "Never")))
+            chat_log(sender,3,"Lifted staff suspension of %s which left %s to finish.",variables=(args[0],str(pretty_timedelta(dur))))
             chat_log(target,4,"%s staff suspension is now lifted. Reagree to rules by typing [/activate staff]. More info on [/status]",variables=("Your"))
             d["locked"] = -2
         if _bit.read(d["notify"],6):
@@ -558,17 +567,8 @@ def onCommand(sender,label,args):
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"unban %s" % (args[0]))
 
-        if DISCORD_EXISTS:
-            plugin = DiscordSRV.getPlugin()
-            manager = plugin.getAccountLinkManager()
-            if manager.getDiscordId(sender.getUniqueId()) is not None:
-                add_staff(sender.getName(),"linked")
-            else:
-                remove_staff(sender.getName())
-        else:
-            remove_staff(sender.getName())
 
-        local_session_notify[uuid(sender)]=0
+        local_session_notify[uuid(target)]=0
         #Run end
     elif cmd=="activate":
         if len(args)<1:
