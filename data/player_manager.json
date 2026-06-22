@@ -1,6 +1,6 @@
 {
 	"punishments":{
-		"disrespect_staff": {				
+		"chat.disrespect_staff": {				
 			"reason":"Disrespect to staff",
 			"kick":{}
 		},
@@ -30,12 +30,12 @@
 			"clear":{},
 			"staff_ban":"4wk"
 		},
-		"threats_irl":{
+		"chat.threats_irl":{
 			"reason":"Threatened for irl things",
 			"mute":true,
 			"ban":"12wk"
 		},
-		"threats_mc":{
+		"chat.threats_mc":{
 			"reason":"Threatened in-game",
 			"mute":"4wk",
 			"ban":"1wk",
@@ -46,7 +46,7 @@
 			"demote":{},
 			"ban":true
 		},
-		"griefiing":{
+		"griefing":{
 			"reason":"Griefing server contents",
 			"ban":true,
 			"demote":{}
@@ -68,7 +68,7 @@
 			"reason":"Using macros for automated actions",
 			"ban":"14d"
 		},
-		"chatbot":{
+		"chat.chatbot":{
 			"reason":"Using chatbots inplemented into user messages to automate messages",
 			"mute":"2d"
 		},
@@ -93,9 +93,18 @@
 			"ban":"2wk",
 			"clear":{}
 		},
-		"nsfw":{
-			"reason":"Doing or talking about nsfw topics",
+		"chat.nsfw":{
+			"reason":"Talking about nsfw topics",
 			"ban":true
+		},
+		"action.nsfw":{
+			"reason":"Doing nsfw topics",
+			"ban":true
+		},
+		"chat.racism":{
+			"reason":"Being racist in chat",
+			"ban":"2d",
+			"mute":"1wk"
 		}
 	},
 	"ranks":{
