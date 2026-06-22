@@ -1429,9 +1429,9 @@ def onMove(event):
 
     feet = player.getLocation().getBlock().getType()
     head = player.getEyeLocation().getBlock().getType()
-    
+
     in_water = feet == Material.WATER or head == Material.WATER
-    
+
     # Ignore passive water movement, but allow active swimming
     if in_water and not player.isSwimming():
         return
