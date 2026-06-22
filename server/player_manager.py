@@ -1435,9 +1435,8 @@ def onMove(event):
         lx, ly, lz, lyaw, lpitch = last_move[uid]
 
         # ignore tiny micro-movements (VERY important)
-        if abs(x - lx) < 0.15 and abs(y - ly) < 0.15 and abs(z - lz) < 0.15:
-            if abs(yaw - lyaw) < 2 and abs(pitch - lpitch) < 2:
-                return  # no real movement → do nothing
+        if abs(x - lx) < 0.15  and abs(z - lz) < 0.15:
+            return  # no real movement → do nothing
 
     last_move[uid] = (x, y, z, yaw, pitch)
     mark_action(player)
