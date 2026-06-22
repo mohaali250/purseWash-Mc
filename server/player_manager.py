@@ -1424,6 +1424,7 @@ def onDamage(event):
 
 
 def onMove(event):
+    upd = True
     player = event.getPlayer()
     uid = player.getUniqueId()
     loc = player.getLocation()
@@ -1441,9 +1442,10 @@ def onMove(event):
     if uid in last_move:
         lx, ly, lz, lyaw, lpitch = last_move[uid]
         if abs(x - lx) < 0.15 and abs(z - lz) < 0.15:
-            return
-    mark_action(player)
-    session_notify(player)
+            upd = False
+    if upd:
+        mark_action(player)
+        session_notify(player)
 def on_non_originated_command_by_here(event):
     # Convert the command to lowercase to handle variations like /Kill or /KILL
     message = event.getMessage().lower()
