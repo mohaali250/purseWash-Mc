@@ -1426,25 +1426,22 @@ def onDamage(event):
 def onMove(event):
     player = event.getPlayer()
     uid = player.getUniqueId()
-
-    feet = player.getLocation().getBlock().getType()
-    head = player.getEyeLocation().getBlock().getType()
-
-    in_water = feet == Material.WATER or head == Material.WATER
-
-    # Ignore passive water movement, but allow active swimming
-    if in_water and not player.isSwimming():
-        return
-
     loc = player.getLocation()
     x, y, z = loc.getX(), loc.getY(), loc.getZ()
     yaw, pitch = loc.getYaw(), loc.getPitch()
+    # update stored position no matter what (prevents jump exploits later)
+    last_move[uid] = (x, y, z, yaw, pitch)
+    # PASSIVE MOVEMENT CHECK (water / vehicles)
+    block = player.getLocation().getBlock().getType()
+    in_water = (block == Material.WATER)
+    in_vehicle = player.isInsideVehicle()
+    if in_water or in_vehicle:
+        return  # movement does NOT count as activity
+    # micro movement filter (normal ground movement)
     if uid in last_move:
         lx, ly, lz, lyaw, lpitch = last_move[uid]
-
         if abs(x - lx) < 0.15 and abs(z - lz) < 0.15:
             return
-    last_move[uid] = (x, y, z, yaw, pitch)
     mark_action(player)
     session_notify(player)
 def on_non_originated_command_by_here(event):
