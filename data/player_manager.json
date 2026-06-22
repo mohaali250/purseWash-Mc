@@ -115,6 +115,10 @@
 		"chat.swearing":{
 			"reason":"Swearing in chat",
 			"mute":"1h"
+		},
+		"chat.spamming":{
+			"reason":"Spamming / flooding in chat",
+			"ban":"1d"
 		}
 	},
 	"ranks":{
