@@ -21,7 +21,7 @@
 			"staff_ban":"3wk"
 		},
 		"advertising":{
-			"reason":"Advertising",
+			"reason":"Advertising",	
 			"mute":"1wk",
 			"ban":"3d"
 		},
@@ -39,6 +39,12 @@
 			"reason":"Threatened in-game",
 			"mute":"4wk",
 			"ban":"1wk",
+			"staff_ban":true
+		},
+		"chat.gender_discrimination":{
+			"reason":"Discrimination against other genders",
+			"mute":"1wk",
+			"ban":"3d",
 			"staff_ban":true
 		},
 		"unauthorized_config_change":{
@@ -103,8 +109,12 @@
 		},
 		"chat.racism":{
 			"reason":"Being racist in chat",
-			"ban":"2d",
+			"ban":"3d",
 			"mute":"1wk"
+		},
+		"chat.swearing":{
+			"reason":"Swearing in chat",
+			"mute":"1h"
 		}
 	},
 	"ranks":{
