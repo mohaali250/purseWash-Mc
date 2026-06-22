@@ -20,6 +20,7 @@ from java.util import Scanner
 from java.util import UUID
 from org.bukkit import Bukkit
 from org.bukkit import Statistic
+from org.bukkit import Material
 from org.bukkit.command import TabExecutor
 from java.util import Arrays
 from org.bukkit.configuration import ConfigurationSection
@@ -1422,26 +1423,30 @@ def onDamage(event):
         session_notify(attacker)
 
 
-
 def onMove(event):
     player = event.getPlayer()
     uid = player.getUniqueId()
 
+    feet = player.getLocation().getBlock().getType()
+    head = player.getEyeLocation().getBlock().getType()
+    
+    in_water = feet == Material.WATER or head == Material.WATER
+    
+    # Ignore passive water movement, but allow active swimming
+    if in_water and not player.isSwimming():
+        return
+
     loc = player.getLocation()
     x, y, z = loc.getX(), loc.getY(), loc.getZ()
     yaw, pitch = loc.getYaw(), loc.getPitch()
-
     if uid in last_move:
         lx, ly, lz, lyaw, lpitch = last_move[uid]
 
-        # ignore tiny micro-movements (VERY important)
-        if abs(x - lx) < 0.15  and abs(z - lz) < 0.15:
-            return  # no real movement → do nothing
-
+        if abs(x - lx) < 0.15 and abs(z - lz) < 0.15:
+            return
     last_move[uid] = (x, y, z, yaw, pitch)
     mark_action(player)
     session_notify(player)
-
 def on_non_originated_command_by_here(event):
     # Convert the command to lowercase to handle variations like /Kill or /KILL
     message = event.getMessage().lower()
