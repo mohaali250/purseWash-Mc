@@ -1201,9 +1201,13 @@ def onCommand(sender,label,args):
     return True
 def typing_filter(arg, options):
     try:
-        return [c for c in options if c.lower().startswith(arg.lower())]
-    except AttributeError as ex:
-        return [c for c in options if c.lower().startswith(" ".join(arg).lower())]
+        prefix = str(arg).lower()
+    except:
+        prefix = " ".join(map(str, arg)).lower()
+    return [
+        c for c in options
+        if str(c).lower().startswith(prefix)
+    ]
 def get_players(arg):
     players = []
     added = set()
@@ -1227,7 +1231,7 @@ def only_numbers(arg):
     return "".join([i for i in arg if i in [str(v) for v in range(0, 10)]])
 
 def reason_tab(arg):
-    return [arg] + [u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]
+    return [arg if isinstance(arg,str) else " ".join(arg)] + [u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]
 
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0].split(":")[-1]
