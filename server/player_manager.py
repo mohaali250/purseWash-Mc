@@ -361,6 +361,14 @@ def get_mute_info(player_name):
     return data
 def chatcolor(msg):
     return ChatColor.translateAlternateColorCodes('&', msg)
+
+def is_all_valid_categories(args):
+    for i in args:
+        if i in [gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"]]:
+            continue
+        return False
+    return True
+
 def onCommand(sender,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
@@ -435,12 +443,14 @@ def onCommand(sender,label,args):
         if dur is None:
             chat_log(sender,1,"%s returned none when parsed as a timedelta",variables=(args[1]),_type=exception_type.PARSE_ERROR)
             return True
-        
         #Run start
         d["locked"]=now()+dur
         remove_staff(target.getName(),d["staff"])
         #Run end
-        chat_log(sender,3,"Suspended %s for \"%s\" expiring in %s.",variables=(args[0]," ".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        if is_all_valid_categories(args[2:]):
+            chat_log(sender,3,"Suspended %s for {highlight}%s{default_color} expiring in %s.",variables=(args[0],"{default_color}, {highlight}".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        else:
+            chat_log(sender,3,"Suspended %s for \"%s\" expiring in %s.",variables=(args[0]," ".join([args[2:]]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
         chat_log(target,0,"%s are now suspended from staff. More info on [/status]",variables=("You"))
     elif cmd=="demote":
         if not sender.hasPermission("staffmanager.demote"):
@@ -477,9 +487,12 @@ def onCommand(sender,label,args):
         d["staff"]=""
         d["locked"]=-2
         #Run end
-        chat_log(sender,3,"Demoted %s for %s.",variables=(args[0]," ".join(args[1:])))
+        if is_all_valid_categories(args[1:]):
+            chat_log(sender,3,"Demoted %s for {highlight}%s{default_color}.",variables=(args[0],"{default_color}, {highlight}".join(args[1:])))
+        else:
+            chat_log(sender,3,"Demoted %s for \"%s\".",variables=(args[0]," ".join([args[1:]])))
         chat_log(target,0,"%s are now demoted from staff. More info on [/status]",variables=("You"))
-    elif cmd=="staff_ban":
+    elif cmd=="staffban":
         if not sender.hasPermission("staffmanager.staffban"):
             chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
             return True
@@ -500,7 +513,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Cannot staff ban %s because they arent a staff member",variables=(args[0]))
             return True
         if len(args)<2:
-            chat_log(sender,2,"Command \"/staff_ban\" requires atleast 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
+            chat_log(sender,2,"Command \"/staffban\" requires atleast 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
         if len(args)<3:
             chat_log(sender,1,"You must provide a reason")
@@ -514,7 +527,10 @@ def onCommand(sender,label,args):
         remove_staff(target.getName(),d["staff"])
         d["staff"]=""
         #Run end
-        chat_log(sender,3,"Staff banned %s for \"%s\" expiring in %s.",variables=(args[0]," ".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        if is_all_valid_categories(args[2:]):
+            chat_log(sender,3,"Staff banned %s for {highlight}%s{default_color} expiring in %s.",variables=(args[0],"{default_color}, {highlight}".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
+        else:
+            chat_log(sender,3,"Staff banned %s for \"%s\" expiring in %s.",variables=(args[0]," ".join([args[2:]]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
         chat_log(target,0,"%s are now banned from staff. More info on [/status]",variables=("You"))
     elif cmd=="pardon":
         if not sender.hasPermission("staffmanager.remove_punishment"):
@@ -567,7 +583,6 @@ def onCommand(sender,label,args):
             chat_log(sender,3,"%s doesnt have a punishment to remove",variables=(args[0]))
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"unban %s" % (args[0]))
-
 
         local_session_notify[uuid(target)]=0
         #Run end
@@ -648,56 +663,78 @@ def onCommand(sender,label,args):
         
         # Run Start
         # Calculate
-        reason_stack = []
+        internal_name_stack = []
         proof_stack = []
+
         bn = 0
         st_bn = 0
         st_susp = 0
-        mute = 0 
+        mute = 0
+
         kick = False
         clear = False
         demote = False
+
+        id_list = set()
+
         for v in args[1:]:
-            i = v.split(":")[0]
-            if len(v.split(":")) == 2:
-                g = v.split(":")[1]
-                proof = g.split(";")
+        
+            split = v.split(":", 1)
+            internal_name = split[0]
+
+            if len(split) == 2:
+                proof = split[1].split(";")
             else:
                 proof = []
-            try:
-                lt_pn = gdata["punishments"][i]
-            except KeyError:
+
+            rule = None
+
+            # Search by internal_name
+            for i, punishment in gdata["punishments"].items():
+                if punishment["meta"]["internal_name"] == internal_name:
+                    rule = punishment
+                    id_list.append(i)
+                    break
+            if rule is None:
                 continue
-            for k in lt_pn.keys():
-                if k=="ban":
-                    if isinstance(lt_pn[k],bool) or bn==-1:
+            meta = rule["meta"]
+            actions = rule["actions"]
+            # Store reasons
+            if meta["internal_name"] not in internal_name_stack:
+                internal_name.append(meta["reason"])
+            proof_stack.append(proof)
+            # Process punishments
+            for action in actions.get("punish", []):
+                action_name, action_value = next(iter(action.items()))
+                if action_name == "ban":
+                    if isinstance(action_value, bool) or bn == -1:
                         bn = -1
                     else:
-                        bn += parse(lt_pn[k])
-                elif k=="staff_ban":
-                    if isinstance(lt_pn[k],bool) or st_bn == -1:
+                        bn += parse(action_value)
+                elif action_name == "staff_ban":
+                    if isinstance(action_value, bool) or st_bn == -1:
                         st_bn = -1
                     else:
-                        st_bn += parse(lt_pn[k])
-                elif k=="suspend_staff":
-                    st_susp += parse(lt_pn[k])
-                elif k=="mute":
-                    if isinstance(lt_pn[k],bool) or mute == -1:
+                        st_bn += parse(action_value)
+                elif action_name == "suspend_staff":
+                    st_susp += parse(action_value)
+                elif action_name == "mute":
+                    if isinstance(action_value, bool) or mute == -1:
                         mute = -1
                     else:
-                        mute += parse(lt_pn[k])
-                elif k=="kick":
+                        mute += parse(action_value)
+                elif action_name == "kick":
                     kick = True
-                elif k=="clear":
+                elif action_name == "clear":
                     clear = True
-                elif k=="demote":
+                elif action_name == "demote":
                     demote = True
-                else:
-                    continue    
-            reason_stack.append(lt_pn["reason"])
-            proof_stack.append(proof)
         # Optimizing actions and apply
-        d["punishments"] = {i: v for i,v in zip(reason_stack,proof_stack)}
+        for n, v in {i: {"violations":gdata["punishments"][i]["actions"]["warn"],"proof":v} for i,v in zip(i,proof_stack)}.items():
+            if n in d["punishments"]:
+                d["punishments"][n] = {i: {"violations":gdata["punishments"][i]["actions"]["warn"]+d["punishments"][n],"proof":v+d["punishments"][n]["proof"]} for i,v in zip(i,proof_stack)}[n]
+            else:
+                d["punishments"][n] = v[n] 
         if clear:
             _bit.write(d["notify"],6,True)
         if demote:
@@ -728,11 +765,11 @@ def onCommand(sender,label,args):
             d["locked"] = 0
         if bn != 0:
             if bn == -1:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban %s Stack Start | %s | Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], " | ".join(reason_stack)))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"ban %s Stack Start | %s | Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], " | ".join([gdata["punishments"][g]["meta"]["reason"] for g in id_list])))
             else:
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban %s %ss Stack Start | %s | Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], str(bn), " | ".join(reason_stack)))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"tempban %s %ss Stack Start | %s | Stack End; If you believe you were punished unfairly appeal in discord" % (args[0], str(bn), " | ".join([gdata["punishments"][g]["meta"]["reason"] for g in id_list])))
         if kick:
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s Stack Start | %s | Stack End; Rejoin with that in mind" % (args[0], " | ".join(reason_stack))) 
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"kick %s Stack Start | %s | Stack End; Rejoin with that in mind" % (args[0], " | ".join([gdata["punishments"][g]["meta"]["reason"] for g in id_list]))) 
         
         chat_log(sender,3,"Punished {highlight}%s{default_color} for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
     elif cmd=="status":
@@ -964,15 +1001,17 @@ def onCommand(sender,label,args):
                 sender.sendMessage(chatcolor("&aStatus: Clean"))
             else:
                 sender.sendMessage(chatcolor("&cStatus: %s" % ", ".join(active)))
-                if len(d["punishments"]) != 0:
+                if len(d["punishments"].keys()) != 0:
                     sender.sendMessage("")
                     sender.sendMessage(chatcolor("&6Reason:"))
-                    for reason, items in d["punishments"].items():
+                    for id, violationdata in d["punishments"].items():
                         sender.sendMessage("")
-                        sender.sendMessage(chatcolor("&e- %s" % reason))
-                        for item in items:
+                        sender.sendMessage(chatcolor("&e%s" % gdata["punishments"][id]["meta"]["name"]))
+                        sender.sendMessage(chatcolor("&7  %s" % gdata["punishments"][id]["meta"]["reason"]))
+                        if violationdata["violations"]:sender.sendMessage(chatcolor("&c  Violations of this rule: %s" % violationdata["violations"]))
+                        for item in violationdata["proof"]:
                             sender.sendMessage(
-                                chatcolor("&7  - %s" % item)
+                                chatcolor("&c  - %s" % item)
                             )
             sender.sendMessage("")
             sender.sendMessage(chatcolor("&8:====================================================:"))
@@ -1095,6 +1134,67 @@ def onCommand(sender,label,args):
         #        )
         #    )
         #sender.sendMessage("If your application gets denied you can always apply again, same for upgrading ranks. Also check your playtime with [/playtime] and your staff status with [/status]")
+    elif cmd=="warn":
+        if not sender.hasPermission("staffmanager.warn"):
+            chat_log(sender,1,"%s are not permitted to use this command",variables=("You"),_type=exception_type.PERMISSION_ERROR)
+            return True
+        
+        if len(args)<1:
+            chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
+            return True
+        
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        if not target.hasPlayedBefore() and not target.isOnline():
+            chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
+            return True
+        u=uuid(target)
+        ensure(u)
+        d=data[u]
+        
+        if len(args)<=1:
+            chat_log(sender,1,"ParameterError : What are you gonna warn them for? (Expected at least 2 arguments, got %s)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
+            return True
+        # Run Start
+        # Calculate
+        internal_name_stack = []
+        proof_stack = []
+
+        id_list = set()
+
+        for v in args[1:]:
+        
+            split = v.split(":", 1)
+            internal_name = split[0]
+
+            if len(split) == 2:
+                proof = split[1].split(";")
+            else:
+                proof = []
+
+            rule = None
+
+            # Search by internal_name
+            for i, punishment in gdata["punishments"].items():
+                if punishment["meta"]["internal_name"] == internal_name:
+                    rule = punishment
+                    id_list.add(i)
+                    break
+            if rule is None:
+                continue
+            meta = rule["meta"]
+            actions = rule["actions"]
+            # Store reasons
+            if meta["internal_name"] not in internal_name_stack:
+                internal_name.append(meta["reason"])
+            proof_stack.append(proof)
+            
+        for n, v in {i: {"violations":gdata["punishments"][i]["actions"]["warn"],"proof":v} for i,v in zip(id_list,proof_stack)}.items():
+            if n in d["punishments"]:
+                d["punishments"][n] = {i: {"violations":1+d["punishments"][n],"proof":v+d["punishments"][n]["proof"]} for i,v in zip(id_list,proof_stack)}[n]
+            else:
+                d["punishments"][n] = v[n]
+        chat_log(sender,3,"Warned %s for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
+        chat_log(sender,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
@@ -1123,6 +1223,8 @@ def get_players(arg):
 def only_numbers(arg):
     return "".join([i for i in arg if i in [str(v) for v in range(0, 10)]])
 
+def reason_tab(arg):
+    return [arg] + [u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]
 
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0].split(":")[-1]
@@ -1135,7 +1237,7 @@ def onTabComplete(sender,alias,args):
             return typing_filter(args[0],["staff","punishments","set","get","as"]) if sender.hasPermission("staffmanager.get_data") else typing_filter(args[0],["staff","punishments"])
         return get_players(args[-1])
     if len(args)==2:
-        if any([i==cmd for i in ["suspend","staff_ban"]]):
+        if any([i==cmd for i in ["suspend","staffban"]]):
             return [only_numbers(args[1]) + i for i in ["s","min","h","d","wk"]]
         if cmd=="status":
             if args[0] == "set" or args[0] == "get":
@@ -1145,9 +1247,13 @@ def onTabComplete(sender,alias,args):
             return typing_filter(args[1],list(gdata["punishments"].keys()))
         if cmd=="promote":
             return typing_filter(args[1],list(gdata["ranks"].keys()))
+        if cmd=="demote":
+            return typing_filter(reason_tab(args[2:]))
+        if cmd=="warn":
+            return typing_filter(reason_tab(args[2:]))
     if len(args)>=3:
-        if any([i==cmd for i in ["suspend","staff_ban","demote"]]):
-            return [args[3:]]
+        if any([i==cmd for i in ["suspend","staffban","demote","warn"]]):
+            return typing_filter(reason_tab(args[3:]))
         if cmd=="punish":
             return typing_filter(args[-1],list(gdata["punishments"].keys()))
         if cmd=="status" and args[0] == "set":
@@ -1500,7 +1606,7 @@ last_move = {}    # UUID -> (x, y, z, yaw, pitch)
 
 
 # Run  
-for c in ["promote","suspend","demote","staff_ban","pardon","punish","activate","status","apply"]:
+for c in ["promote","suspend","demote","staffban","pardon","punish","activate","status","apply","warn"]:
     ps.command.registerCommand(onCommand, onTabComplete, c)
 for ev in [
     PlayerInteractEvent,
