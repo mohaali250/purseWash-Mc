@@ -1200,9 +1200,9 @@ def onCommand(sender,label,args):
         session_notify(p) 
     return True
 def typing_filter(arg, options):
-    if isinstance(arg,str):
+    try:
         return [c for c in options if c.lower().startswith(arg.lower())]
-    else:
+    except AttributeError as ex:
         return [c for c in options if " ".join(c).lower().startswith(arg.lower())]
 def get_players(arg):
     players = []
