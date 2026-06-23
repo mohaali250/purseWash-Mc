@@ -388,7 +388,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u0020",""))
         if not target.hasPlayedBefore() and not target.isOnline():
             chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
@@ -423,7 +423,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u0020",""))
         if not target.hasPlayedBefore() and not target.isOnline():
             chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
@@ -461,7 +461,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u0020",""))
         if not target.hasPlayedBefore() and not target.isOnline():
             chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
@@ -501,7 +501,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u0020",""))
         if not target.hasPlayedBefore() and not target.isOnline():
             chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
@@ -541,7 +541,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u0020",""))
         if not target.hasPlayedBefore() and not target.isOnline():
             chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
@@ -649,7 +649,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u0020",""))
         if not target.hasPlayedBefore() and not target.isOnline():
             chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
@@ -829,7 +829,7 @@ def onCommand(sender,label,args):
                 chat_log(sender,1,"%s are not permitted to use this argument/subcommand",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
             section_show = 0
-            target=Bukkit.getOfflinePlayer(args[1].replace(u"\u00A0",""))
+            target=Bukkit.getOfflinePlayer(args[1].replace(u"\u0020",""))
             if not target.hasPlayedBefore() and not target.isOnline():
                 chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[1]),_type=exception_type.PARSE_ERROR)
                 return True
@@ -1065,7 +1065,7 @@ def onCommand(sender,label,args):
                 chat_log(sender,1,"%s are not permitted to use this argument/subcommand",variables=("You"),_type=exception_type.PERMISSION_ERROR)
                 return True
             section_show = 0
-            target=Bukkit.getOfflinePlayer(args[1].replace(u"\u00A0",""))
+            target=Bukkit.getOfflinePlayer(args[1].replace(u"\u0020",""))
             if not target.hasPlayedBefore() and not target.isOnline():
                 chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[1]),_type=exception_type.PARSE_ERROR)
                 return True
@@ -1143,7 +1143,7 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Expected String for argument 1, got None",_type=exception_type.PARAMETER_ERROR)
             return True
         
-        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u00A0",""))
+        target=Bukkit.getOfflinePlayer(args[0].replace(u"\u0020",""))
         if not target.hasPlayedBefore() and not target.isOnline():
             chat_log(sender,1,"Target %s has never joined or is an invalid username",variables=(args[0]),_type=exception_type.PARSE_ERROR)
             return True
@@ -1224,14 +1224,14 @@ def get_players(arg):
         if not name or name in added:
             continue
         if name.lower().startswith(arg):
-            players.append(u"\u00A0"+name)
+            players.append(u"\u0020"+name)
     return players
 
 def only_numbers(arg):
     return "".join([i for i in arg if i in [str(v) for v in range(0, 10)]])
 
 def reason_tab(arg):
-    return [arg if isinstance(arg,str) else " ".join(arg)] + [u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]
+    return [arg if isinstance(arg,str) else " ".join(arg)] + [u"\u0020"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]
 
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0].split(":")[-1]
