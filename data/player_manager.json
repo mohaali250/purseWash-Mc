@@ -1,125 +1,381 @@
 {
 	"punishments":{
-		"chat.disrespect_staff": {				
-			"reason":"Disrespect to staff",
-			"kick":{}
-		},
-		"failed_report":{
-			"reason":"Failing to report",
-			"ban":"1d"
-		},
-		"staff.failed_punishment":{
-			"reason":"Failing to Punish a rule breaking player",
-			"staff_ban":"1wk"
-		},
-		"staff.unauthorized_changes":{
-			"reason":"Changed/Updated contents of the server",
-			"suspend_staff":"5wk"
-		},
-		"attempt_loophole_rule":{
-			"reason":"Attempted to loophole a rule",
-			"staff_ban":"3wk"
-		},
-		"advertising":{
-			"reason":"Advertising",	
-			"mute":"1wk",
-			"ban":"3d"
-		},
-		"staff.usage_nbt":{
-			"reason":"Used unauthorized nbt items",
-			"clear":{},
-			"staff_ban":"4wk"
-		},
-		"chat.threats_irl":{
-			"reason":"Threatened for irl things",
-			"mute":true,
-			"ban":"12wk"
-		},
-		"chat.threats_mc":{
-			"reason":"Threatened in-game",
-			"mute":"4wk",
-			"ban":"1wk",
-			"staff_ban":true
-		},
-		"chat.gender_discrimination":{
-			"reason":"Discrimination against other genders",
-			"mute":"1wk",
-			"ban":"3d",
-			"staff_ban":true
-		},
-		"staff.unauthorized_config_change":{
-			"reason":"Altered a config file without consent",
-			"demote":{},
-			"ban":true
-		},
-		"staff.griefing":{
-			"reason":"Griefing server contents",
-			"ban":true,
-			"demote":{}
-		},
-		"irl_trading":{
-			"reason":"Trading server items for real goods or money",
-			"ban":"2wk",
-			"clear":{}
-		},
-		"incomplete_punishment":{
-			"reason":"Lacking info for punishment. Use /punish for auto info",
-			"suspend_staff":"2d"
-		},
-		"unreasoned_punishment":{
-			"reason":"Punishing without a cause / Missing proof of rule breaking",
-			"demote":{}
-		},
-		"macros":{
-			"reason":"Using macros for automated actions",
-			"ban":"14d"
-		},
-		"chat.chatbot":{
-			"reason":"Using chatbots inplemented into user messages to automate messages",
-			"mute":"2d"
-		},
-		"cheating.combat":{
-			"reason":"Using hacked clients for unfair advantage (Combat related hacks)",
-			"ban":"2wk"
-		},
-		"cheating.prediction":{
-			"reason":"Using hacked clients for unfair advantage (Fly / Movement related hacks)",
-			"ban":"2wk"
-		},
-		"cheating.scaffolding":{
-			"reason":"Using hacked clients for unfair advantage (Scafolding hacks)",
-			"ban":"2wk"
-		},
-		"cheating.breaking":{
-			"reason":"Using hacked clients for unfair advantage (Breaking hacks)",
-			"ban":"2wk"
-		},
-		"duping":{
-			"reason":"Duping items",
-			"ban":"2wk",
-			"clear":{}
-		},
-		"chat.nsfw":{
-			"reason":"Talking about nsfw topics",
-			"ban":true
-		},
-		"action.nsfw":{
-			"reason":"Doing nsfw topics",
-			"ban":true
-		},
-		"chat.racism":{
-			"reason":"Being racist in chat",
-			"ban":"3d",
-			"mute":"1wk"
-		},
-		"chat.swearing":{
-			"reason":"Swearing in chat",
-			"mute":"1h"
-		},
-		"chat.spamming":{
-			"reason":"Spamming / flooding in chat",
-			"ban":"1d"
-		}
+    "0": {
+        "meta": {
+            "internal_name": "failed_report",
+            "name": "Failed Report",
+            "reason": "Failing to report"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"1d"}
+            ]
+        }
+    },
+
+    "1": {
+        "meta": {
+            "internal_name": "staff.failed_punishment",
+            "name": "Failed Punishment",
+            "reason": "Failing to Punish a rule breaking player"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"staff_ban":"1wk"}
+            ]
+        }
+    },
+
+    "2": {
+        "meta": {
+            "internal_name": "staff.unauthorized_changes",
+            "name": "Unauthorized Changes",
+            "reason": "Changed/Updated contents of the server"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"suspend_staff":"5wk"}
+            ]
+        }
+    },
+
+    "3": {
+        "meta": {
+            "internal_name": "attempt_loophole_rule",
+            "name": "Attempted Rule Loophole",
+            "reason": "Attempted to loophole a rule"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"staff_ban":"3wk"}
+            ]
+        }
+    },
+
+    "4": {
+        "meta": {
+            "internal_name": "advertising",
+            "name": "Advertising",
+            "reason": "Advertising"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"mute":"1wk"},
+                {"ban":"3d"}
+            ]
+        }
+    },
+
+    "5": {
+        "meta": {
+            "internal_name": "staff.usage_nbt",
+            "name": "Unauthorized NBT Usage",
+            "reason": "Used unauthorized nbt items"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"clear":{}},
+                {"staff_ban":"4wk"}
+            ]
+        }
+    },
+
+    "6": {
+        "meta": {
+            "internal_name": "chat.threats_irl",
+            "name": "IRL Threats",
+            "reason": "Threatened for irl things"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"mute":true},
+                {"ban":"12wk"}
+            ]
+        }
+    },
+
+    "7": {
+        "meta": {
+            "internal_name": "chat.threats_mc",
+            "name": "In-Game Threats",
+            "reason": "Threatened in-game"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"mute":"4wk"},
+                {"ban":"1wk"},
+                {"staff_ban":true}
+            ]
+        }
+    },
+
+    "8": {
+        "meta": {
+            "internal_name": "chat.gender_discrimination",
+            "name": "Gender Discrimination",
+            "reason": "Discrimination against other genders"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"mute":"1wk"},
+                {"ban":"3d"},
+                {"staff_ban":true}
+            ]
+        }
+    },
+
+    "9": {
+        "meta": {
+            "internal_name": "staff.unauthorized_config_change",
+            "name": "Unauthorized Config Change",
+            "reason": "Altered a config file without consent"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"demote":{}},
+                {"ban":true}
+            ]
+        }
+    },
+
+    "10": {
+        "meta": {
+            "internal_name": "staff.griefing",
+            "name": "Staff Griefing",
+            "reason": "Griefing server contents"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":true},
+                {"demote":{}}
+            ]
+        }
+    },
+
+    "11": {
+        "meta": {
+            "internal_name": "irl_trading",
+            "name": "IRL Trading",
+            "reason": "Trading server items for real goods or money"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"2wk"},
+                {"clear":{}}
+            ]
+        }
+    },
+
+    "12": {
+        "meta": {
+            "internal_name": "incomplete_punishment",
+            "name": "Incomplete Punishment",
+            "reason": "Lacking info for punishment. Use /punish for auto info"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"suspend_staff":"2d"}
+            ]
+        }
+    },
+
+    "13": {
+        "meta": {
+            "internal_name": "unreasoned_punishment",
+            "name": "Unreasoned Punishment",
+            "reason": "Punishing without a cause / Missing proof of rule breaking"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"demote":{}}
+            ]
+        }
+    },
+
+    "14": {
+        "meta": {
+            "internal_name": "macros",
+            "name": "Macros",
+            "reason": "Using macros for automated actions"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"14d"}
+            ]
+        }
+    },
+
+    "15": {
+        "meta": {
+            "internal_name": "chat.chatbot",
+            "name": "Chatbot Usage",
+            "reason": "Using chatbots implemented into user messages to automate messages"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"mute":"2d"}
+            ]
+        }
+    },
+
+    "16": {
+        "meta": {
+            "internal_name": "cheating.combat",
+            "name": "Combat Cheats",
+            "reason": "Using hacked clients for unfair advantage (Combat related hacks)"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"2wk"}
+            ]
+        }
+    },
+
+    "17": {
+        "meta": {
+            "internal_name": "cheating.prediction",
+            "name": "Movement Cheats",
+            "reason": "Using hacked clients for unfair advantage (Fly / Movement related hacks)"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"2wk"}
+            ]
+        }
+    },
+
+    "18": {
+        "meta": {
+            "internal_name": "cheating.scaffolding",
+            "name": "Scaffolding Cheats",
+            "reason": "Using hacked clients for unfair advantage (Scaffolding hacks)"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"2wk"}
+            ]
+        }
+    },
+
+    "19": {
+        "meta": {
+            "internal_name": "cheating.breaking",
+            "name": "Breaking Cheats",
+            "reason": "Using hacked clients for unfair advantage (Breaking hacks)"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"2wk"}
+            ]
+        }
+    },
+
+    "20": {
+        "meta": {
+            "internal_name": "duping",
+            "name": "Duping",
+            "reason": "Duping items"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"2wk"},
+                {"clear":{}}
+            ]
+        }
+    },
+
+    "21": {
+        "meta": {
+            "internal_name": "chat.nsfw",
+            "name": "NSFW Chat",
+            "reason": "Talking about nsfw topics"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":true}
+            ]
+        }
+    },
+
+    "22": {
+        "meta": {
+            "internal_name": "action.nsfw",
+            "name": "NSFW Actions",
+            "reason": "Doing nsfw topics"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":true}
+            ]
+        }
+    },
+
+    "23": {
+        "meta": {
+            "internal_name": "chat.racism",
+            "name": "Racism",
+            "reason": "Being racist in chat"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"3d"},
+                {"mute":"1wk"}
+            ]
+        }
+    },
+
+    "24": {
+        "meta": {
+            "internal_name": "chat.swearing",
+            "name": "Swearing",
+            "reason": "Swearing in chat"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"mute":"1h"}
+            ]
+        }
+    },
+
+    "25": {
+        "meta": {
+            "internal_name": "chat.spamming",
+            "name": "Spamming",
+            "reason": "Spamming / flooding in chat"
+        },
+        "actions": {
+            "warn": 0,
+            "punish": [
+                {"ban":"1d"}
+            ]
+        }
+    }
+}
 	},
 	"ranks":{
 		"helper":{
