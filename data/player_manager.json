@@ -375,8 +375,7 @@
             ]
         }
     }
-}
-	},
+},
 	"ranks":{
 		"helper":{
 			"required_playtime":"8h",
