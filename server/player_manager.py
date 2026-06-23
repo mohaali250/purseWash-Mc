@@ -372,7 +372,7 @@ def is_all_valid_categories(args):
 def onCommand(sender,label,args):
     if gdata is None:
         print("[Staff] Failed to load remote config")
-        return
+        return True
     cmd=label.split(" ")[0].split(":")[-1]
     if hasattr(sender, "getUniqueId"):
         u=uuid(sender)
