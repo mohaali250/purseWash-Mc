@@ -8,11 +8,11 @@
 			"reason":"Failing to report",
 			"ban":"1d"
 		},
-		"failed_punishment":{
+		"staff.failed_punishment":{
 			"reason":"Failing to Punish a rule breaking player",
 			"staff_ban":"1wk"
 		},
-		"unauthorized_changes":{
+		"staff.unauthorized_changes":{
 			"reason":"Changed/Updated contents of the server",
 			"suspend_staff":"5wk"
 		},
@@ -25,7 +25,7 @@
 			"mute":"1wk",
 			"ban":"3d"
 		},
-		"usage_nbt":{
+		"staff.usage_nbt":{
 			"reason":"Used unauthorized nbt items",
 			"clear":{},
 			"staff_ban":"4wk"
@@ -47,12 +47,12 @@
 			"ban":"3d",
 			"staff_ban":true
 		},
-		"unauthorized_config_change":{
+		"staff.unauthorized_config_change":{
 			"reason":"Altered a config file without consent",
 			"demote":{},
 			"ban":true
 		},
-		"griefing":{
+		"staff.griefing":{
 			"reason":"Griefing server contents",
 			"ban":true,
 			"demote":{}
