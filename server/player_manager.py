@@ -1203,7 +1203,7 @@ def typing_filter(arg, options):
     try:
         return [c for c in options if c.lower().startswith(arg.lower())]
     except AttributeError as ex:
-        return [c for c in options if " ".join(c).lower().startswith(arg.lower())]
+        return [c for c in options if c.lower().startswith(" ".join(arg).lower())]
 def get_players(arg):
     players = []
     added = set()
