@@ -359,6 +359,25 @@ def get_mute_info(player_name):
     except:
         pass
     return data
+
+def merge_quotes(args):
+    result = []
+    buffer = None
+    for arg in args:
+        if buffer is None:
+            if arg.startswith('"') and not arg.endswith('"'):
+                buffer = [arg]
+            else:
+                result.append(arg)
+        else:
+            buffer.append(arg)
+            if arg.endswith('"'):
+                result.append(" ".join(buffer))
+                buffer = None
+    if buffer is not None:
+        result.append(" ".join(buffer))
+    return result
+
 def chatcolor(msg):
     return ChatColor.translateAlternateColorCodes('&', msg)
 
@@ -1157,6 +1176,7 @@ def onCommand(sender,label,args):
         if len(args)<=1:
             chat_log(sender,1,"ParameterError : What are you gonna warn them for? (Expected at least 2 arguments, got %s)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
+        args = merge_quotes(args)
         # Run Start
         # Calculate
         internal_name_stack = []
