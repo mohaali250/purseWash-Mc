@@ -1255,6 +1255,8 @@ def only_numbers(arg):
 
 
 def reason_tab(args):
+    if len(args) == 0:
+        return [u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"]]
     current = args[-1]
     reasons = [
         u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"]
