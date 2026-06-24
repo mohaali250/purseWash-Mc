@@ -1188,11 +1188,11 @@ def onCommand(sender,label,args):
                 internal_name_stack.append(meta["reason"])
             proof_stack.append(proof)
             
-        for n, v in {i: {"violations":gdata["punishments"][i]["actions"]["warn"],"proof":v} for i,v in zip(id_list,proof_stack)}.items():
+        for n, v in zip(id_list,proof_stack):
             if n in d["punishments"]:
-                d["punishments"][unicode(n).strip()] = {i: {"violations":1+d["punishments"][n],"proof":v+d["punishments"][n]["proof"]} for i,v in zip(id_list,proof_stack)}[n]
+                d["punishments"][n] = {i: {"violations":1+d["punishments"][n],"proof":v+d["punishments"][n]["proof"]} for i,v in zip(id_list,proof_stack)}[n]
             else:
-                d["punishments"][unicode(n).strip()] = v[n]
+                d["punishments"][n] = {"violations":gdata["punishments"][i]["actions"]["warn"],"proof":v}
         chat_log(sender,3,"Warned %s for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
         chat_log(sender,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
     save()  
