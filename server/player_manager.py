@@ -1201,9 +1201,9 @@ def onCommand(sender,label,args):
     return True
 def typing_filter(arg, options):
     try:
-        prefix = str(arg).lower()
+        prefix = arg.lower()
     except:
-        prefix = " ".join(map(str, arg)).lower()
+        prefix = " ".join(arg).lower()
     return [
         c for c in options
         if c.lower().startswith(prefix)
