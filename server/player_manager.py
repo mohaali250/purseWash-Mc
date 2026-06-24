@@ -1257,16 +1257,20 @@ def only_numbers(arg):
 
 
 def reason_tab(args):
-    if len(args) == 0:
-        return [u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"]]
-    current = args[-1]
     reasons = [
-        u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"]
+        gdata["punishments"][h]["meta"]["internal_name"]
         for h in gdata["punishments"]
     ]
+    previous = args[:-1]
+    current = args[-1]
     matches = typing_filter(current, reasons)
-    already_selected = args[:-1]
-    return already_selected + [current] + matches
+    base = " ".join(previous)
+    if len(base):
+        return (
+            [base + " " + current] +
+            [base + " " + m for m in matches]
+        )
+    return [current] + matches
 
 
 def onTabComplete(sender,alias,args):
