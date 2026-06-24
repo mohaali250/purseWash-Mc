@@ -1253,14 +1253,14 @@ def onTabComplete(sender,alias,args):
         if cmd=="punish":
             return typing_filter(args[1],list([gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]))
         if cmd=="promote":
-            return typing_filter(args[1],list([gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]))
+            return typing_filter(args[1],list(gdata["ranks"].keys()))
         if cmd=="demote":
             return typing_filter(args[-1], reason_tab(args[2:]))
         if cmd=="warn":
             return typing_filter(args[-1], reason_tab(args[2:]))
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staffban","demote","warn"]]):
-            return typing_filter(reason_tab(args[3:]))
+            return typing_filter(args[-1],reason_tab(args[3:]))
         if cmd=="punish":
             return typing_filter(args[-1],[gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()])
         if cmd=="demote":
