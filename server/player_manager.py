@@ -68,8 +68,9 @@ config_defaults = {
     "staff.warn-unverified-staff": True,
     "afk.threshold-seconds": 180,
     "afk.fulfill-requirement-with-afk": False,
-    "tick.tick-ms": 1000,
-    "tick.save-ms": 60000,
+    "performance.tick-ms": 1000,
+    "performance.save-ms": 60000,
+    "performance.offline-player-tab-completion": 15,
     "anti-cheat.auto-punish-for-cheating": True,
     "anti-cheat.ban-threshold": 100,
     "anti-cheat.decay-per-minute": 10,
@@ -106,8 +107,9 @@ WARN_UNVERIFIED_STAFF = cfg.getBoolean("staff.warn-unverified-staff")
 AFK_THRESHOLD = cfg.getInt("afk.threshold-seconds")
 AFK_FULFILL = cfg.getBoolean("afk.fulfill-requirement-with-afk")
 # TICK SYSTEM
-TICK_LOOP_INTERVAL_MS = cfg.getInt("tick.tick-ms")
-SAVE_INTERVAL_MS = cfg.getLong("tick.save-ms")
+TICK_LOOP_INTERVAL_MS = cfg.getInt("performance.tick-ms")
+SAVE_INTERVAL_MS = cfg.getLong("performance.save-ms")
+OFFLINE_PLAYER_TAB_LIMIT = cfg.getLong("performance.offline-player-tab-completion")
 # ANTI-CHEAT
 AUTO_PUNISH = cfg.getBoolean("anti-cheat.auto-punish-for-cheating")
 BAN_THRESHOLD = cfg.getInt("anti-cheat.ban-threshold")
@@ -1241,7 +1243,7 @@ def get_players(arg):
             players.append(name)
             added.add(name)
     for p in Bukkit.getOfflinePlayers():
-        if len(players) >= 50:
+        if len(players) >= OFFLINE_PLAYER_TAB_LIMIT:
             break
         name = p.getName()  
         if not name or name in added:
