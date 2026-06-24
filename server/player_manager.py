@@ -1260,15 +1260,15 @@ def reason_tab(args):
     reasons = [
         gdata["punishments"][h]["meta"]["internal_name"]
         for h in gdata["punishments"]
-    ]
+    ]   
     previous = args[:-1]
     current = args[-1]
     matches = typing_filter(current, reasons)
     base = " ".join(previous)
     if len(base):
         return (
-            [base + " " + current] +
-            [base + " " + m for m in matches]
+            [current] +
+            [m for m in matches]
         )
     return [current] + matches if len(matches) else [current] + reasons
 
