@@ -1253,8 +1253,6 @@ def get_players(arg):
 def only_numbers(arg):
     return "".join([i for i in arg if i in [str(v) for v in range(0, 10)]])
 
-def reason_tab(arg):
-    return typing_filter(arg,[u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()])
 
 def reason_tab(args):
     current = args[-1]
