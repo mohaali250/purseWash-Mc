@@ -1256,6 +1256,17 @@ def only_numbers(arg):
 def reason_tab(arg):
     return typing_filter(arg,[u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()])
 
+def reason_tab(args):
+    current = args[-1]
+    reasons = [
+        u"\u00A0"+gdata["punishments"][h]["meta"]["internal_name"]
+        for h in gdata["punishments"]
+    ]
+    matches = typing_filter(current, reasons)
+    already_selected = args[:-1]
+    return already_selected + [current] + matches
+
+
 def onTabComplete(sender,alias,args):
     cmd=alias.split(" ")[0].split(":")[-1]
     if cmd=="apply":
@@ -1278,18 +1289,18 @@ def onTabComplete(sender,alias,args):
         if cmd=="promote":
             return typing_filter(args[1],list(gdata["ranks"].keys()))
         if cmd=="demote":
-            return [" ".join(args[2:])] + reason_tab(args[2:])
+            return reason_tab(args[2:])
         if cmd=="warn":
-            return [" ".join(args[2:])] + reason_tab(args[2:])
+            return reason_tab(args[2:])
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staffban","demote","warn"]]):
-            return [" ".join(args[3:])] + reason_tab(args[3:])
+            return reason_tab(args[3:])
         if cmd=="punish":
             return typing_filter(args[-1],[gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()])
         if cmd=="demote":
-            return [" ".join(args[3:])] + reason_tab(args[3:])
+            return reason_tab(args[3:])
         if cmd=="warn":
-            return [" ".join(args[3:])] + reason_tab(args[3:])
+            return reason_tab(args[3:])
         if cmd=="status" and args[0] == "set":
             # /status set <player>
             target = Bukkit.getOfflinePlayer(args[1])
