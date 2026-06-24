@@ -1206,7 +1206,7 @@ def typing_filter(arg, options):
         prefix = " ".join(map(str, arg)).lower()
     return [
         c for c in options
-        if unicode(c).lower().startswith(prefix)
+        if c.lower().startswith(prefix)
     ]
 def get_players(arg):
     players = []
