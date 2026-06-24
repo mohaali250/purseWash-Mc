@@ -600,7 +600,7 @@ def onCommand(sender,label,args):
             chat_log(sender,3,"Cancelled %s's inventory clear.",variables=(args[0]))
         if not _any:
             chat_log(sender,3,"%s doesnt have a punishment to remove",variables=(args[0]))
-
+        d["punishments"] = {}
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"unban %s" % (args[0]))
 
         local_session_notify[uuid(target)]=0
