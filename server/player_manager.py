@@ -989,8 +989,8 @@ def onCommand(sender,label,args):
             if d["punishments"] and len(d["punishments"].keys()) != 0:
                 active.append(
                     "Warnings (%s rules broken, %s total warnings)"
-                    % len(d["punishments"].keys(),sum([len(v["proof"]) for v in d["punishments"].values()])
-                )
+                    % len(d["punishments"].keys(),sum([len(v["proof"]) for v in d["punishments"].values()]))
+                    )
             mute_info = get_mute_info(sender.getName())
             if mute_info and mute_info["muted"]:
                 if mute_info["unmute_timestamp"] == -1:
