@@ -1195,7 +1195,7 @@ def onCommand(sender,label,args):
             else:
                 d["punishments"][n] = {"violations":1,"proof":v}
         chat_log(sender,3,"Warned %s for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
-        chat_log(sender,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
+        chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
