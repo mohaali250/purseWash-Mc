@@ -450,7 +450,7 @@ def onCommand(sender,label,args):
         if is_all_valid_categories(args[2:]):
             chat_log(sender,3,"Suspended %s for {highlight}%s{default_color} expiring in %s.",variables=(args[0],"{default_color}, {highlight}".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
         else:
-            chat_log(sender,3,"Suspended %s for \"%s\" expiring in %s.",variables=(target.getName()," ".join([args[2:]]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
+            chat_log(sender,3,"Suspended %s for \"%s\" expiring in %s.",variables=(args[0]," ".join(args[2:]),str(pretty_timedelta(dur) if dur != -1 else "Never")))
         chat_log(target,0,"%s are now suspended from staff. More info on [/status]",variables=("You"))
     elif cmd=="demote":
         if not sender.hasPermission("staffmanager.demote"):
