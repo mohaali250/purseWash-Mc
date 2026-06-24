@@ -1074,7 +1074,8 @@ def onCommand(sender,label,args):
             d=data[u]
             sender.sendMessage("Raw data of %s:" % (args[1]))
             for i, v in d.items():
-                sender.sendMessage(" Key: %s\n Type: %s\n Value: %s\n\n" % (i, str(type(v)),str(v)))
+                sender.sendMessage("")
+                sender.sendMessage(" Key: %s\n Type: %s\n Value: %s\n" % (i, str(type(v)),str(v)))
     elif cmd=="apply":
         sender.sendMessage(chatcolor("&8:===================< &6APPLY &8>===================:"))
         sender.sendMessage("")
