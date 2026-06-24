@@ -1270,7 +1270,7 @@ def reason_tab(args):
             [base + " " + current] +
             [base + " " + m for m in matches]
         )
-    return [current] + matches
+    return [current] + matches if len(matches) else [current] + reasons
 
 
 def onTabComplete(sender,alias,args):
