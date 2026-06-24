@@ -1190,9 +1190,9 @@ def onCommand(sender,label,args):
             
         for n, v in {i: {"violations":gdata["punishments"][i]["actions"]["warn"],"proof":v} for i,v in zip(id_list,proof_stack)}.items():
             if n in d["punishments"]:
-                d["punishments"][str(n)] = {i: {"violations":1+d["punishments"][n],"proof":v+d["punishments"][n]["proof"]} for i,v in zip(id_list,proof_stack)}[n]
+                d["punishments"][unicode(n).strip()] = {i: {"violations":1+d["punishments"][n],"proof":v+d["punishments"][n]["proof"]} for i,v in zip(id_list,proof_stack)}[n]
             else:
-                d["punishments"][str(n)] = v[n]
+                d["punishments"][unicode(n).strip()] = v[n]
         chat_log(sender,3,"Warned %s for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
         chat_log(sender,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
     save()  
