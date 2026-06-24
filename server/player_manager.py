@@ -1289,18 +1289,18 @@ def onTabComplete(sender,alias,args):
         if cmd=="promote":
             return typing_filter(args[1],list(gdata["ranks"].keys()))
         if cmd=="demote":
-            return reason_tab(args[2:])
+            return [" ".join(args[2:])] + reason_tab(args[2:])
         if cmd=="warn":
-            return reason_tab(args[2:])
+            return [" ".join(args[2:])] + reason_tab(args[2:])
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staffban","demote","warn"]]):
             return reason_tab(args[3:])
         if cmd=="punish":
             return typing_filter(args[-1],[gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()])
         if cmd=="demote":
-            return reason_tab(args[2:])
+            return [" ".join(args[2:])] + reason_tab(args[2:])
         if cmd=="warn":
-            return reason_tab(args[2:])
+            return [" ".join(args[2:])] + reason_tab(args[2:])
         if cmd=="status" and args[0] == "set":
             # /status set <player>
             target = Bukkit.getOfflinePlayer(args[1])
@@ -1311,7 +1311,7 @@ def onTabComplete(sender,alias,args):
                 return typing_filter(
                     args[2],
                     list(data[u].keys())
-                )
+                )   
             # /status set <player> <key> <type>
             if len(args) == 4:
                 types_list = []
