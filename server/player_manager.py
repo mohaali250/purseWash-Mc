@@ -728,7 +728,7 @@ def onCommand(sender,label,args):
             for action in actions.get("punish", []):
                 action_name, action_value = next(iter(action.items()))
                 if action_name == "ban":
-                    if isinstance(action_value, bool) or bn == -1:
+                    if isinstance(action_value, bool) or bn == -    1:
                         bn = -1
                     else:
                         bn += parse(action_value)
@@ -1184,7 +1184,10 @@ def onCommand(sender,label,args):
         internal_name_stack = []
         proof_stack = []
 
-        id_list = set()
+        unresolved_arguments = []
+        has_atempted_a_valid_category = False
+
+        id_list = []
 
         for v in args[1:]:
         
@@ -1205,7 +1208,10 @@ def onCommand(sender,label,args):
                     id_list.add(i)
                     break
             if rule is None:
+                unresolved_arguments.append(v)
                 continue
+            else:
+                has_atempted_a_valid_category = True
             meta = rule["meta"]
             actions = rule["actions"]
             # Store reasons
@@ -1218,8 +1224,13 @@ def onCommand(sender,label,args):
                 d["punishments"][n] = {"violations":1+d["punishments"][n]["violations"],"proof":v+d["punishments"][n]["proof"]}
             else:
                 d["punishments"][n] = {"violations":1,"proof":v}
-        chat_log(sender,3,"Warned {highlight}%s{default_color} for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
-        chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
+        if is_all_valid_categories(args[1:]):
+            chat_log(sender,3,"Warned {highlight}%s{default_color} for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
+            chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
+        else:
+            chat_log(sender,3,"Warned {highlight}%s{default_color} for {highlight}%s{default_color}." % (args[0]," ".join(args[1:])))
+            if has_atempted_a_valid_category: chat_log(sender,3,"Could not resolve the following arguments: %s. Check for player_manager.json if you missed a category, or check the spelling" % ("{default_color}, {highlight}".join(unresolved_arguments)))
+            chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % (" ".join(args[1:])))
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
