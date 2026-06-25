@@ -696,7 +696,7 @@ def onCommand(sender,label,args):
         clear = False
         demote = False
 
-        id_list = set()
+        id_list = []
 
         for v in args[1:]:
         
@@ -1218,7 +1218,7 @@ def onCommand(sender,label,args):
                 d["punishments"][n] = {"violations":1+d["punishments"][n]["violations"],"proof":v+d["punishments"][n]["proof"]}
             else:
                 d["punishments"][n] = {"violations":1,"proof":v}
-        chat_log(sender,3,"Warned %s for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
+        chat_log(sender,3,"Warned {highlight}%s{default_color} for {highlight}%s{default_color}." % (args[0],"{default_color}, {highlight}".join(args[1:])))
         chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
     save()  
     for p in Bukkit.getOnlinePlayers():
@@ -1287,19 +1287,15 @@ def onTabComplete(sender,alias,args):
             return typing_filter(args[1],list([gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]))
         if cmd=="promote":
             return typing_filter(args[1],list(gdata["ranks"].keys()))
-        if cmd=="demote":
-            return [" ".join(args[1:])] + reason_tab(args[1:])
-        if cmd=="warn":
-            return [" ".join(args[1:])] + reason_tab(args[1:])
+        if cmd in ["warn", "demote"]:
+            return reason_tab(args[1:])
     if len(args)>=3:
         if any([i==cmd for i in ["suspend","staffban"]]):
             return reason_tab(args[2:])
         if cmd=="punish":
             return typing_filter(args[-1],[gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()])
-        if cmd=="demote":
-            return [" ".join(args[1:])] + reason_tab(args[1:])
-        if cmd=="warn":
-            return [" ".join(args[1:])] + reason_tab(args[1:])
+        if cmd in ["warn", "demote"]:
+            return reason_tab(args[1:])
         if cmd=="status" and args[0] == "set":
             # /status set <player>
             target = Bukkit.getOfflinePlayer(args[1])
