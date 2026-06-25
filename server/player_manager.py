@@ -722,7 +722,7 @@ def onCommand(sender,label,args):
             actions = rule["actions"]
             # Store reasons
             if meta["internal_name"] not in internal_name_stack:
-                internal_name.append(meta["reason"])
+                internal_name_stack.append(meta["reason"])
             proof_stack.append(proof)
             # Process punishments
             for action in actions.get("punish", []):
