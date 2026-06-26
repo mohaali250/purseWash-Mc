@@ -1205,7 +1205,7 @@ def onCommand(sender,label,args):
             for i, punishment in gdata["punishments"].items():
                 if punishment["meta"]["internal_name"] == internal_name:
                     rule = punishment
-                    id_list.add(i)
+                    id_list.append(i)
                     break
             if rule is None:
                 unresolved_arguments.append(v)
