@@ -66,6 +66,7 @@ CONFIG_FILE = File("plugins/PySpigot/staffmanager.yml")
 config_defaults = {
     "staff.require-player-linked-for-staff": True,
     "staff.warn-unverified-staff": True,
+    "staff.auto-verify-staff-when-has-lpgroup": True,
     "afk.threshold-seconds": 180,
     "afk.fulfill-requirement-with-afk": False,
     "performance.tick-ms": 1000,
@@ -103,6 +104,7 @@ if changed:
 # STAFF SETTINGS
 REQUIRE_LINKED = cfg.getBoolean("staff.require-player-linked-for-staff")
 WARN_UNVERIFIED_STAFF = cfg.getBoolean("staff.warn-unverified-staff")
+AUTO_VERIFY_STAFF = cfg.getBoolean("staff.auto-verify-staff-when-has-lpgroup")
 # AFK SETTINGS
 AFK_THRESHOLD = cfg.getInt("afk.threshold-seconds")
 AFK_FULFILL = cfg.getBoolean("afk.fulfill-requirement-with-afk")
@@ -155,14 +157,16 @@ def fetch_data():
         traceback.print_exc()
         return None
 last_save = time.time()
-def save(rdata={}):
-    global last_save
-    if data is None: data = rdata
-    if time.time() < last_save + SAVE_INTERVAL_MS/1000:return
+def save(rdata=None):
+    global data, last_save
+    if rdata is None:
+        rdata = data
+    if time.time() < last_save + SAVE_INTERVAL_MS / 1000:
+        return
     last_save = time.time()
     tmp = File(FILE + ".tmp")
     with open(tmp.getPath(), "w") as f:
-        json.dump(data, f, indent=4)
+        json.dump(rdata, f, indent=4)
     File(FILE).delete()
     tmp.renameTo(File(FILE))
 def now():
@@ -246,11 +250,12 @@ def chat_log(target,state,string,variables=(),_type="PRINT"):
     )
 
 def ensure(u):
+    global players
     defaults = {
-        "staff": "",
-        "lpgroup":str(get_primary_group(Bukkit.getOfflinePlayer(u))),
+        "staff": str(get_primary_group(u)) if (str(get_primary_group(u)) != DEFAULT_GROUP and get_primary_group(u) in gdata["ranks"].keys()) and AUTO_VERIFY_STAFF else "",
+        "lpgroup":str(get_primary_group(u)),
         "staff_playtime": get_total_playtime_seconds(u),
-        "locked": -1,
+        "locked": 0 if (str(get_primary_group(u)) != DEFAULT_GROUP) and AUTO_VERIFY_STAFF else -1,
         "banned": 0,
         "punishments": {},
         "notify": 0
@@ -1442,9 +1447,10 @@ def get_primary_group(player):
         uid = UUID.fromString(player)
     else:
         uid = player.getUniqueId()
-    user = luckperms.getUserManager().loadUser(uid).join()
+    manager = luckperms.getUserManager()
+    user = manager.getUser(uid)
     if user is None:
-        return None
+        user = manager.loadUser(uid).join()
     return user.getPrimaryGroup()
 flag_data = {}
 
@@ -1649,46 +1655,43 @@ OWNERUUID = "ce120874-48ad-45e8-a4c5-a70790a56934"
 DEFAULT_GROUP="default"
 local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlinePlayers()],[0]*len(Bukkit.getOnlinePlayers()))}
 def load_async():
-    if not os.path.exists(FILE):
-        with open(FILE,"w") as f:
-            json.dump({},f) 
-    with open(FILE,"r") as f:
-        data=json.load(f)
-        changed = False
-        if "players" not in data:
-            data["players"] = data.copy()
-            changed = True
-        if "data_version" not in data:
-            data["data_version"] = 2
-            changed = True
-        if changed:
-            for p in Bukkit.getOnlinePlayers():
-                if p.isOp():
-                    ps.scheduler.scheduleTask(lambda: chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"])))
-            save(data)
-    ps.scheduler.scheduleTask(main)
+    global data
+    changed = False
+    if "players" not in data:
+        data["players"] = data.copy()
+        changed = True
+    if "data_version" not in data:
+        data["data_version"] = 2
+        changed = True
+    if data["data_version"] == 2:
+        data = {"players":data["players"].copy()}
+        data["data_version"] = 3
+        changed = True
+    if changed:
+        for p in Bukkit.getOnlinePlayers():
+            if p.isOp():
+                Bukkit.getScheduler().runTask(ps_plugin, lambda a: chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"])))
+        save(data)
+    Bukkit.getScheduler().runTask(ps_plugin, main)
 
 
 # Global data
 ps_plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 gdata = fetch_data()
 players = None
-data = None
+if not os.path.exists(FILE):
+    with open(FILE,"w") as f:
+        json.dump({},f) 
+with open(FILE,"r") as f:
+    data=json.load(f)
 last_action = {}  # UUID -> timestamp
 last_move = {}    # UUID -> (x, y, z, yaw, pitch)
 
 
 # Run  
-def main():
+def main(a):
     global data, players
-    if not os.path.exists(FILE):
-        with open(FILE,"w") as f:
-            json.dump({},f) 
-    with open(FILE,"r") as f:
-        data=json.load(f)
     players = data["players"]
-    for c in ["promote","suspend","demote","staffban","pardon","punish","activate","status","apply","warn"]:
-        ps.command.registerCommand(onCommand, onTabComplete, c)
     for ev in [
         PlayerInteractEvent,
         AsyncPlayerChatEvent]:
@@ -1703,4 +1706,6 @@ def main():
     ps.scheduler.scheduleRepeatingTask(tick, TICK_LOOP_INTERVAL_MS//50, TICK_LOOP_INTERVAL_MS//50)
     print("[Staff] Loaded.")
 # Finish 
-ps.scheduler.scheduleAsyncTask(load_async)
+for c in ["promote","suspend","demote","staffban","pardon","punish","activate","status","apply","warn"]:
+    ps.command.registerCommand(onCommand, onTabComplete, c)
+Bukkit.getScheduler().runTaskAsynchronously(ps_plugin, load_async)
