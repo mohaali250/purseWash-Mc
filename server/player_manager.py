@@ -1666,10 +1666,11 @@ def load_async():
                 if p.isOp():
                     Bukkit.getScheduler().runTask(ps, lambda: chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"])))
             save(data)
-    Bukkit.getScheduler().runTask(ps, main)
+    Bukkit.getScheduler().runTask(ps_plugin, main)
 
 
 # Global data
+ps_plugin = Bukkit.getPluginManager().getPlugin("PySpigot")
 gdata = fetch_data()
 players = None
 data = None
@@ -1702,4 +1703,4 @@ def main():
     ps.scheduler.scheduleRepeatingTask(tick, TICK_LOOP_INTERVAL_MS//50, TICK_LOOP_INTERVAL_MS//50)
     print("[Staff] Loaded.")
 # Finish 
-Bukkit.getScheduler().runTaskAsynchronously(ps, load_async)
+Bukkit.getScheduler().runTaskAsynchronously(ps_plugin, load_async)
