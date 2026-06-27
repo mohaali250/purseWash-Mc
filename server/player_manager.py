@@ -254,12 +254,12 @@ def ensure(u):
         "punishments": {},
         "notify": 0
     }
-    if u not in data:
-        data[u] = defaults.copy()
+    if u not in players:
+        players[u] = defaults.copy()
     else:
         for k, default in defaults.items():
-            if k not in data[u]:
-                data[u][k] = default
+            if k not in players[u]:
+                players[u][k] = default
 def pretty_timedelta(timeinterval):
     if not isinstance(timeinterval,int):
         return None
@@ -314,13 +314,13 @@ def lp(cmd):
 def add_staff(name,rank):
     u=uuid(Bukkit.getOfflinePlayer(name))
     ensure(u)
-    d=data[u]
+    d=players[u]
     d["lpgroup"] = rank
     lp("user %s parent set %s"%(name,rank))
 def remove_staff(name,rank=""):
     u=uuid(Bukkit.getOfflinePlayer(name))
     ensure(u)
-    d=data[u]
+    d=players[u]
     d["lpgroup"] = DEFAULT_GROUP
     lp("user %s parent clear"%(name))
 def eligible(d):
@@ -398,7 +398,7 @@ def onCommand(sender,label,args):
     if hasattr(sender, "getUniqueId"):
         u=uuid(sender)
         ensure(u)
-        f=data[u]
+        f=players[u]
     allowed = ["owner","manager"]
     if cmd=="promote":
         if not sender.hasPermission("staffmanager.promote"):
@@ -415,7 +415,7 @@ def onCommand(sender,label,args):
             return True
         u=uuid(target)
         ensure(u)
-        d=data[u]
+        d=players[u]
         if len(args)!=2:
             chat_log(sender,2,"Command \"/promote\" requires exactely 2 arguments (%s were given)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
             return True
@@ -450,7 +450,7 @@ def onCommand(sender,label,args):
             return True
         u=uuid(target)
         ensure(u)
-        d=data[u]
+        d=players[u]
         if d["staff"] == "":
             chat_log(sender,1,"Cannot suspend %s because they arent a staff member",variables=(args[0]))
             return True
@@ -488,7 +488,7 @@ def onCommand(sender,label,args):
             return True
         u=uuid(target)
         ensure(u)
-        d=data[u]
+        d=players[u]
         if d["staff"] == "":
             chat_log(sender,1,"Cannot demote %s because they arent a staff member",variables=(args[0]))
             return True
@@ -528,7 +528,7 @@ def onCommand(sender,label,args):
             return True
         u=uuid(target)
         ensure(u)
-        d=data[u]
+        d=players[u]
         
         if d["staff"] == "":
             chat_log(sender,1,"Cannot staff ban %s because they arent a staff member",variables=(args[0]))
@@ -568,7 +568,7 @@ def onCommand(sender,label,args):
             return True
         u=uuid(target)
         ensure(u)
-        d=data[u]
+        d=players[u]
 
         #Run start
 
@@ -676,7 +676,7 @@ def onCommand(sender,label,args):
             return True
         u=uuid(target)
         ensure(u)
-        d=data[u]
+        d=players[u]
         
         if len(args)<=1:
             chat_log(sender,1,"ParameterError : What are you gonna punish them for? (Expected at least 2 arguments, got %s)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
@@ -856,7 +856,7 @@ def onCommand(sender,label,args):
                 return True
             u=uuid(target)
             ensure(u)
-            d=data[u]
+            d=players[u]
             chat_log(sender,3,"Displaying %s as %s.",variables=("/status",args[1]))
         
         if section_show == 1 or section_show == 0:
@@ -1082,7 +1082,7 @@ def onCommand(sender,label,args):
             ensure(uuid(Bukkit.getOfflinePlayer(args[1])))
             player_uuid = uuid(Bukkit.getOfflinePlayer(args[1]))
             converter = getattr(__builtin__, args[3])
-            data[player_uuid][args[2]] = converter(" ".join(args[4:]))
+            players[player_uuid][args[2]] = converter(" ".join(args[4:]))
         if section_show == 5:
             if not sender.hasPermission("staffmanager.get_data"):
                 chat_log(sender,1,"%s are not permitted to use this argument/subcommand",variables=("You"),_type=exception_type.PERMISSION_ERROR)
@@ -1094,7 +1094,7 @@ def onCommand(sender,label,args):
                 return True
             u=uuid(target)
             ensure(u)
-            d=data[u]
+            d=players[u]
             sender.sendMessage("Raw data of %s:" % (args[1]))
             for i, v in d.items():
                 sender.sendMessage("")
@@ -1173,7 +1173,7 @@ def onCommand(sender,label,args):
             return True
         u=uuid(target)
         ensure(u)
-        d=data[u]
+        d=players[u]
         
         if len(args)<=1:
             chat_log(sender,1,"ParameterError : What are you gonna warn them for? (Expected at least 2 arguments, got %s)",variables=(str(len(args))),_type=exception_type.PARAMETER_ERROR)
@@ -1229,7 +1229,7 @@ def onCommand(sender,label,args):
             chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
         else:
             chat_log(sender,3,"Warned {highlight}%s{default_color} for {highlight}%s{default_color}." % (args[0]," ".join(args[1:])))
-            if has_atempted_a_valid_category: chat_log(sender,3,"Could not resolve the following arguments: %s. Check for player_manager.json if you missed a category, or check the spelling" % ("{default_color}, {highlight}".join(unresolved_arguments)))
+            if has_atempted_a_valid_category: chat_log(sender,3,"Could not resolve the following arguments: %s." % ("{default_color}, {highlight}".join(unresolved_arguments)))
             chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % (" ".join(args[1:])))
     save()  
     for p in Bukkit.getOnlinePlayers():
@@ -1316,7 +1316,7 @@ def onTabComplete(sender,alias,args):
             if len(args) == 3:
                 return typing_filter(
                     args[2],
-                    list(data[u].keys())
+                    list(players[u].keys())
                 )   
             # /status set <player> <key> <type>
             if len(args) == 4:
@@ -1331,7 +1331,7 @@ def onTabComplete(sender,alias,args):
                 )
             # /status set <player> <key> <type> <value>
             if len(args) == 5:
-                current = data[u].get(args[2])
+                current = players[u].get(args[2])
                 if isinstance(current, bool):
                     return typing_filter(args[4], ["True", "False"])
                 return [str(current)]
@@ -1340,7 +1340,7 @@ def session_notify(p):
     local_session_notify.setdefault(uuid(p), 0)
     u=uuid(p)
     ensure(u)
-    d=data[u]
+    d=players[u]
     if d["staff"] != "" and eligible_to_activate(d) and not _bit.read(local_session_notify[uuid(p)],0):
         chat_log(p,4,"You are now elegible to activate staff see /status")
         local_session_notify[uuid(p)] = _bit.write(local_session_notify[uuid(p)],0,True)
@@ -1380,7 +1380,7 @@ def session_notify(p):
 def is_legit_staff(p):
     u=uuid(p)
     ensure(u)
-    d=data[u]
+    d=players[u]
     group = get_primary_group(p)
     if group in gdata["ranks"]:
         if d["lpgroup"] == group:
@@ -1405,7 +1405,7 @@ def handle_join(event):
     p = event.getPlayer()
     u=uuid(p)
     ensure(u)
-    d=data[u]
+    d=players[u]
     local_session_notify[uuid(p)] = d["notify"]
     session_notify(p)
     p=event.getPlayer()
@@ -1635,7 +1635,7 @@ def tick():
     for p in Bukkit.getOnlinePlayers():
         u=uuid(p)
         ensure(u)
-        d=data[u]
+        d=players[u]
         if d["banned"] == 0 and (get_idle_time(p) < AFK_THRESHOLD or AFK_FULFILL):
             d["staff_playtime"]+=(now()-last_tick)
         session_notify(p)
@@ -1651,6 +1651,19 @@ if not os.path.exists(FILE):
         json.dump({},f) 
 with open(FILE,"r") as f:
     data=json.load(f)
+    changed = False
+    if "players" not in data:
+        data["players"] = data.copy()
+        changed = True
+    if "data_version" not in data:
+        data["data_version"] = 2
+        changed = True
+    if changed:
+        for p in Bukkit.getOnlinePlayers():
+            if p.isOp():
+                chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"]))
+        save()
+players = data["players"]
 
 last_action = {}  # UUID -> timestamp
 last_move = {}    # UUID -> (x, y, z, yaw, pitch)
