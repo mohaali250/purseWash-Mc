@@ -155,8 +155,9 @@ def fetch_data():
         traceback.print_exc()
         return None
 last_save = time.time()
-def save():
+def save(rdata={}):
     global last_save
+    if data is None: data = rdata
     if time.time() < last_save + SAVE_INTERVAL_MS/1000:return
     last_save = time.time()
     tmp = File(FILE + ".tmp")
@@ -1643,48 +1644,62 @@ def tick():
     save()
 
 # starter variables
+
 OWNERUUID = "ce120874-48ad-45e8-a4c5-a70790a56934"
 DEFAULT_GROUP="default"
 local_session_notify = {i: y for i, y in zip([uuid(k) for k in Bukkit.getOnlinePlayers()],[0]*len(Bukkit.getOnlinePlayers()))}
-if not os.path.exists(FILE):
-    with open(FILE,"w") as f:
-        json.dump({},f) 
-with open(FILE,"r") as f:
-    data=json.load(f)
-    changed = False
-    if "players" not in data:
-        data["players"] = data.copy()
-        changed = True
-    if "data_version" not in data:
-        data["data_version"] = 2
-        changed = True
-    if changed:
-        for p in Bukkit.getOnlinePlayers():
-            if p.isOp():
-                chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"]))
-        save()
-players = data["players"]
+def load_async():
+    if not os.path.exists(FILE):
+        with open(FILE,"w") as f:
+            json.dump({},f) 
+    with open(FILE,"r") as f:
+        data=json.load(f)
+        changed = False
+        if "players" not in data:
+            data["players"] = data.copy()
+            changed = True
+        if "data_version" not in data:
+            data["data_version"] = 2
+            changed = True
+        if changed:
+            for p in Bukkit.getOnlinePlayers():
+                if p.isOp():
+                    Bukkit.getScheduler().runTask(ps, lambda: chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"])))
+            save(data)
+    Bukkit.getScheduler().runTask(ps, main)
 
+
+# Global data
+gdata = fetch_data()
+players = None
+data = None
 last_action = {}  # UUID -> timestamp
 last_move = {}    # UUID -> (x, y, z, yaw, pitch)
 
 
 # Run  
-for c in ["promote","suspend","demote","staffban","pardon","punish","activate","status","apply","warn"]:
-    ps.command.registerCommand(onCommand, onTabComplete, c)
-for ev in [
-    PlayerInteractEvent,
-    AsyncPlayerChatEvent]:
-    ps.listener.registerListener(on_afk_general,ev)
-gdata = fetch_data()
-ps.listener.registerListener(onJoin, PlayerJoinEvent)
-ps.listener.registerListener(onQuit, PlayerQuitEvent)
-ps.listener.registerListener(onKick, PlayerKickEvent)
-ps.listener.registerListener(onMove, PlayerMoveEvent)
-ps.listener.registerListener(onDamage, EntityDamageByEntityEvent)
-if GRIM_EXISTS: ps.listener.registerListener(onFlag, FlagEvent)
-ps.listener.registerListener(on_command_event, PlayerCommandPreprocessEvent)
-ps.scheduler.scheduleRepeatingTask(tick, TICK_LOOP_INTERVAL_MS//50, TICK_LOOP_INTERVAL_MS//50)
-print("[Staff] Loaded.")
-
+def main():
+    global data, players
+    if not os.path.exists(FILE):
+        with open(FILE,"w") as f:
+            json.dump({},f) 
+    with open(FILE,"r") as f:
+        data=json.load(f)
+    players = data["players"]
+    for c in ["promote","suspend","demote","staffban","pardon","punish","activate","status","apply","warn"]:
+        ps.command.registerCommand(onCommand, onTabComplete, c)
+    for ev in [
+        PlayerInteractEvent,
+        AsyncPlayerChatEvent]:
+        ps.listener.registerListener(on_afk_general,ev)
+    ps.listener.registerListener(onJoin, PlayerJoinEvent)
+    ps.listener.registerListener(onQuit, PlayerQuitEvent)
+    ps.listener.registerListener(onKick, PlayerKickEvent)
+    ps.listener.registerListener(onMove, PlayerMoveEvent)
+    ps.listener.registerListener(onDamage, EntityDamageByEntityEvent)
+    if GRIM_EXISTS: ps.listener.registerListener(onFlag, FlagEvent)
+    ps.listener.registerListener(on_command_event, PlayerCommandPreprocessEvent)
+    ps.scheduler.scheduleRepeatingTask(tick, TICK_LOOP_INTERVAL_MS//50, TICK_LOOP_INTERVAL_MS//50)
+    print("[Staff] Loaded.")
 # Finish 
+Bukkit.getScheduler().runTaskAsynchronously(ps, load_async)
