@@ -1664,9 +1664,9 @@ def load_async():
         if changed:
             for p in Bukkit.getOnlinePlayers():
                 if p.isOp():
-                    ps.scheduler.runTask(lambda: chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"])))
+                    ps.scheduler.scheduleTask(lambda: chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"])))
             save(data)
-    ps.scheduler.runTask(main)
+    ps.scheduler.scheduleTask(main)
 
 
 # Global data
@@ -1703,4 +1703,4 @@ def main():
     ps.scheduler.scheduleRepeatingTask(tick, TICK_LOOP_INTERVAL_MS//50, TICK_LOOP_INTERVAL_MS//50)
     print("[Staff] Loaded.")
 # Finish 
-ps.scheduler.runTaskAsynchronously(load_async)
+ps.scheduler.scheduleAsyncTask(load_async)
