@@ -1,10 +1,10 @@
 {
     "Days_Since_last_pay":30,
-    "Credits":340,
+    "Credits":280,
     "Last_Updated":[
         2026,
-        5,
-        24
+        6,
+        28
     ],
     "load_type":"absolute",
     "required_credits":400,
