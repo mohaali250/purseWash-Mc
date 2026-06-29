@@ -12,7 +12,7 @@
 #GrimAc
 
 
-import json,random,datetime,time,re,os,__builtin__  # Python 2.7
+import json,random,datetime,time,re,os, math,__builtin__  # Python 2.7
 import pyspigot as ps
 from java.io import File
 from java.net import URL
@@ -57,9 +57,10 @@ else:
 try:
     from net.luckperms.api import LuckPerms
 except ImportError as imp:
-    LP_EXISTS=False
-else:
-    LP_EXISTS=True
+    for p in Bukkit.getOnlinePlayers:
+        if p.IsOp():
+            p.sendMessage(ChatColor.RED + "[StaffManager] LuckPerms is missing, this plugin will not work without it.")
+    raise ValueError("LuckPerms is missing, this plugin will not work without it.")
 
 CONFIG_FILE = File("plugins/PySpigot/staffmanager.yml")
 
@@ -67,6 +68,7 @@ config_defaults = {
     "staff.require-player-linked-for-staff": True,
     "staff.warn-unverified-staff": True,
     "staff.auto-verify-staff-when-has-lpgroup": True,
+    "staff.max-players-per-page-list": 10,
     "afk.threshold-seconds": 180,
     "afk.fulfill-requirement-with-afk": False,
     "performance.tick-ms": 1000,
@@ -105,6 +107,7 @@ if changed:
 REQUIRE_LINKED = cfg.getBoolean("staff.require-player-linked-for-staff")
 WARN_UNVERIFIED_STAFF = cfg.getBoolean("staff.warn-unverified-staff")
 AUTO_VERIFY_STAFF = cfg.getBoolean("staff.auto-verify-staff-when-has-lpgroup")
+MAX_PLAYERS_PER_PAGE = cfg.getInt("staff.max-players-per-page-list")
 # AFK SETTINGS
 AFK_THRESHOLD = cfg.getInt("afk.threshold-seconds")
 AFK_FULFILL = cfg.getBoolean("afk.fulfill-requirement-with-afk")
@@ -141,20 +144,34 @@ except (KeyError, ValueError) as ex:
 
 # functions
 def fetch_data():
-    try:
-        stream = URL(URL_DATA).openStream()
-        scanner = Scanner(stream).useDelimiter("\\A")
-        response = scanner.next() if scanner.hasNext() else None
-        scanner.close()
-        if response is None:
-            print("Response was None")
+    if URL_DATA.startswith("http://") or URL_DATA.startswith("https://"):
+        try:
+            stream = URL(URL_DATA).openStream()
+            scanner = Scanner(stream).useDelimiter("\\A")
+            response = scanner.next() if scanner.hasNext() else None
+            scanner.close()
+            if response is None:
+                print("Response was None")
+                return None
+            obj = json.loads(response)
+            return obj
+        except Exception as ex:
+            print("EXCEPTION:", ex)
+            import traceback
+            traceback.print_exc()
             return None
-        obj = json.loads(response)
-        return obj
-    except Exception as ex:
-        print("EXCEPTION:", ex)
-        import traceback
-        traceback.print_exc()
+    try:
+        with open(URL_DATA, "r") as f:
+            return json.load(f)
+    except IOError:
+        for p in Bukkit.getOnlinePlayers():
+            if p.IsOp():
+                p.sendMessage("[Staff Manager] The file path for the constants returned IOError. Perhaps the file doesnt exist?")
+        return None
+    except ValueError:
+        for p in Bukkit.getOnlinePlayers():
+            if p.IsOp():
+                p.sendMessage("[Staff Manager] Malformed json at the file constants")
         return None
 last_save = time.time()
 def save(rdata=None):
@@ -260,12 +277,22 @@ def ensure(u):
         "punishments": {},
         "notify": 0
     }
-    if u not in players:
-        players[u] = defaults.copy()
+    if u not in data["players"]:
+        data["players"][u] = defaults.copy()
     else:
         for k, default in defaults.items():
-            if k not in players[u]:
-                players[u][k] = default
+            if k not in data["players"][u]:
+                data["players"][u][k] = default
+    current_rank = None
+    for rank in data["ranks"]:
+        if u in data["ranks"][rank]["players"]:
+            current_rank = rank
+            break
+    expected_rank = data["players"][u]["lpgroup"]
+    if current_rank != expected_rank and expected_rank in data["ranks"]:
+        if current_rank is not None:
+            data["ranks"][current_rank]["players"].remove(u)
+        data["ranks"][expected_rank]["players"].append(u)
 def pretty_timedelta(timeinterval):
     if not isinstance(timeinterval,int):
         return None
@@ -296,7 +323,7 @@ def pretty_timedelta(timeinterval):
             text += "%d seconds " % (seconds)
     return text[:-1]
 def extended_staff_rank(string):
-    extended_ranks = {DEFAULT_GROUP:"Default","trainee":"Trainee","linked":"Linked","owner":"Owner"}
+    extended_ranks = {DEFAULT_GROUP:"Default","trainee":"Trainee","linked":"Linked","owner":"Owner","sub-user":"Sub User"}
     if string in gdata["ranks"].keys():
         return gdata["ranks"][string]["extended_name"]
     elif string in extended_ranks.keys():
@@ -321,12 +348,15 @@ def add_staff(name,rank):
     u=uuid(Bukkit.getOfflinePlayer(name))
     ensure(u)
     d=players[u]
+    if d["lpgroup"] in gdata["ranks"].keys(): data["ranks"][d["lpgroup"]]["players"].remove(uuid(Bukkit.getOfflinePlayer(name)))
     d["lpgroup"] = rank
+    if d["lpgroup"] in gdata["ranks"].keys(): data["ranks"][d["lpgroup"]]["players"].append(uuid(Bukkit.getOfflinePlayer(name)))
     lp("user %s parent set %s"%(name,rank))
 def remove_staff(name,rank=""):
     u=uuid(Bukkit.getOfflinePlayer(name))
     ensure(u)
     d=players[u]
+    if d["lpgroup"] in data["ranks"].keys(): data["ranks"][d["lpgroup"]]["players"].remove(uuid(Bukkit.getOfflinePlayer(name)))
     d["lpgroup"] = DEFAULT_GROUP
     lp("user %s parent clear"%(name))
 def eligible(d):
@@ -499,17 +529,16 @@ def onCommand(sender,label,args):
             chat_log(sender,1,"Cannot demote %s because they arent a staff member",variables=(args[0]))
             return True
 
-
         #Run start
         if DISCORD_EXISTS:
             plugin = DiscordSRV.getPlugin()
             manager = plugin.getAccountLinkManager()
-            if manager.getDiscordId(sender.getUniqueId()) is not None:
-                add_staff(sender.getName(),"linked")
+            if manager.getDiscordId(target.getUniqueId()) is not None:
+                add_staff(target.getName(),"linked")
             else:
-                remove_staff(sender.getName())
+                remove_staff(target.getName())
         else:
-            remove_staff(sender.getName())
+            remove_staff(target.getName())
         d["staff_playtime"]=0
         d["staff"]=""
         d["locked"]=-2
@@ -761,7 +790,7 @@ def onCommand(sender,label,args):
             if n in d["punishments"]:
                 d["punishments"][n] = {i: {"violations":gdata["punishments"][i]["actions"]["warn"]+d["punishments"][n],"proof":v+d["punishments"][n]["proof"]} for i,v in zip(i,proof_stack)}[n]
             else:
-                d["punishments"][n] = v[n] 
+                d["punishments"][n] = v
         if clear:
             _bit.write(d["notify"],6,True)
         if demote:
@@ -864,6 +893,8 @@ def onCommand(sender,label,args):
             ensure(u)
             d=players[u]
             chat_log(sender,3,"Displaying %s as %s.",variables=("/status",args[1]))
+        elif args[0] == "list":
+            section_show = 6
         
         if section_show == 1 or section_show == 0:
             sender.sendMessage(chatcolor("&8:=====================< &6STATUS &8>======================:"))
@@ -1105,6 +1136,73 @@ def onCommand(sender,label,args):
             for i, v in d.items():
                 sender.sendMessage("")
                 sender.sendMessage(" Key: %s\n Type: %s\n Value: %s\n" % (i, str(type(v)),str(v)))
+        if section_show == 6:
+            if args[1] == "@online":
+                selector = [uuid(p) for p in Bukkit.getOnlinePlayers()]
+            elif args[1] == "@all":
+                selector = data["players"].keys()
+            elif args[1] == "@staff":
+                selector = []
+                for i in data["ranks"]:
+                    selector += data["ranks"][i]["players"]
+            elif args[1] in gdata["ranks"]:
+                selector = data["ranks"][args[1]]["players"]
+            else:
+                chat_log(sender,1,"%s is either not a valid rank, or you forgot to register it at %s",variables=(args[1],URL_DATA))
+                if URL_DATA.startswith("http://") or URL_DATA.startswith("https://"):chat_log(sender,1,"If %s do not have acess to change this webfile contents please switch to a local file at staffmanager.yml",variables=("you"))
+                return True
+            
+            try:
+                page_display = int(args[2]) if len(args) >= 3 else 1
+                page = page_display - 1
+            except ValueError:
+                chat_log(sender,1,"%s is not a valid number!",variables=(args[2]))
+
+            selector_page = selector[MAX_PLAYERS_PER_PAGE*int(page):MAX_PLAYERS_PER_PAGE*(int(page)+1)]
+            max_page = max(0, (len(selector) - 1) // MAX_PLAYERS_PER_PAGE)  
+
+            if not 0 <= page <= max_page:
+                chat_log(sender,1,"Page %s is out of bounds (1-%s)",variables=(page_display,1+max_page),_type=exception_type.PARAMETER_ERROR)
+                return True
+            
+            sender.sendMessage(chatcolor("&8:===================< &6STAFF LIST &8>===================:"))
+            sender.sendMessage("")
+            for p in selector_page:
+                sender.sendMessage(
+                    chatcolor(
+                        "&8» &b%s &7- &f%s"
+                        % (
+                            extended_staff_rank(get_primary_group(Bukkit.getOfflinePlayer(UUID.fromString(p)))),
+                            Bukkit.getOfflinePlayer(UUID.fromString(p)).getName()
+                        )
+                    )
+                )
+            sender.sendMessage("")
+            message = interactable_message()
+            message.add("[Prev]", hover="Click to view the previous page", click_behavior=interactable_message.RUN_COMMAND, click="/status list %s %s" % (args[1], max(page_display-1, 0)))
+            message.add(
+                chatcolor(
+                    "&7 Page &b%s&7 of &b%s&7 "
+                    % (
+                        page_display,
+                        max_page + 1
+                    )
+                )
+            )
+            message.add("[Next]", hover="Click to view the next page", click_behavior=interactable_message.RUN_COMMAND, click="/status list %s %s" % (args[1], min(page_display + 1, max_page+1)))
+            message.send(sender)
+            sender.sendMessage("")
+            sender.sendMessage(
+                chatcolor(
+                    "&7From &b%s&7 to &b%s&7 of &b%s&7 Listed Players"
+                    % (
+                        page * MAX_PLAYERS_PER_PAGE + 1,
+                        min((page + 1) * MAX_PLAYERS_PER_PAGE, len(selector)),
+                        len(selector),
+                    )
+                )
+            )
+            sender.sendMessage(chatcolor("&8:====================================================:"))
     elif cmd=="apply":
         sender.sendMessage(chatcolor("&8:===================< &6APPLY &8>===================:"))
         sender.sendMessage("")
@@ -1235,12 +1333,36 @@ def onCommand(sender,label,args):
             chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % ("{default_color}, {highlight}".join(args[1:])))
         else:
             chat_log(sender,3,"Warned {highlight}%s{default_color} for {highlight}%s{default_color}." % (args[0]," ".join(args[1:])))
-            if has_atempted_a_valid_category: chat_log(sender,3,"Could not resolve the following arguments: %s." % ("{default_color}, {highlight}".join(unresolved_arguments)))
+            if has_atempted_a_valid_category: chat_log(sender,3,"Could not resolve the following arguments: {highlight}%s{default_color}." % ("{default_color}, {highlight}".join(unresolved_arguments)))
             chat_log(target,4,"You got warned for {highlight}%s{default_color}. More info on [/status]" % (" ".join(args[1:])))
     save()  
     for p in Bukkit.getOnlinePlayers():
         session_notify(p) 
     return True
+class interactable_message:
+    NONE = 0
+    RUN_COMMAND = 1
+    SUGGEST_COMMAND = 2
+    def __init__(self):
+        self.msg = TextComponent("")
+    def add(self, text, click_behavior=0, click="", hover=""):
+        component = TextComponent(text)
+        if click_behavior == 1:
+            component.setClickEvent(
+                ClickEvent(ClickEvent.Action.RUN_COMMAND, click)
+            )
+        if click_behavior == 2:
+            component.setClickEvent(
+                ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, click)
+            )
+        if hover != "":
+            component.setHoverEvent(
+                HoverEvent(HoverEvent.Action.SHOW_TEXT, Text(hover))
+            )
+        self.msg.addExtra(component)
+    def send(self, player):
+        player.spigot().sendMessage(self.msg)
+        del self
 def typing_filter(arg, options):
     try:
         prefix = arg.lower()
@@ -1291,7 +1413,7 @@ def onTabComplete(sender,alias,args):
         if cmd=="activate":
             return typing_filter(args[0],["staff"])
         if cmd=="status":
-            return typing_filter(args[0],["staff","punishments","set","get","as"]) if sender.hasPermission("staffmanager.get_data") else typing_filter(args[0],["staff","punishments"])
+            return typing_filter(args[0],["staff","punishments","set","get","as","list"]) if sender.hasPermission("staffmanager.get_data") else typing_filter(args[0],["staff","punishments"])
         return get_players(args[-1])
     if len(args)==2:
         if any([i==cmd for i in ["suspend","staffban"]]):
@@ -1299,6 +1421,8 @@ def onTabComplete(sender,alias,args):
         if cmd=="status":
             if args[0] == "set" or args[0] == "get":
                 return get_players(args[-1])
+            if args[0] == "list":
+                return typing_filter(args[1],gdata["ranks"].keys()+["@online","@all","@staff"])
             return get_players(args[-1])
         if cmd=="punish":
             return typing_filter(args[1],list([gdata["punishments"][h]["meta"]["internal_name"] for h in gdata["punishments"].keys()]))
@@ -1667,10 +1791,27 @@ def load_async():
         data = {"players":data["players"].copy()}
         data["data_version"] = 3
         changed = True
+    if data["data_version"] == 3:
+        Bukkit.getScheduler().runTask(ps_plugin, lambda a: [chat_log(p,1,"Running possible expensive data update, plugin commands and features cannot proceed on this state until this is finished.") for p in Bukkit.getOnlinePlayers() if p.isOp()])
+        data["ranks"] = {
+            rank: {"players": []}
+            for rank in gdata["ranks"]
+        }
+        for i, v in data["players"].items():
+            if v["lpgroup"] in gdata["ranks"].keys():
+                data["ranks"][v["lpgroup"]]["players"].append(i)
+        data["data_version"] = 4
+        changed = True
+    if data["data_version"] == 4:
+        Bukkit.getScheduler().runTask(ps_plugin, lambda a: [chat_log(p,1,"Running possible expensive data update, plugin commands and features cannot proceed on this state until this is finished.") for p in Bukkit.getOnlinePlayers() if p.isOp()])
+        for offline in Bukkit.getOfflinePlayers():
+            ensure(uuid(offline))
+        data["data_version"] = 5
+        changed = True
     if changed:
         for p in Bukkit.getOnlinePlayers():
             if p.isOp():
-                Bukkit.getScheduler().runTask(ps_plugin, lambda a: chat_log(p,1,"Variable data file was updated to the latest version (%s)" % (data["data_version"])))
+                Bukkit.getScheduler().runTask(ps_plugin, lambda a: [chat_log(p,0,"Variable data file was updated to latest version (%s).",variables=(data["data_version"])) for p in Bukkit.getOnlinePlayers() if p.isOp()])
         save(data)
     Bukkit.getScheduler().runTask(ps_plugin, main)
 
