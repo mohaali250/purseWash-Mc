@@ -1,0 +1,297 @@
+punishments:
+  "0":
+    meta:
+      internal_name: failed_report
+      name: Failed Report
+      reason: Failing to report
+    actions:
+      warn: 0
+      punish:
+        - ban: 1d
+
+  "1":
+    meta:
+      internal_name: staff.failed_punishment
+      name: Failed Punishment
+      reason: Failing to Punish a rule breaking player
+    actions:
+      warn: 0
+      punish:
+        - staff_ban: 1wk
+
+  "2":
+    meta:
+      internal_name: staff.unauthorized_changes
+      name: Unauthorized Changes
+      reason: Changed/Updated contents of the server
+    actions:
+      warn: 0
+      punish:
+        - suspend_staff: 5wk
+
+  "3":
+    meta:
+      internal_name: attempt_loophole_rule
+      name: Attempted Rule Loophole
+      reason: Attempted to loophole a rule
+    actions:
+      warn: 0
+      punish:
+        - staff_ban: 3wk
+
+  "4":
+    meta:
+      internal_name: advertising
+      name: Advertising
+      reason: Advertising
+    actions:
+      warn: 0
+      punish:
+        - mute: 1wk
+        - ban: 3d
+
+  "5":
+    meta:
+      internal_name: staff.usage_nbt
+      name: Unauthorized NBT Usage
+      reason: Used unauthorized nbt items
+    actions:
+      warn: 0
+      punish:
+        - clear: {}
+        - staff_ban: 4wk
+
+  "6":
+    meta:
+      internal_name: chat.threats_irl
+      name: IRL Threats
+      reason: Threatened for irl things
+    actions:
+      warn: 0
+      punish:
+        - mute: true
+        - ban: 12wk
+
+  "7":
+    meta:
+      internal_name: chat.threats_mc
+      name: In-Game Threats
+      reason: Threatened in-game
+    actions:
+      warn: 0
+      punish:
+        - mute: 4wk
+        - ban: 1wk
+        - staff_ban: true
+
+  "8":
+    meta:
+      internal_name: chat.gender_discrimination
+      name: Gender Discrimination
+      reason: Discrimination against other genders
+    actions:
+      warn: 0
+      punish:
+        - mute: 1wk
+        - ban: 3d
+        - staff_ban: true
+
+  "9":
+    meta:
+      internal_name: staff.unauthorized_config_change
+      name: Unauthorized Config Change
+      reason: Altered a config file without consent
+    actions:
+      warn: 0
+      punish:
+        - demote: {}
+        - ban: true
+
+  "10":
+    meta:
+      internal_name: staff.griefing
+      name: Staff Griefing
+      reason: Griefing server contents
+    actions:
+      warn: 0
+      punish:
+        - ban: true
+        - demote: {}
+
+  "11":
+    meta:
+      internal_name: irl_trading
+      name: IRL Trading
+      reason: Trading server items for real goods or money
+    actions:
+      warn: 0
+      punish:
+        - ban: 2wk
+        - clear: {}
+
+  "12":
+    meta:
+      internal_name: incomplete_punishment
+      name: Incomplete Punishment
+      reason: Lacking info for punishment. Use /punish for auto info
+    actions:
+      warn: 0
+      punish:
+        - suspend_staff: 2d
+
+  "13":
+    meta:
+      internal_name: unreasoned_punishment
+      name: Unreasoned Punishment
+      reason: Punishing without a cause / Missing proof of rule breaking
+    actions:
+      warn: 0
+      punish:
+        - demote: {}
+
+  "14":
+    meta:
+      internal_name: macros
+      name: Macros
+      reason: Using macros for automated actions
+    actions:
+      warn: 0
+      punish:
+        - ban: 14d
+
+  "15":
+    meta:
+      internal_name: chat.chatbot
+      name: Chatbot Usage
+      reason: Using chatbots implemented into user messages to automate messages
+    actions:
+      warn: 0
+      punish:
+        - mute: 2d
+
+  "16":
+    meta:
+      internal_name: cheating.combat
+      name: Combat Cheats
+      reason: Using hacked clients for unfair advantage (Combat related hacks)
+    actions:
+      warn: 0
+      punish:
+        - ban: 2wk
+
+  "17":
+    meta:
+      internal_name: cheating.prediction
+      name: Movement Cheats
+      reason: Using hacked clients for unfair advantage (Fly / Movement related hacks)
+    actions:
+      warn: 0
+      punish:
+        - ban: 2wk
+
+  "18":
+    meta:
+      internal_name: cheating.scaffolding
+      name: Scaffolding Cheats
+      reason: Using hacked clients for unfair advantage (Scaffolding hacks)
+    actions:
+      warn: 0
+      punish:
+        - ban: 2wk
+
+  "19":
+    meta:
+      internal_name: cheating.breaking
+      name: Breaking Cheats
+      reason: Using hacked clients for unfair advantage (Breaking hacks)
+    actions:
+      warn: 0
+      punish:
+        - ban: 2wk
+
+  "20":
+    meta:
+      internal_name: duping
+      name: Duping
+      reason: Duping items
+    actions:
+      warn: 0
+      punish:
+        - ban: 2wk
+        - clear: {}
+
+  "21":
+    meta:
+      internal_name: chat.nsfw
+      name: NSFW Chat
+      reason: Talking about nsfw topics
+    actions:
+      warn: 0
+      punish:
+        - ban: true
+
+  "22":
+    meta:
+      internal_name: action.nsfw
+      name: NSFW Actions
+      reason: Doing nsfw topics
+    actions:
+      warn: 0
+      punish:
+        - ban: true
+
+  "23":
+    meta:
+      internal_name: chat.racism
+      name: Racism
+      reason: Being racist in chat
+    actions:
+      warn: 0
+      punish:
+        - ban: 3d
+        - mute: 1wk
+
+  "24":
+    meta:
+      internal_name: chat.swearing
+      name: Swearing
+      reason: Swearing in chat
+    actions:
+      warn: 0
+      punish:
+        - mute: 1h
+
+  "25":
+    meta:
+      internal_name: chat.spamming
+      name: Spamming
+      reason: Spamming / flooding in chat
+    actions:
+      warn: 0
+      punish:
+        - ban: 1d
+
+ranks:
+  helper:
+    required_playtime: 8h
+    extended_name: Helper
+
+  mod:
+    required_playtime: 9h
+    extended_name: Moderator
+
+  admin:
+    required_playtime: 12h
+    extended_name: Administrator
+
+  builder:
+    required_playtime: 24h
+    extended_name: Builder
+
+  dev:
+    required_playtime: 36h
+    extended_name: Developer
+
+  manager:
+    required_playtime: 96h
+    extended_name: Manager
